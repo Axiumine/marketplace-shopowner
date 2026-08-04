@@ -1,0 +1,34 @@
+# Endpoint: /authenticated-authorization (marketplace-dev-authenticated-authorization, port 4029)
+#
+# Hand-maintained slice — see the header of public-authorization.graphql for why there is no SDL to
+# pull. Verified on 2026-08-04 against:
+#   src/graphQLApi/schema/queries.mts
+#   src/graphQLApi/schema/mutations.mts
+#   src/graphQLApi/schema/mutations/refresh.mts
+#   src/graphQLApi/schema/types/RefreshType.mts
+#
+# ⚠️ `RefreshType` has exactly two fields, and `refreshToken` is deliberately not among them. The
+# refresh token is set as a signed httpOnly cookie by `setLoginCookies`, so the browser never sees its
+# value and must never try to. Selecting it returns a validation error, not a token.
+
+schema {
+	query: QueriesApi
+	mutation: MutationsApi
+}
+
+type QueriesApi {
+	helloRefresh: String!
+}
+
+type MutationsApi {
+	"""
+	Consumes the refresh-token cookie, mints a new access/refresh pair, rotates the cookie and
+	deletes the used refresh key from Redis.
+	"""
+	refresh: RefreshType!
+}
+
+type RefreshType {
+	status: Boolean!
+	accessToken: String!
+}

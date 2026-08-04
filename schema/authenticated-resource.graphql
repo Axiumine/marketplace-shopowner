@@ -1,0 +1,165 @@
+# Endpoint: /authenticated-resource (marketplace-dev-authenticated-resource, port 4026)
+#
+# Hand-maintained slice — see the header of public-authorization.graphql for why there is no SDL to
+# pull. Verified field by field on 2026-08-04 against:
+#   src/graphQLApi/schema/queries.mts               → shopOwnerCompanies
+#   src/graphQLApi/schema/mutations.mts             → companyAdd, companyDel, companyUpdate
+#   src/graphQLApi/schema/types/GraphQLCompany.mts
+#   src/graphQLApi/schema/GraphQLInput/GraphQLInputCompany.mts
+#   @thedoctorweb_agency/marketplace-common/schema/types/fragments/GraphQLBaseAddressFrag
+#   @thedoctorweb_agency/marketplace-common/schema/types/fragments/GraphQLAddressFrag
+#   @thedoctorweb_agency/marketplace-common/schema/types/fragments/GraphQLPositionFrag
+#   @axiumine/koa-utils/graphQL/schema/types/OnlyIdType
+#
+# ⚠️ **This is the whole authenticated surface of the ShopOwner tier — one query and three mutations.**
+# It is not a subset kept small for this app's benefit; the service has nothing else. Anything the
+# operator app does that is missing here (a profile after login, a password change, stats, a period
+# breakdown, a paginated table) has no ShopOwner-tier resolver at all, and adding a screen for it means
+# writing one in `marketplace-dev-authenticated-resource` first.
+#
+# ⚠️ **Three of these four names also exist on the Admin tier with different signatures.** There,
+# `shopOwnerCompanies` takes `idShopOwner`, and `companyAdd` takes `(idShopOwner, company)` and answers
+# `Boolean`. Point this app's resource endpoint at `/admin-authenticated-resource` by mistake and the
+# failure is a GraphQL *validation* error about unknown arguments, never a 404 — see the note in
+# src/env.ts.
+
+schema {
+	query: QueriesApi
+	mutation: MutationsApi
+}
+
+type QueriesApi {
+	"""
+	The signed-in owner's live companies.
+
+	Takes no arguments, and that is the tenant boundary: the resolver filters on
+	`idShopOwner: ctx.state.user._id` — the Redis session behind the access token — and on
+	`deleted: { $exists: false }`. There is no id for a client to supply and none for it to get wrong.
+	"""
+	shopOwnerCompanies: [GraphQLCompany!]!
+}
+
+type MutationsApi {
+	"""
+	Creates a company for the signed-in owner, stamping `idShopOwner` from the session.
+
+	Answers the new `_id` rather than a boolean — the Admin tier's namesake answers `Boolean` — because
+	the owner's own flow creates the company and then hangs things off it.
+
+	A duplicate `vatNumber` or `certifiedEmail` surfaces as a 409 through `tryCatchRethrow`, not as a
+	`false`: both indexes are plain global uniques with no partial filter, so a retired company keeps its
+	partita IVA occupied for good.
+	"""
+	companyAdd(company: GraphQLInputCompany!): OnlyIdType!
+
+	"""
+	Saves a company of the signed-in owner. `throwIfShopOwnerDontOwnCompany` runs first, so a company
+	belonging to someone else — or one already retired — answers 403 rather than writing anything.
+
+	The whole object is `$set`, so a field the owner cleared is cleared in the document: send every
+	field, not a diff. A filter miss is a 500 (`matchedCount !== 1`); a write that matched and changed
+	nothing is a plain `true`.
+	"""
+	companyUpdate(_id: ID!, company: GraphQLInputCompany!): Boolean!
+
+	"""
+	Soft-deletes a company: stamps `deleted` with a date, leaves the row in place.
+
+	⚠️ Deleting one already deleted answers **403** on this tier, where the Admin tier answers 200 — the
+	difference is `throwIfShopOwnerDontOwnCompany`, which filters `deleted` and which only this tier
+	runs. Both are correct: liveness belongs on the ownership guard, not on the delete write itself.
+	"""
+	companyDel(_id: ID!): Boolean!
+}
+
+"""
+A registered company. `idShopOwner` is exposed even though every read path here already filters by the
+session's owner: a field the server refuses to state is one the client has to infer.
+
+`taxCode` and `uniqueCode` are the only nullable fields — the collection stores them when given and
+leaves them out otherwise, which is not the same as storing an empty string.
+"""
+type GraphQLCompany {
+	_id: ID!
+	idShopOwner: ID!
+	"""
+	Ragione sociale.
+	"""
+	legalName: String!
+	"""
+	Partita IVA. Globally unique across the platform, forever — see `companyAdd`.
+	"""
+	vatNumber: String!
+	"""
+	Codice fiscale, when it differs from the partita IVA.
+	"""
+	taxCode: String
+	contactPerson: String!
+	administrator: String!
+	"""
+	Codice univoco / SDI, for electronic invoicing.
+	"""
+	uniqueCode: String
+	"""
+	PEC. Unique across the platform on the same terms as `vatNumber`.
+	"""
+	certifiedEmail: String!
+	address: GraphQLCompanyAddress!
+	"""
+	Visura camerale — the stored filename.
+	"""
+	registryExtract: String!
+}
+
+type GraphQLCompanyAddress {
+	street: String!
+	postalCode: String!
+	city: String!
+	province: String!
+	position: GraphQLCompanyPosition!
+}
+
+"""
+GeoJSON `Point`. `coordinates` is [longitude, latitude], in that order, and `Float` rather than `Int`
+— as `Int` the schema rejected every real latitude before a resolver ever ran.
+"""
+type GraphQLCompanyPosition {
+	type: String!
+	coordinates: [Float!]!
+}
+
+"""
+The company as the owner fills it in: `GraphQLCompany` minus the two fields the server owns — `_id`,
+and `idShopOwner`, which comes from the session and is never an argument on this tier.
+"""
+input GraphQLInputCompany {
+	legalName: String!
+	vatNumber: String!
+	taxCode: String
+	contactPerson: String!
+	administrator: String!
+	uniqueCode: String
+	certifiedEmail: String!
+	address: GraphQLInputCompanyAddress!
+	registryExtract: String!
+}
+
+input GraphQLInputCompanyAddress {
+	street: String!
+	postalCode: String!
+	city: String!
+	province: String!
+	position: GraphQLInputCompanyPosition!
+}
+
+input GraphQLInputCompanyPosition {
+	type: String!
+	coordinates: [Float!]!
+}
+
+"""
+Shared by koa-utils: the id of something just created, and nothing else.
+"""
+type OnlyIdType {
+	_id: ID!
+}

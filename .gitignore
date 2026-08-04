@@ -1,0 +1,35 @@
+node_modules/
+*.iml
+.idea/
+*.log*
+.DS_STORE
+coverage/
+.env
+.env.*
+!.env.example
+dist/
+.yarnrc
+TODO
+nohup.out
+*.orig
+.npmrc
+
+# Vite
+.vite/
+dev-dist/
+
+# Stryker
+reports/
+.stryker-tmp/
+.env*.bak
+
+# TLS certs for the https dev server. Never committed — the key is a private key.
+certs/
+
+# GitNexus index storage. The committed part is .gitnexusrc at the repo root.
+.gitnexus/
+
+# Qodana — scan results (SARIF + report), written by .githooks/pre-commit and pre-push.
+# They pass --results-dir .qodana/results so the SARIF is readable from the repo root
+# after a failed gate, rather than under ~/.cache/JetBrains/Qodana/<project-hash>/.
+.qodana/

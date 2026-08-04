@@ -1,0 +1,38 @@
+# Committed placeholder template. Copy to `.env` (git-ignored) and fill in the real values.
+# Never commit `.env`: the pre-commit hook refuses it, and a value printed to a terminal in this
+# workspace is written in plaintext to the session transcript and cannot be un-sent.
+
+# Dev server port. Read by vite.config.ts via `loadEnv`, so this file is the single place the port
+# is written — the same invariant every backend service holds.
+PORT=3044
+
+# ── GraphQL endpoints ─────────────────────────────────────────────────────────
+# Paths, not URLs. The SPA and the four services are served from one origin (nginx in production,
+# the vite proxy table in development), because the refresh token is a signed httpOnly cookie: a
+# cross-origin request would need `SameSite=None` on the cookie plus a CORS allow-list on every
+# service to carry it. Same origin makes `credentials: 'include'` sufficient on its own.
+#
+# The paths below are the `ENDPOINT` constants exported by each service's src/index.mts. Changing
+# one here without changing it there produces a 404, not a GraphQL error — with one exception worth
+# knowing about: `/admin-authenticated-resource` serves `shopOwnerCompanies`, `companyAdd`,
+# `companyUpdate` and `companyDel` under the same names as `/authenticated-resource` but with
+# different arguments, so pointing the resource line at the admin service answers 200 with a GraphQL
+# validation error about unknown arguments. See the note in src/env.ts.
+VITE_GRAPHQL_ENDPOINT_PUBLIC_AUTHORIZATION=/public-authorization
+VITE_GRAPHQL_ENDPOINT_AUTHENTICATED_AUTHORIZATION=/authenticated-authorization
+VITE_GRAPHQL_ENDPOINT_AUTHENTICATED_RESOURCE=/authenticated-resource
+VITE_GRAPHQL_ENDPOINT_LOGOUT=/logout
+
+# ── Sentry ────────────────────────────────────────────────────────────────────
+# Leave the DSN empty to disable reporting entirely (src/instrument.ts skips init without one).
+# The real DSN is a secret: it lives in .env only.
+VITE_SENTRY_DSN=
+VITE_SENTRY_ENVIRONMENT=development
+
+# ── Qodana Ultimate Plus ──────────────────────────────────────────────────────
+# Project token from https://qodana.cloud (project settings → token).
+# Required by the local pre-merge gate to run the paid `jetbrains/qodana-js:2026.2`
+# linter and to enable coverage / license-audit / taint inspections.
+# Per repository: create a `marketplace-shopowner` project of its own. Reusing a backend
+# service's token files this repo's reports under that project and corrupts its baseline.
+QODANA_TOKEN=

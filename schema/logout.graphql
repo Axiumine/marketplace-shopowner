@@ -1,0 +1,23 @@
+# Endpoint: /logout (marketplace-dev-authenticated-logout, port 4030)
+#
+# Hand-maintained slice — see the header of public-authorization.graphql. Verified on 2026-08-04
+# against src/graphQLApi/schema/queries.mts and src/graphQLApi/schema/mutations/logout.mts.
+#
+# This is the ShopOwner tier's own logout service, and the operator app calls it too. That is correct
+# rather than a leak in either direction: `authorizationLogoutHandler` resolves the bearer token
+# straight out of Redis and never opens a collection, so it is tier-agnostic by construction. The
+# resolver deletes the refresh key, deletes the access key if one is present, clears the cookie, and
+# returns `true` whatever happened — a logout that fails still has to log the owner out.
+
+schema {
+	query: QueriesApi
+	mutation: MutationsApi
+}
+
+type QueriesApi {
+	helloLogout: String!
+}
+
+type MutationsApi {
+	logout: Boolean!
+}

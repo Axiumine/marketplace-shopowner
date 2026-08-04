@@ -1,0 +1,52 @@
+# Endpoint: /public-authorization (marketplace-dev-public-authorization, port 4028)
+#
+# HAND-MAINTAINED SLICE, NOT A DUMP. The seven backend services build their schemas
+# programmatically with graphql-js (`new GraphQLObjectType`), so there is no SDL file anywhere on the
+# platform to copy. Read the resolvers and write the slice by hand; anything that looks like a ready-
+# made SDL for this platform is not one.
+#
+# What is below was read off the resolvers and verified field by field on 2026-08-04:
+#   src/graphQLPublic/schema/mutations.mts
+#   src/graphQLPublic/schema/mutations/login.mts
+#   @axiumine/koa-utils/graphQL/schema/types/LoginAppType
+#
+# It contains only what this app calls. `loginAdmin` shares this endpoint and is deliberately absent:
+# this app never calls it, and codegen only needs to type what the documents under
+# src/api/operations/publicAuthorization/ actually ask for.
+#
+# To re-verify after a backend change, diff against those files. There is no introspection endpoint to
+# pull from — the services only expose introspection to callers holding `x-introspectioncode`, which is
+# a secret and must never reach a browser client or a committed script.
+
+schema {
+	query: QueriesPublic
+	mutation: MutationsPublic
+}
+
+type QueriesPublic {
+	authPublicHello: String!
+}
+
+type MutationsPublic {
+	"""
+	The ShopOwner-tier login: checks the address against the `shopOwner` collection, mints an
+	access/refresh pair and sets the refresh token as a signed httpOnly cookie.
+	"""
+	login(email: String!, password: String!, rememberMe: Boolean!): LoginAppType!
+}
+
+"""
+Returned by every login on the platform.
+
+⚠️ The two onboarding fields are the ShopOwner tier's own, and they are the ones this app would care
+about — but `login.mts` never fills them in. It declares `let onboardingStep = ''` / `let
+onboardingDone = false`, computes the real step into a `const step` inside the transaction, writes
+that into the Redis payload, and returns the two untouched locals. So the mutation answers `''` and
+`false` for every owner regardless of their actual state. The documents select them anyway, so that
+nothing has to change here when the resolver is fixed — but **no code may branch on them until it is**.
+"""
+type LoginAppType {
+	accessToken: String!
+	onboardingStep: String!
+	onboardingDone: Boolean!
+}
