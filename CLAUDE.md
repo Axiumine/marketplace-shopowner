@@ -2,7 +2,7 @@
 
 Shop-owner SPA (`ShopOwner` tier) for Marketplace. Vite + React + TypeScript. Read the parent
 workspace's `/media/nvme/websites/fullstack-marketplace-blueprint/CLAUDE.md` first — this is one of
-eleven repos and almost nothing here is changeable on its own.
+fourteen sub-repos and almost nothing here is changeable on its own.
 
 **A shop owner sees their own companies and nothing else.** That is not enforced by anything in this
 app: `shopOwnerCompanies`, `companyAdd`, `companyUpdate` and `companyDel` take no owner id, and the
@@ -40,7 +40,7 @@ The other three paths do 404 when mistyped. Dev port is **3044**; the operator a
 
 ## Do not trust `schema/*.graphql`
 
-The platform has **no SDL**. All seven backend services build their schema programmatically with
+The platform has **no SDL**. All nine backend services build their schema programmatically with
 graphql-js. The four files under `schema/` are hand-written slices, kept only because graphql-codegen
 needs a schema to type documents against.
 
@@ -121,7 +121,8 @@ That is what lets a page be rendered in a test without a router assertion in the
   four slices declare root types literally named `QueriesApi` / `MutationsApi`, so a merge collides
   `refresh`, `logout` and `companyAdd` onto one type.
 - **Indentation is tabs** (eslint `indent: ['error','tab']`). Prettier: no semicolons, single quotes,
-  `trailingComma: "none"`, `printWidth: 129`, `useTabs: true` — byte-identical to the other ten repos.
+  `trailingComma: "none"`, `printWidth: 129`, `useTabs: true` — byte-identical to the other twelve
+  repos that carry a `.prettierrc`.
   `lint` runs `eslint --fix . && prettier --write .` and `lint:check` runs both read-only, over the
   **whole tree**, not `src/`. What is out of scope lives in `.prettierignore`, and markdown is in
   there on purpose: `proseWrap: "never"` would flatten every hand-wrapped paragraph in these docs onto
