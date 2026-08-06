@@ -152,17 +152,15 @@ That is what lets a page be rendered in a test without a router assertion in the
 
 ## Tests
 
-⚠️ **There are none yet.** No `test/` directory was copied when this repo was mirrored — the operator
-app's suite is written against its own screens and none of it applies to these. The harness is in
-place (`vitest.config.ts`, `vitest.setup.ts`, `stryker.config.mjs`, the `test:*` scripts), so what is
-missing is the tests themselves.
+**497 tests over 38 files, 100% coverage on all four metrics, 100% mutation score** — the same bar as
+every other repo on the platform. `git commit --no-verify` is no longer needed here and must not be
+used; a red gate is fixed with a test, never by lowering a threshold or deleting the gate. See
+`COVERAGE.md` for the layers and for what to do with a Stryker survivor.
 
-Consequence, and state it plainly rather than working around it silently: **a commit here needs
-`git commit --no-verify`** while `.githooks/pre-commit` still gates coverage. Do not lower a threshold
-to get a commit through, and do not delete the gate — every other repo on the platform runs at 100%
-coverage and 100% mutation score and this one is expected to join them. `COVERAGE.md` describes the
-target; the conventions below are what the operator app's suite established, kept here so the first
-test written does not reinvent them:
+The suite was seeded from the operator app's (`cp -r ../marketplace-admin/test/.`) and adapted file by
+file, so its conventions are the ones below. Where it diverges, the divergence is a tier difference:
+no `ShopOwnerById` fixture and no id in any URL, a two-section sidebar, and a `CompaniesPage.test.tsx`
+with no counterpart there. The conventions themselves:
 
 - **GraphQL is stubbed at `fetch`**, not with a mock urql client. Everything above `fetch` is then
   real: the cache, the 498 retry, the status extraction, the session teardown. Replies are queued per

@@ -1,0 +1,28 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Alert > renders the error tone 1`] = `
+<div
+  class="rounded-box border px-4 py-3 text-sm border-app-error bg-app-error/10 text-app-error"
+  role="alert"
+>
+  Message
+</div>
+`;
+
+exports[`Alert > renders the info tone 1`] = `
+<div
+  class="rounded-box border px-4 py-3 text-sm border-third bg-secondary/40 text-palette-bg"
+  role="status"
+>
+  Message
+</div>
+`;
+
+exports[`Alert > renders the success tone 1`] = `
+<div
+  class="rounded-box border px-4 py-3 text-sm border-app-ok bg-app-ok/10 text-app-ok"
+  role="status"
+>
+  Message
+</div>
+`;

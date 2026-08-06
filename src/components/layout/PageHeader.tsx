@@ -1,6 +1,5 @@
 import type { LinkProps } from '@tanstack/react-router'
 import { Link } from '@tanstack/react-router'
-import type { ReactNode } from 'react'
 
 export interface Crumb {
 	readonly name: string
@@ -12,17 +11,15 @@ export interface Crumb {
 }
 
 /**
- * Title, breadcrumbs and a slot for the section buttons — the strip every page opens with.
+ * Title and breadcrumbs — the strip every page opens with.
+ *
+ * ⚠️ No `actions` slot, unlike the operator app's, where four pages hang a section menu off it. The two
+ * pages here have nothing to put in one: the companies page's only control is "New company", and it
+ * belongs beside the list it adds to rather than beside the page title. A slot no page fills is a branch
+ * no test can reach except by rendering the component nothing renders — add it back the day a page needs
+ * it, with that page's test.
  */
-export const PageHeader = ({
-	title,
-	crumbs = [],
-	actions
-}: {
-	title: string
-	crumbs?: readonly Crumb[]
-	actions?: ReactNode
-}) => (
+export const PageHeader = ({ title, crumbs = [] }: { title: string; crumbs?: readonly Crumb[] }) => (
 	<header className="mb-6 flex flex-col gap-3 border-b border-tip pb-4">
 		{crumbs.length === 0 ? null : (
 			<nav aria-label="Path">
@@ -38,7 +35,6 @@ export const PageHeader = ({
 
 		<div className="flex flex-wrap items-center justify-between gap-4">
 			<h1 className="text-2xl font-bold">{title}</h1>
-			{actions === undefined ? null : <div className="flex gap-2">{actions}</div>}
 		</div>
 	</header>
 )

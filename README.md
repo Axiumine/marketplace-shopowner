@@ -77,13 +77,15 @@ yarn lint           # eslint --fix + prettier --write   (lint:check for CI)
 ./qodana.sh         # Qodana Ultimate scan: inspections, SAST, SCA, licenses, coverage
 ```
 
-⚠️ **There is no `test/` directory yet, so `yarn test`, `test:cov` and `test:mutation` have nothing to
-run.** The suite was deliberately not copied when the repo was mirrored — the operator app's tests are
-written against its own screens and none of them applies to these. `vitest.config.ts`,
-`vitest.setup.ts` and `stryker.config.mjs` are in place and configured, so the gap is the tests
-themselves and not the harness. Until they exist a commit here needs `--no-verify`, and that is a
-stated exception rather than the way to work in this repo: every other repo on the platform gates at
-100% coverage and 100% mutation score, and this one is expected to join them.
+```bash
+yarn test           # vitest run          (test:watch to keep it open)
+yarn test:cov       # coverage, gated at 100% on all four metrics
+yarn test:mutation  # Stryker, gated at a score of 100
+```
+
+**497 tests over 38 files, 100% coverage, 100% mutation score** — the same bar as every other repo on
+the platform, so no commit here needs `--no-verify`. The suite was seeded from the operator app's and
+adapted screen by screen; `COVERAGE.md` has the gate layers and the recipe for a surviving mutant.
 
 `.githooks/pre-push` runs lint → typecheck → coverage → mutation → Qodana, all blocking, and
 `.githooks/pre-commit` runs lint → typecheck → coverage → Qodana on top of the secret guard. Qodana is

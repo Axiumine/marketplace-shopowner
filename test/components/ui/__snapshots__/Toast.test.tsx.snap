@@ -1,0 +1,92 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Toast > renders 1`] = `
+<div
+  class="pointer-events-auto overflow-hidden rounded-box border shadow-lg border-app-ok bg-palette-white text-app-ok"
+  role="status"
+>
+  <div
+    class="flex items-start gap-3 px-4 py-3 text-sm"
+  >
+    <span
+      class="grow"
+    >
+      Changes saved.
+    </span>
+    <button
+      aria-label="Close"
+      class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+      title="Close"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="h-4 w-4"
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="1.75"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M6 6 18 18"
+        />
+        <path
+          d="M18 6 6 18"
+        />
+      </svg>
+    </button>
+  </div>
+  <div
+    aria-hidden="true"
+    class="h-1 w-full bg-palette-bg1"
+  >
+    <div
+      class="h-full origin-left bg-current"
+      style="animation-name: countdown; animation-duration: 5000ms; animation-timing-function: linear; animation-fill-mode: forwards; animation-play-state: running;"
+    />
+  </div>
+</div>
+`;
+
+exports[`Toast > renders an error 1`] = `
+<div
+  class="pointer-events-auto overflow-hidden rounded-box border shadow-lg border-app-error bg-palette-white text-app-error"
+  role="alert"
+>
+  <div
+    class="flex items-start gap-3 px-4 py-3 text-sm"
+  >
+    <span
+      class="grow"
+    >
+      Save failed.
+    </span>
+    <button
+      aria-label="Close"
+      class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+      title="Close"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="h-4 w-4"
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="1.75"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M6 6 18 18"
+        />
+        <path
+          d="M18 6 6 18"
+        />
+      </svg>
+    </button>
+  </div>
+</div>
+`;

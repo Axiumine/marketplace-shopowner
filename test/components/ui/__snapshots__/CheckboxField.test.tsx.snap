@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`CheckboxField > renders 1`] = `
+<div
+  class="flex items-center gap-2"
+>
+  <input
+    class="h-4 w-4 rounded-box border border-tip accent-third"
+    id="field-disabled"
+    type="checkbox"
+  />
+  <label
+    class="text-sm font-semibold"
+    for="field-disabled"
+  >
+    Disabled
+  </label>
+</div>
+`;

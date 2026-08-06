@@ -1,0 +1,40 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`HomePage > renders 1`] = `
+<main
+  class="flex-1 overflow-auto p-6"
+>
+  <header
+    class="mb-6 flex flex-col gap-3 border-b border-tip pb-4"
+  >
+    <div
+      class="flex flex-wrap items-center justify-between gap-4"
+    >
+      <h1
+        class="text-2xl font-bold"
+      >
+        Dashboard
+      </h1>
+    </div>
+  </header>
+  <div
+    class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+  >
+    <a
+      class="block rounded-box border-4 border-third bg-white p-4 shadow transition-shadow hover:shadow-lg"
+      href="/companies"
+    >
+      <h2
+        class="font-bold"
+      >
+        Companies
+      </h2>
+      <p
+        class="text-sm text-tip"
+      >
+        Manage your companies
+      </p>
+    </a>
+  </div>
+</main>
+`;

@@ -1,0 +1,85 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`TextareaField > renders 1`] = `
+<div
+  class="flex flex-col gap-1"
+>
+  <label
+    class="text-sm font-semibold"
+    for="field-note"
+  >
+    Notes
+  </label>
+  <textarea
+    aria-invalid="false"
+    class="w-full resize-y rounded-box border-tip px-3 py-2 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border bg-white"
+    id="field-note"
+    rows="5"
+  />
+  <div
+    class="flex items-start justify-between gap-2"
+  />
+</div>
+`;
+
+exports[`TextareaField > renders with a count 1`] = `
+<div
+  class="flex flex-col gap-1"
+>
+  <label
+    class="text-sm font-semibold"
+    for="field-note"
+  >
+    Notes
+  </label>
+  <textarea
+    aria-describedby="field-note-remaining"
+    aria-invalid="false"
+    class="w-full resize-y rounded-box border-tip px-3 py-2 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border bg-white"
+    id="field-note"
+    rows="5"
+  />
+  <div
+    class="flex items-start justify-between gap-2"
+  >
+    <span
+      aria-live="polite"
+      class="ml-auto text-xs text-tip"
+      id="field-note-remaining"
+    >
+      1985
+       characters remaining
+    </span>
+  </div>
+</div>
+`;
+
+exports[`TextareaField > renders with an error 1`] = `
+<div
+  class="flex flex-col gap-1"
+>
+  <label
+    class="text-sm font-semibold"
+    for="field-note"
+  >
+    Notes
+  </label>
+  <textarea
+    aria-describedby="field-note-error"
+    aria-invalid="true"
+    class="w-full resize-y rounded-box border-tip px-3 py-2 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border-2 bg-app-error/10"
+    id="field-note"
+    rows="5"
+  />
+  <div
+    class="flex items-start justify-between gap-2"
+  >
+    <span
+      class="text-xs text-app-error"
+      id="field-note-error"
+    >
+      The notes cannot exceed 2000 characters
+    </span>
+  </div>
+</div>
+`;

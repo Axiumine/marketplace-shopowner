@@ -1,0 +1,51 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SideMenu > renders 1`] = `
+<nav
+  aria-label="Main menu"
+  class="flex h-full w-56 flex-col bg-secondary p-4"
+>
+  <p
+    class="mb-6 text-lg font-bold text-third"
+  >
+    Marketplace
+  </p>
+  <ul
+    class="flex flex-col gap-1"
+  >
+    <li>
+      <a
+        aria-current="page"
+        class="block rounded-box px-3 py-2 text-sm bg-palette-bg1 font-bold active"
+        data-status="active"
+        href="/home"
+      >
+        Dashboard
+      </a>
+    </li>
+    <li>
+      <a
+        class="block rounded-box px-3 py-2 text-sm "
+        href="/companies"
+      >
+        Companies
+      </a>
+    </li>
+  </ul>
+  <div
+    class="mt-auto flex flex-col gap-2"
+  >
+    <p
+      class="text-xs break-all text-tip"
+    >
+      owner@marketplace.it
+    </p>
+    <button
+      class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-secondary text-palette-bg hover:bg-primary px-4"
+      type="button"
+    >
+      Logout
+    </button>
+  </div>
+</nav>
+`;
