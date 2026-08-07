@@ -1,0 +1,24 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`LoadingPage > renders 1`] = `
+<div>
+  <div
+    class="flex h-full items-center justify-center"
+  >
+    <span
+      class="inline-flex items-center gap-2"
+      role="status"
+    >
+      <span
+        aria-hidden="true"
+        class="size-4 animate-spin rounded-full border-2 border-third border-t-transparent"
+      />
+      <span
+        class="sr-only"
+      >
+        Loading session
+      </span>
+    </span>
+  </div>
+</div>
+`;

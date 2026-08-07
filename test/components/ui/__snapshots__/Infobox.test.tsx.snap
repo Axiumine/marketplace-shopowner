@@ -1,0 +1,50 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`InfoRow > renders 1`] = `
+<div
+  class="flex justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
+>
+  <span
+    class="text-tip"
+  >
+    Mobile
+  </span>
+  <span
+    class="text-right"
+  >
+    333 1234567
+  </span>
+</div>
+`;
+
+exports[`Infobox > renders without a caller class 1`] = `
+<section
+  aria-labelledby=":id-0:"
+  class="h-full overflow-hidden rounded-box border-4 border-third bg-white p-[10px] shadow "
+>
+  <div
+    class="mb-2 flex items-center justify-between gap-2"
+  >
+    <h3
+      class="font-bold"
+      id=":id-0:"
+    >
+      Account status
+    </h3>
+  </div>
+  <div
+    class="flex justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
+  >
+    <span
+      class="text-tip"
+    >
+      Disabled
+    </span>
+    <span
+      class="text-right"
+    >
+      No
+    </span>
+  </div>
+</section>
+`;

@@ -1,0 +1,312 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AddressField > announces the wait while the geocoder is answering 1`] = `
+<div>
+  <div
+    class="flex flex-col gap-2 "
+  >
+    <div
+      class="flex flex-col gap-1"
+    >
+      <label
+        class="text-sm font-semibold"
+        for=":id-0:"
+      >
+        Address
+      </label>
+      <div
+        class="relative"
+      >
+        <input
+          aria-invalid="false"
+          autocomplete="off"
+          class="w-full rounded-box border-tip py-2 pl-3 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border bg-white pr-3"
+          id=":id-0:"
+          value="Via Roma 1"
+        />
+      </div>
+    </div>
+    <span
+      class="inline-flex items-center gap-2"
+      role="status"
+    >
+      <span
+        aria-hidden="true"
+        class="size-4 animate-spin rounded-full border-2 border-third border-t-transparent"
+      />
+      <span
+        class="sr-only"
+      >
+        Searching addresses
+      </span>
+    </span>
+    <iframe
+      class="w-full rounded-box border border-tip"
+      height="400"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=12.49240,41.89880,12.50040,41.90680&layer=mapnik&marker=41.90280,12.49640"
+      title="Address map"
+    />
+    <p
+      class="text-xs text-tip"
+    >
+      Map data ©
+       
+      <a
+        class="underline"
+        href="https://www.openstreetmap.org/copyright"
+        rel="noreferrer"
+        target="_blank"
+      >
+        OpenStreetMap
+      </a>
+       
+      contributors
+    </p>
+  </div>
+</div>
+`;
+
+exports[`AddressField > renders a map of Italy before anything is typed 1`] = `
+<div>
+  <div
+    class="flex flex-col gap-2 "
+  >
+    <div
+      class="flex flex-col gap-1"
+    >
+      <label
+        class="text-sm font-semibold"
+        for=":id-0:"
+      >
+        Address
+      </label>
+      <div
+        class="relative"
+      >
+        <input
+          aria-invalid="false"
+          autocomplete="off"
+          class="w-full rounded-box border-tip py-2 pl-3 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border bg-white pr-3"
+          id=":id-0:"
+          value=""
+        />
+      </div>
+    </div>
+    <iframe
+      class="w-full rounded-box border border-tip"
+      height="400"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=12.49240,41.89880,12.50040,41.90680&layer=mapnik&marker=41.90280,12.49640"
+      title="Address map"
+    />
+    <p
+      class="text-xs text-tip"
+    >
+      Map data ©
+       
+      <a
+        class="underline"
+        href="https://www.openstreetmap.org/copyright"
+        rel="noreferrer"
+        target="_blank"
+      >
+        OpenStreetMap
+      </a>
+       
+      contributors
+    </p>
+  </div>
+</div>
+`;
+
+exports[`AddressField > reports a geocoder failure instead of pretending there are no matches 1`] = `
+<div>
+  <div
+    class="flex flex-col gap-2 "
+  >
+    <div
+      class="flex flex-col gap-1"
+    >
+      <label
+        class="text-sm font-semibold"
+        for=":id-0:"
+      >
+        Address
+      </label>
+      <div
+        class="relative"
+      >
+        <input
+          aria-invalid="false"
+          autocomplete="off"
+          class="w-full rounded-box border-tip py-2 pl-3 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border bg-white pr-3"
+          id=":id-0:"
+          value="Via Roma 1"
+        />
+      </div>
+    </div>
+    <div
+      class="rounded-box border px-4 py-3 text-sm border-app-error bg-app-error/10 text-app-error"
+      role="alert"
+    >
+      Address search unavailable
+    </div>
+    <iframe
+      class="w-full rounded-box border border-tip"
+      height="400"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=12.49240,41.89880,12.50040,41.90680&layer=mapnik&marker=41.90280,12.49640"
+      title="Address map"
+    />
+    <p
+      class="text-xs text-tip"
+    >
+      Map data ©
+       
+      <a
+        class="underline"
+        href="https://www.openstreetmap.org/copyright"
+        rel="noreferrer"
+        target="_blank"
+      >
+        OpenStreetMap
+      </a>
+       
+      contributors
+    </p>
+  </div>
+</div>
+`;
+
+exports[`AddressField > says so when the address matches nothing 1`] = `
+<div>
+  <div
+    class="flex flex-col gap-2 "
+  >
+    <div
+      class="flex flex-col gap-1"
+    >
+      <label
+        class="text-sm font-semibold"
+        for=":id-0:"
+      >
+        Address
+      </label>
+      <div
+        class="relative"
+      >
+        <input
+          aria-invalid="false"
+          autocomplete="off"
+          class="w-full rounded-box border-tip py-2 pl-3 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border bg-white pr-3"
+          id=":id-0:"
+          value="Via Inesistente 99"
+        />
+      </div>
+    </div>
+    <p
+      class="text-sm text-tip"
+      role="status"
+    >
+      No address found
+    </p>
+    <iframe
+      class="w-full rounded-box border border-tip"
+      height="400"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=12.49240,41.89880,12.50040,41.90680&layer=mapnik&marker=41.90280,12.49640"
+      title="Address map"
+    />
+    <p
+      class="text-xs text-tip"
+    >
+      Map data ©
+       
+      <a
+        class="underline"
+        href="https://www.openstreetmap.org/copyright"
+        rel="noreferrer"
+        target="_blank"
+      >
+        OpenStreetMap
+      </a>
+       
+      contributors
+    </p>
+  </div>
+</div>
+`;
+
+exports[`AddressField > shows the suggestions OSM answered with 1`] = `
+<div>
+  <div
+    class="flex flex-col gap-2 "
+  >
+    <div
+      class="flex flex-col gap-1"
+    >
+      <label
+        class="text-sm font-semibold"
+        for=":id-0:"
+      >
+        Address
+      </label>
+      <div
+        class="relative"
+      >
+        <input
+          aria-invalid="false"
+          autocomplete="off"
+          class="w-full rounded-box border-tip py-2 pl-3 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border bg-white pr-3"
+          id=":id-0:"
+          value="Via Roma 1"
+        />
+      </div>
+    </div>
+    <ul
+      aria-label="Addresses found"
+      class="rounded-box border border-tip bg-white"
+    >
+      <li
+        class="border-b border-palette-bg1 last:border-b-0"
+      >
+        <button
+          class="w-full rounded-box px-3 py-2 text-left text-sm hover:bg-palette-bg1 focus-visible:bg-palette-bg1 focus-visible:outline-none"
+          type="button"
+        >
+          Via Roma, 1, Milano, MI, 20121, Italia
+        </button>
+      </li>
+      <li
+        class="border-b border-palette-bg1 last:border-b-0"
+      >
+        <button
+          class="w-full rounded-box px-3 py-2 text-left text-sm hover:bg-palette-bg1 focus-visible:bg-palette-bg1 focus-visible:outline-none"
+          type="button"
+        >
+          Via Roma, 4, Como, CO, 22100, Italia
+        </button>
+      </li>
+    </ul>
+    <iframe
+      class="w-full rounded-box border border-tip"
+      height="400"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=9.18550,45.46020,9.19350,45.46820&layer=mapnik&marker=45.46420,9.18950"
+      title="Address map"
+    />
+    <p
+      class="text-xs text-tip"
+    >
+      Map data ©
+       
+      <a
+        class="underline"
+        href="https://www.openstreetmap.org/copyright"
+        rel="noreferrer"
+        target="_blank"
+      >
+        OpenStreetMap
+      </a>
+       
+      contributors
+    </p>
+  </div>
+</div>
+`;

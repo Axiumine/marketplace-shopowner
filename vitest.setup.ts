@@ -4,7 +4,7 @@ import { cleanup } from '@testing-library/react'
 import { afterEach, beforeEach, expect } from 'vitest'
 
 import { clearAccessToken } from '@/api/tokenStore'
-import { clearSession } from '@/auth/session'
+import { clearPendingEmail, clearSession } from '@/auth/session'
 
 /** React's `useId` output, in both the `_r_1_` and the `«r1»` spelling. */
 const GENERATED_ID = /_r_[0-9a-z]+_|«r[0-9a-z]+»/g
@@ -62,12 +62,15 @@ window.scrollTo = () => {
 	/* no layout to scroll in jsdom */
 }
 
-// The access token and the signed-in identity are module-scoped singletons — that is the point of
-// them, and it means one test's login leaks into the next file's first render. Resetting both before
-// every test makes "signed out" the default state a test has to opt out of.
+// The access token, the signed-in identity and the address waiting to become one are module-scoped
+// singletons — that is the point of them, and it means one test's login leaks into the next file's
+// first render. Resetting all three before every test makes "signed out" the default state a test has
+// to opt out of. The pending address is the easiest of the three to forget: nothing renders it, so a
+// leak shows up two files later as a sidebar naming an owner that test never signed in.
 beforeEach(() => {
 	clearAccessToken()
 	clearSession()
+	clearPendingEmail()
 })
 
 // Testing Library's auto-cleanup only fires when it detects a global `afterEach`, and it detects it
