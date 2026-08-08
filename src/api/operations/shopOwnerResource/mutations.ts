@@ -13,7 +13,7 @@ import { graphql } from '@gql/shopOwnerResource'
  *   - `companyUpdate` and `companyDel` run `throwIfShopOwnerDontOwnCompany` first, which filters
  *     `deleted` — so a second delete of the same company answers 403 rather than repeating the stamp.
  *
- * `CompanyDel` is a soft delete: it stamps `deleted` and the row stays. ⚠️ The VAT number stays
+ * `CompanyDel` is a soft delete: it stamps `deleted` and the document stays. ⚠️ The VAT number stays
  * occupied afterwards — `vatNumber_unique` is a plain global unique with no partial filter — so a
  * retired company can never be registered again.
  *

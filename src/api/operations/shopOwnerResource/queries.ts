@@ -11,7 +11,7 @@ import { graphql } from '@gql/shopOwnerResource'
  * Retired companies are filtered out by the resolver (`deleted: { $exists: false }`), so the list is
  * already the live set and this app never filters it again.
  *
- * Whole rows, not a projection: the companies page edits these cards in place, and there is no second
+ * Whole documents, not a projection: the companies page edits these cards in place, and there is no second
  * query behind them. It is also the app's session probe — see LoadingPage.
  */
 export const ShopOwnerCompaniesDocument = graphql(`

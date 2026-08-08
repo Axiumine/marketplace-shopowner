@@ -63,7 +63,7 @@ type MutationsApi {
 	companyUpdate(_id: ID!, company: GraphQLInputCompany!): Boolean!
 
 	"""
-	Soft-deletes a company: stamps `deleted` with a date, leaves the row in place.
+	Soft-deletes a company: stamps `deleted` with a date, leaves the company in place.
 
 	⚠️ Deleting one already deleted answers **403** on this tier, where the Admin tier answers 200 — the
 	difference is `throwIfShopOwnerDontOwnCompany`, which filters `deleted` and which only this tier
