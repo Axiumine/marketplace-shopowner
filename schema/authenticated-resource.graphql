@@ -6,9 +6,9 @@
 #   src/graphQLApi/schema/mutations.mts             → companyAdd, companyDel, companyUpdate
 #   src/graphQLApi/schema/types/GraphQLCompany.mts
 #   src/graphQLApi/schema/GraphQLInput/GraphQLInputCompany.mts
-#   @thedoctorweb_agency/marketplace-common/schema/types/fragments/GraphQLBaseAddressFrag
-#   @thedoctorweb_agency/marketplace-common/schema/types/fragments/GraphQLAddressFrag
-#   @thedoctorweb_agency/marketplace-common/schema/types/fragments/GraphQLPositionFrag
+#   @axiumine/marketplace-common/schema/types/fragments/GraphQLBaseAddressFrag
+#   @axiumine/marketplace-common/schema/types/fragments/GraphQLAddressFrag
+#   @axiumine/marketplace-common/schema/types/fragments/GraphQLPositionFrag
 #   @axiumine/koa-utils/graphQL/schema/types/OnlyIdType
 #
 # ⚠️ **This is the whole authenticated surface of the ShopOwner tier — one query and three mutations.**
