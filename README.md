@@ -182,9 +182,9 @@ guard against all render as a working screen.
 - **`companyDel` answers 403 on a company already deleted, where the Admin tier answers 200.** The
   difference is `throwIfShopOwnerDontOwnCompany`, which filters `deleted` and which only this tier
   runs. Both are correct: liveness belongs on the ownership guard, not on the delete write.
-- **A retired company keeps its partita IVA forever.** `vatNumber_unique` and `certifiedEmail_unique`
+- **A retired company keeps its VAT number forever.** `vatNumber_unique` and `certifiedEmail_unique`
   are plain global uniques with no partial filter, so re-registering one answers a duplicate-key error.
-  That is the intended rule — one partita IVA is one company — not something to work around here.
+  That is the intended rule — one VAT number is one company — not something to work around here.
 - **Create and delete mutations pass `additionalTypenames`.** The document cache invalidates by the
   typenames a mutation's *response* mentions; `companyUpdate` and `companyDel` answer a bare `Boolean`
   and `companyAdd` an `OnlyIdType`, so without the list every write leaves the screen unchanged.

@@ -38,7 +38,7 @@ exports[`SideMenu > renders 1`] = `
     <p
       class="text-xs break-all text-tip"
     >
-      owner@marketplace.it
+      owner@marketplace.test
     </p>
     <button
       class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-secondary text-palette-bg hover:bg-primary px-4"

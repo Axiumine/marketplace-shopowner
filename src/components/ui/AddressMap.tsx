@@ -7,7 +7,7 @@ import { urlMap } from '@/lib/nominatim'
  * inside the frame, and has nothing to resize or invalidate when its container changes — Leaflet would
  * need all three plus a jsdom shim before any of this could be tested.
  *
- * `titolo` is required rather than defaulted because a page can hold several of these — one per shop —
+ * `title` is required rather than defaulted because a page can hold several of these — one per shop —
  * and an iframe's accessible name is its `title`. Frames that all announce "map" are a list nobody can
  * choose from, and the one thing that tells them apart is the address each is pointing at.
  */

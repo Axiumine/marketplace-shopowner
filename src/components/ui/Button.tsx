@@ -6,9 +6,9 @@ export type ButtonVariant = 'primary' | 'ghost' | 'danger'
 export type ButtonPadding = 'default' | 'form'
 
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
-	primary: 'bg-third text-palette-white hover:bg-pomodoro',
+	primary: 'bg-third text-palette-white hover:bg-tomato',
 	ghost: 'bg-secondary text-palette-bg hover:bg-primary',
-	danger: 'bg-app-error text-palette-white hover:bg-pomodoro'
+	danger: 'bg-app-error text-palette-white hover:bg-tomato'
 }
 
 /*

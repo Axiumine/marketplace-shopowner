@@ -16,12 +16,12 @@ This repo is a mirror of `marketplace-admin`, the operator app. Same stack, same
 hooks. It is thinner because the ShopOwner-tier backend is thinner — see `README.md` for the table of
 screens that do not exist and the resolvers that would have to be written first.
 
-⚠️ **Language: everything is English** — identifiers, UI text, form labels, comments, routes. Never add
-an Italian identifier; the names here are the names the database and the resolvers use. Italian
-survives in two deliberate places: **domain terms with no English equivalent** in prose and comments
-(*partita IVA* = `vatNumber`, *codice fiscale* = `taxCode`, *PEC* = `certifiedEmail`, *visura* =
-`registryExtract`, *ragione sociale* = `legalName`), and the **`it-IT` locale** `formatDateTime`
-renders with, which is a market choice and not a name.
+⚠️ **Language: everything is English** — identifiers, UI text, form labels, comments, routes. There is
+no second language anywhere in this app, and adding one is a regression rather than a style nit. The
+names here are the names the database and the resolvers use, so a rename is never local to this repo.
+
+The **`en-GB` locale** `formatDateTime` renders with is a market choice and not a name; changing it
+changes what dates look like on screen and every snapshot that shows one.
 
 ## The four endpoints are the ones *without* `admin` in the name
 
@@ -130,7 +130,7 @@ That is what lets a page be rendered in a test without a router assertion in the
 - **Every block in `eslint.config.js` carries a `files` glob.** A flat-config entry without one applies
   to *every* file eslint walks into, so `js.configs.recommended` with no glob lints any stray `.js`
   under the root — in the operator app the minified Qodana HTML report turned `yarn lint` into 1601
-  `no-undef` errors in code nobody wrote. The globs live in `SORGENTI` and `CONFIG_ROOT` at the top of
+  `no-undef` errors in code nobody wrote. The globs live in `SOURCES` and `CONFIG_ROOT` at the top of
   the file; add a block by reusing them, not by omitting `files`.
 - **Node `^24.18.0`**, yarn classic. `engines` is a hard gate: `nvm use 24.18.0` before any yarn
   command or the install exits 1.

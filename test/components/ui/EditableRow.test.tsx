@@ -50,20 +50,20 @@ describe('EditableRow', () => {
 	// visible label and the two pens would otherwise announce identically.
 	it('takes an explicit name when the label would not be unique', () => {
 		render(
-			<EditableRow label="lunedì" action="Change openingHours 2" value="18:30 – 23:00">
-				<input aria-label="Dalle" />
+			<EditableRow label="monday" action="Change openingHours 2" value="18:30 – 23:00">
+				<input aria-label="From" />
 			</EditableRow>
 		)
 
 		expect(screen.getByRole('button', { name: 'Change openingHours 2' })).toBeInTheDocument()
-		expect(screen.queryByRole('button', { name: 'Change lunedì' })).not.toBeInTheDocument()
+		expect(screen.queryByRole('button', { name: 'Change monday' })).not.toBeInTheDocument()
 	})
 
 	// Icon-only, so `aria-label` is the only thing naming it and the glyph has to stay out of the
 	// accessibility tree — otherwise the row announces an unnamed control next to an unnamed image.
 	it('names the icon-only pen and hides the glyph from assistive tech', () => {
 		render(
-			<EditableRow label="First name" value="Mario">
+			<EditableRow label="First name" value="Mark">
 				<input aria-label="First name" />
 			</EditableRow>
 		)
@@ -86,7 +86,7 @@ describe('EditableRow', () => {
 					submitted = true
 				}}
 			>
-				<EditableRow label="First name" value="Mario">
+				<EditableRow label="First name" value="Mark">
 					<input aria-label="First name" />
 				</EditableRow>
 			</form>
@@ -101,7 +101,7 @@ describe('EditableRow', () => {
 	// so those rows do not grow a control that could only ever be a mistake.
 	it('has no bin unless one is asked for', () => {
 		render(
-			<EditableRow label="First name" value="Mario">
+			<EditableRow label="First name" value="Mark">
 				<input aria-label="First name" />
 			</EditableRow>
 		)
@@ -132,19 +132,19 @@ describe('EditableRow', () => {
 	it('takes an explicit name for the bin when the label would not be unique', () => {
 		render(
 			<EditableRow
-				label="lunedì"
+				label="monday"
 				actionDelete="Delete openingHours 2"
 				value="18:30 – 23:00"
 				onDelete={() => {
 					/* not pressed here */
 				}}
 			>
-				<input aria-label="Dalle" />
+				<input aria-label="From" />
 			</EditableRow>
 		)
 
 		expect(screen.getByRole('button', { name: 'Delete openingHours 2' })).toBeInTheDocument()
-		expect(screen.queryByRole('button', { name: 'Delete lunedì' })).not.toBeInTheDocument()
+		expect(screen.queryByRole('button', { name: 'Delete monday' })).not.toBeInTheDocument()
 	})
 
 	// The whole point of keeping it reachable: a row is usually opened *before* the operator decides it
@@ -154,20 +154,20 @@ describe('EditableRow', () => {
 
 		render(
 			<EditableRow
-				label="lunedì"
+				label="monday"
 				value="11:30 – 14:30"
 				onDelete={() => {
 					deleted = true
 				}}
 			>
-				<input aria-label="Dalle" />
+				<input aria-label="From" />
 			</EditableRow>
 		)
 
-		await userEvent.click(screen.getByRole('button', { name: 'Change lunedì' }))
-		await userEvent.click(screen.getByRole('button', { name: 'Delete lunedì' }))
+		await userEvent.click(screen.getByRole('button', { name: 'Change monday' }))
+		await userEvent.click(screen.getByRole('button', { name: 'Delete monday' }))
 
-		expect(screen.getByRole('textbox', { name: 'Dalle' })).toBeInTheDocument()
+		expect(screen.getByRole('textbox', { name: 'From' })).toBeInTheDocument()
 		expect(deleted).toBe(true)
 	})
 
@@ -176,11 +176,11 @@ describe('EditableRow', () => {
 	it('can start open', () => {
 		render(
 			<EditableRow label="" value="" openInitial>
-				<input aria-label="Giorno" />
+				<input aria-label="Day" />
 			</EditableRow>
 		)
 
-		expect(screen.getByRole('textbox', { name: 'Giorno' })).toBeInTheDocument()
+		expect(screen.getByRole('textbox', { name: 'Day' })).toBeInTheDocument()
 	})
 
 	it('does not submit the form it sits in when the bin is pressed', async () => {
@@ -194,25 +194,25 @@ describe('EditableRow', () => {
 				}}
 			>
 				<EditableRow
-					label="lunedì"
+					label="monday"
 					value="11:30 – 14:30"
 					onDelete={() => {
 						/* the submit is what is under test */
 					}}
 				>
-					<input aria-label="Dalle" />
+					<input aria-label="From" />
 				</EditableRow>
 			</form>
 		)
 
-		await userEvent.click(screen.getByRole('button', { name: 'Delete lunedì' }))
+		await userEvent.click(screen.getByRole('button', { name: 'Delete monday' }))
 
 		expect(submitted).toBe(false)
 	})
 
 	it('renders read-only', () => {
 		const { container } = render(
-			<EditableRow label="First name" value="Mario">
+			<EditableRow label="First name" value="Mark">
 				<input aria-label="First name" />
 			</EditableRow>
 		)
@@ -222,7 +222,7 @@ describe('EditableRow', () => {
 
 	it('renders open', async () => {
 		const { container } = render(
-			<EditableRow label="First name" value="Mario">
+			<EditableRow label="First name" value="Mark">
 				<input aria-label="First name" />
 			</EditableRow>
 		)
@@ -234,13 +234,13 @@ describe('EditableRow', () => {
 	it('renders with a bin', () => {
 		const { container } = render(
 			<EditableRow
-				label="lunedì"
+				label="monday"
 				value="11:30 – 14:30"
 				onDelete={() => {
 					/* not pressed here */
 				}}
 			>
-				<input aria-label="Dalle" />
+				<input aria-label="From" />
 			</EditableRow>
 		)
 

@@ -1,5 +1,5 @@
 /**
- * Display formatting. Italian, because every label on this platform is Italian.
+ * Display formatting. English throughout, like every label on this platform.
  *
  * ⚠️ ISO strings are handed to `Date` directly, which is what an ISO-8601 timestamp is specified to
  * accept. Do not "improve" this into a hand-parse — splitting on `\D+` and rebuilding through
@@ -10,7 +10,7 @@
 /** The placeholder for a field with nothing in it. */
 export const NO_VALUE = '---'
 
-const DATE_TIME_FORMAT = new Intl.DateTimeFormat('it-IT', {
+const DATE_TIME_FORMAT = new Intl.DateTimeFormat('en-GB', {
 	day: 'numeric',
 	month: 'long',
 	year: 'numeric',
@@ -20,22 +20,22 @@ const DATE_TIME_FORMAT = new Intl.DateTimeFormat('it-IT', {
 })
 
 /*
- * The three options are spelled out rather than inherited, even though `it-IT`'s own default is already
+ * The three options are spelled out rather than inherited, even though `en-GB`'s own default is already
  * `dd/mm/yyyy` — which is exactly why the empty-object mutant here is equivalent and is the one place in
  * this repo that carries a disable. It was checked, not assumed: `{}` and this literal produce the same
  * string for every date the runtime can represent, from year 1 to year 275760 and on both sides of the
  * era boundary. Nothing this app can render distinguishes them, so no test can, and the literal stays
  * because the day the CLDR default moves is the day the owner's dates would silently change shape.
  */
-// Stryker disable next-line ObjectLiteral: equivalent under it-IT — see the note above.
-const DATE_FORMAT = new Intl.DateTimeFormat('it-IT', { day: '2-digit', month: '2-digit', year: 'numeric' })
+// Stryker disable next-line ObjectLiteral: equivalent under en-GB — see the note above.
+const DATE_FORMAT = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })
 
 /*
  * UTC, unlike the two above, and the difference is not an oversight.
  *
- * `openingHours.da` / `.a` are not moments in time — they are clock readings the owner typed, which the
+ * `openingHours.from` / `.a` are not moments in time — they are clock readings the owner typed, which the
  * backend's `Time` scalar stamped onto an arbitrary calendar day at the offset they were sent with. The
- * app sends them as `HH:MM:00Z`, so reading them back in the browser's zone would print an Italian
+ * app sends them as `HH:MM:00Z`, so reading them back in the browser's zone would print a foreign
  * shop's 11:30 opening as 13:30 in summer, and the edit box beside it — which is fed the UTC half —
  * would disagree with the value printed above it.
  */
@@ -71,7 +71,7 @@ export const handleNullHash = (val: string | null | undefined): string => (val =
  * missing value means the same thing as an explicit `false`; showing the placeholder instead would
  * turn "not set" into something an owner reads as broken data.
  */
-export const handleNullBoolYN = (val: boolean | null | undefined): string => (val === true ? 'Sì' : 'No')
+export const handleNullBoolYN = (val: boolean | null | undefined): string => (val === true ? 'Yes' : 'No')
 
 /**
  * A stored timestamp as `<input type="date">` needs it: `YYYY-MM-DD`, read in UTC.
@@ -90,7 +90,7 @@ export const toDateInput = (iso: string): string => {
 }
 
 /** As above for `<input type="time">`: the `HH:MM` half of a stored opening hour, in UTC. */
-export const toOraInput = (iso: string): string => {
+export const toTimeInput = (iso: string): string => {
 	const date = new Date(iso)
 	return Number.isNaN(date.getTime()) ? '' : date.toISOString().slice(11, 16)
 }
@@ -102,18 +102,18 @@ export const toOraInput = (iso: string): string => {
  * `11:30:00`, and without it the value would also be read at the server's offset rather than at the one
  * the rest of this file assumes.
  */
-export const toOraWire = (ora: string): string => `${ora}:00Z`
+export const toTimeWire = (time: string): string => `${time}:00Z`
 
 /**
  * `handleNull` in reverse: a cleared text box, as the wire wants it.
  *
  * An emptied optional field has to travel as `null`, never as `''`. Every collection on this platform
  * is validated with `additionalProperties: false` and `bsonType: 'string'`, so an empty string is a
- * *value* of the right type and gets written — a landline number of no digits, a codice uniqueCode of no
+ * *value* of the right type and gets written — a landline number of no digits, a unique code of no
  * characters — while `null` is what the services' validators turn into an absent key.
  */
 export const emptyInNull = (value: string): string | null => (value === '' ? null : value)
 
-/** `via Roma 1, 20100 Milano (MI)` */
+/** `1 main street, 02109 Boston (MA)` */
 export const formatAddress = (address: { street: string; postalCode: string; city: string; province: string }): string =>
 	`${address.street}, ${address.postalCode} ${address.city} (${address.province})`

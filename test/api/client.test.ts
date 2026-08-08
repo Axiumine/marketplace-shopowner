@@ -22,20 +22,20 @@ const COMPANIES = {
 		{
 			__typename: 'GraphQLCompany',
 			_id: '65f0000000000000000000a1',
-			legalName: 'Rossi Mario S.r.l.',
+			legalName: 'Rivers Trading Ltd',
 			vatNumber: '12345678901',
 			taxCode: null,
-			contactPerson: 'Mario Rossi',
-			administrator: 'Mario Rossi',
+			contactPerson: 'Mark Rivers',
+			administrator: 'Mark Rivers',
 			uniqueCode: null,
-			certifiedEmail: 'rossi@pec.it',
-			registryExtract: 'MI-123456',
+			certifiedEmail: 'certified@rivers.test',
+			registryExtract: 'MA-123456',
 			address: {
-				street: 'Via Dante 3',
-				postalCode: '20121',
-				city: 'Milano',
-				province: 'MI',
-				position: { type: 'Point', coordinates: [9.1859, 45.4668] }
+				street: '3 Oak Street',
+				postalCode: '02108',
+				city: 'Boston',
+				province: 'MA',
+				position: { type: 'Point', coordinates: [-71.0636, 42.3626] }
 			}
 		}
 	]
@@ -100,7 +100,7 @@ describe('createGraphQLClient', () => {
 		await client
 			.mutation(
 				LoginDocument,
-				{ email: 'owner@marketplace.it', password: 'password123', rememberMe: false },
+				{ email: 'owner@marketplace.test', password: 'password123', rememberMe: false },
 				CTX_PUBLIC_AUTHORIZATION
 			)
 			.toPromise()

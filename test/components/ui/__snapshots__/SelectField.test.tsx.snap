@@ -6,9 +6,9 @@ exports[`SelectField > renders 1`] = `
 >
   <label
     class="text-sm font-semibold"
-    for="field-giorno"
+    for="field-day"
   >
-    Giorno
+    Day
   </label>
   <div
     class="relative"
@@ -16,17 +16,17 @@ exports[`SelectField > renders 1`] = `
     <select
       aria-invalid="false"
       class="w-full appearance-none rounded-box border-tip py-2 pl-3 pr-9 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border bg-white"
-      id="field-giorno"
+      id="field-day"
     >
       <option
         value="Lun"
       >
-        Lunedì
+        Monday
       </option>
       <option
         value="Mar"
       >
-        Martedì
+        Tuesday
       </option>
     </select>
     <span
@@ -57,28 +57,28 @@ exports[`SelectField > renders with an error 1`] = `
 >
   <label
     class="text-sm font-semibold"
-    for="field-giorno"
+    for="field-day"
   >
-    Giorno
+    Day
   </label>
   <div
     class="relative"
   >
     <select
-      aria-describedby="field-giorno-error"
+      aria-describedby="field-day-error"
       aria-invalid="true"
       class="w-full appearance-none rounded-box border-tip py-2 pl-3 pr-9 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border-2 bg-app-error/10"
-      id="field-giorno"
+      id="field-day"
     >
       <option
         value="Lun"
       >
-        Lunedì
+        Monday
       </option>
       <option
         value="Mar"
       >
-        Martedì
+        Tuesday
       </option>
     </select>
     <span
@@ -102,7 +102,7 @@ exports[`SelectField > renders with an error 1`] = `
   </div>
   <span
     class="text-xs text-app-error"
-    id="field-giorno-error"
+    id="field-day-error"
   >
     Day is required
   </span>

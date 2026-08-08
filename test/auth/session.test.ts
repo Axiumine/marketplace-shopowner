@@ -18,7 +18,7 @@ import {
  * all, so the only thing this app ever learns about the owner is the address they typed into the
  * sign-in form.
  */
-const OWNER = { email: 'owner@marketplace.it' }
+const OWNER = { email: 'owner@marketplace.test' }
 
 describe('the session store', () => {
 	it('starts empty', () => {
@@ -122,21 +122,21 @@ describe('the pending email', () => {
 	 * sidebar. The clearing belongs to `useLogout` and to nothing else.
 	 */
 	it('survives being read', () => {
-		setPendingEmail('owner@marketplace.it')
+		setPendingEmail('owner@marketplace.test')
 
-		expect(getPendingEmail()).toBe('owner@marketplace.it')
-		expect(getPendingEmail()).toBe('owner@marketplace.it')
+		expect(getPendingEmail()).toBe('owner@marketplace.test')
+		expect(getPendingEmail()).toBe('owner@marketplace.test')
 	})
 
 	it('takes the address of the most recent sign-in', () => {
-		setPendingEmail('first@marketplace.it')
-		setPendingEmail('second@marketplace.it')
+		setPendingEmail('first@marketplace.test')
+		setPendingEmail('second@marketplace.test')
 
-		expect(getPendingEmail()).toBe('second@marketplace.it')
+		expect(getPendingEmail()).toBe('second@marketplace.test')
 	})
 
 	it('clears back to null', () => {
-		setPendingEmail('owner@marketplace.it')
+		setPendingEmail('owner@marketplace.test')
 		clearPendingEmail()
 
 		expect(getPendingEmail()).toBeNull()
@@ -145,19 +145,19 @@ describe('the pending email', () => {
 	// It is not part of the session store: clearing one must not clear the other, or signing in again
 	// after a failed bootstrap would find the address already gone.
 	it('is untouched by the session store', () => {
-		setPendingEmail('owner@marketplace.it')
+		setPendingEmail('owner@marketplace.test')
 
 		setSession(OWNER)
-		expect(getPendingEmail()).toBe('owner@marketplace.it')
+		expect(getPendingEmail()).toBe('owner@marketplace.test')
 
 		clearSession()
-		expect(getPendingEmail()).toBe('owner@marketplace.it')
+		expect(getPendingEmail()).toBe('owner@marketplace.test')
 	})
 
 	// A module variable, so it leaves nothing behind either — the whole reason it is not a search param
 	// is that the address must not reach the browser history or an access log.
 	it('persists nothing', () => {
-		setPendingEmail('owner@marketplace.it')
+		setPendingEmail('owner@marketplace.test')
 
 		expect(localStorage.length).toBe(0)
 		expect(sessionStorage.length).toBe(0)

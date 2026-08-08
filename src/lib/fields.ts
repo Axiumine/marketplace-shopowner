@@ -5,8 +5,8 @@ import { z } from 'zod'
  *
  * They were one copy per feature file until the company moved into a collection of its own, at which
  * point the same seven rules would have existed twice on the same page — the shop card kept the address
- * and the contacts, the company card took the ragione sociale, the Certified email and the registryExtract, and both need the
- * required/optional/email trio to say so. Two copies of a message like "non può superare 100 characters"
+ * and the contacts, the company card took the legal name, the Certified email and the registryExtract, and both need the
+ * required/optional/email trio to say so. Two copies of a message like "must not exceed 100 characters"
  * is how one of them ends up phrased differently from the other.
  *
  * ⚠️ The **bounds** stay at the call sites and are deliberately not here. `MAX_ADDRESS` is 100 on a

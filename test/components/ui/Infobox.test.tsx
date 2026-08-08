@@ -7,12 +7,12 @@ describe('Infobox', () => {
 	it('renders its title and children', () => {
 		render(
 			<Infobox title="ShopOwner">
-				<p>contenuto</p>
+				<p>content</p>
 			</Infobox>
 		)
 
 		expect(screen.getByRole('heading', { name: 'ShopOwner' })).toBeInTheDocument()
-		expect(screen.getByText('contenuto')).toBeInTheDocument()
+		expect(screen.getByText('content')).toBeInTheDocument()
 	})
 
 	// The account-status colour arrives as a class name, never as an inline style or a raw hex string
@@ -32,7 +32,7 @@ describe('Infobox', () => {
 	it('puts the caller actions on the title line', () => {
 		render(
 			<Infobox title="OpeningHours" actions={<button type="button">Add openingHours</button>}>
-				<InfoRow label="lunedì" value="11:30 – 14:30" />
+				<InfoRow label="monday" value="11:30 – 14:30" />
 			</Infobox>
 		)
 

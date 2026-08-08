@@ -48,8 +48,8 @@ const MAX_ADDRESS = 100
 const MAX_CITY = 100
 
 /**
- * Exactly 11, and not the 16 of a personal codice fiscale: this is the company's, which for a legal
- * entity is the 11-digit form and usually equals its partita IVA. Optional, because no company stored
+ * Exactly 11, and not the 16 of a personal tax code: this is the company's, which for a legal
+ * entity is the 11-digit form and usually equals its VAT number. Optional, because no company stored
  * before the extraction carries one — the field did not exist.
  */
 const TAX_CODE_LENGTH = 11
@@ -380,9 +380,9 @@ const FormCompany = ({
 	return (
 		<section>
 			<div className="mb-1 flex items-center justify-between gap-2">
-				{/* The heading is the ragione sociale, which is the company's name and the one thing that
+				{/* The heading is the legal name, which is the company's name and the one thing that
 				    identifies the card. It is edited from a row inside the box like every other field —
-				    there is no pen up here, unlike a shop, whose insegna has no box of its own at all. */}
+				    there is no pen up here, unlike a shop, whose trading name has no box of its own at all. */}
 				<h3 className={`text-lg font-bold ${deleted ? 'text-tip line-through' : ''}`}>
 					{company === null ? 'New company' : company.legalName}
 				</h3>
@@ -535,8 +535,8 @@ const FormCompany = ({
 /**
  * The stored companies, plus whatever new cards the owner has open.
  *
- * Each company is its own form and its own section of the page's save: one failing on a duplicate partita
- * IVA leaves the others' edits in the boxes, still dirty and still savable.
+ * Each company is its own form and its own section of the page's save: one failing on a duplicate VAT
+ * number leaves the others' edits in the boxes, still dirty and still savable.
  */
 const ListCompanies = ({
 	companies,

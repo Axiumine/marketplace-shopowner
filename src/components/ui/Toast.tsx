@@ -22,7 +22,7 @@ export const OK_DURATION = 5000
  * its widest message and spans the top-right corner, and without this it would swallow clicks on
  * whatever sits under the empty space beside a short one.
  */
-const STACK_ID = 'pila-toast'
+const STACK_ID = 'toast-stack'
 
 const stack = (): HTMLElement => {
 	const existing = document.getElementById(STACK_ID)
@@ -59,7 +59,7 @@ const TONE_CLASS: Record<AlertTone, string> = {
  * executed again, which is what makes the round trip happen on its own.
  *
  * `role="alert"` for the error tone only, as in `Alert`: assertive is right for a refused save and
- * wrong for "salvato".
+ * wrong for "saved".
  *
  * ⚠️ Only the success tone counts down. A confirmation has been read by the time it is understood and
  * the owner has nothing left to do about it; a failure is the opposite — it names something that
@@ -68,7 +68,7 @@ const TONE_CLASS: Record<AlertTone, string> = {
  * goes away when the cross is pressed.
  */
 export const Toast = ({ tone, children }: { tone: AlertTone; children: ReactNode }) => {
-	const conTimer = tone === 'success'
+	const hasTimer = tone === 'success'
 	const [inPause, setInPause] = useState(false)
 	const [closed, setClosed] = useState(false)
 	// Read once, in a lazy initialiser rather than in an effect: the portal needs the node during the
@@ -111,7 +111,7 @@ export const Toast = ({ tone, children }: { tone: AlertTone; children: ReactNode
 			</div>
 			{/* The countdown, drawn rather than announced: `aria-hidden` because the live region above has
 			    already read the message out, and a bar that reported itself would say "80%" every frame. */}
-			{conTimer ? (
+			{hasTimer ? (
 				<div aria-hidden="true" className="h-1 w-full bg-palette-bg1">
 					{/*
 					 * ⚠️ The animation **is** the clock — `animationend` is what closes the toast, and there is no

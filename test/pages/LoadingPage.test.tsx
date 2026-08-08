@@ -72,14 +72,14 @@ describe('LoadingPage', () => {
 	// The address the sign-in form put aside, turned into the session's own. It is the only way this app
 	// ever learns who is signed in: no ShopOwner-tier query answers "who am I".
 	it('names the session with the address the login form left behind', async () => {
-		setPendingEmail('owner@marketplace.it')
+		setPendingEmail('owner@marketplace.test')
 		stubGraphQL({ ShopOwnerCompanies: signedIn })
 		const { router } = await renderRoute('/loading', { session: null })
 
 		await waitFor(() => {
 			expect(router.state.location.pathname).toBe('/home')
 		})
-		expect(getSession()).toEqual({ email: 'owner@marketplace.it' })
+		expect(getSession()).toEqual({ email: 'owner@marketplace.test' })
 	})
 
 	/*
@@ -106,14 +106,14 @@ describe('LoadingPage', () => {
 	 * disappear from the sidebar for no reason they could see. Clearing belongs to `useLogout`.
 	 */
 	it('leaves the pending address where it found it', async () => {
-		setPendingEmail('owner@marketplace.it')
+		setPendingEmail('owner@marketplace.test')
 		stubGraphQL({ ShopOwnerCompanies: signedIn })
 		const { router } = await renderRoute('/loading', { session: null })
 
 		await waitFor(() => {
 			expect(router.state.location.pathname).toBe('/home')
 		})
-		expect(getPendingEmail()).toBe('owner@marketplace.it')
+		expect(getPendingEmail()).toBe('owner@marketplace.test')
 	})
 
 	it('honours a same-site redirect target', async () => {

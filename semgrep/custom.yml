@@ -49,8 +49,8 @@ rules:
         - src/api/client.ts
     pattern-either:
       - pattern: 'preferGetMethod: true'
-      - pattern: 'preferGetMethod: ''force'''
-      - pattern: 'preferGetMethod: ''within-url-limit'''
+      - pattern: "preferGetMethod: 'force'"
+      - pattern: "preferGetMethod: 'within-url-limit'"
 
   # `import.meta.env.VITE_*` is substituted into the client bundle at build time.
   # A secret named this way is not "read at runtime by the browser" — it is

@@ -19,26 +19,26 @@ beforeEach(async () => {
 })
 
 const VALID = {
-	legalName: 'Rossi Mario S.r.l.',
+	legalName: 'Rivers Trading Ltd',
 	vatNumber: '12345678901',
-	// Kept different from the partita IVA even though a company's usually equals it: a fixture that shared
+	// Kept different from the VAT number even though a company's usually equals it: a fixture that shared
 	// one string would let a swapped pair pass every assertion in this file.
 	taxCode: '98765432109',
-	contactPerson: 'Mario Rossi',
-	administrator: 'Anna Bianchi',
+	contactPerson: 'Mark Rivers',
+	administrator: 'Anna White',
 	uniqueCode: 'ABC1234',
-	certifiedEmail: 'rossi@pec.it',
-	registryExtract: 'MI-123456',
+	certifiedEmail: 'certified@rivers.test',
+	registryExtract: 'MA-123456',
 	// The one line the owner sees, spelling out the four fields under it. The rule at the bottom of the
 	// schema is the only thing that holds them together, so a fixture where they disagreed would fail
 	// every test in this file for a reason none of them are about.
-	addressComplete: 'Via Roma 1, 20100 Milano (MI)',
-	street: 'Via Roma 1',
-	postalCode: '20100',
-	city: 'Milano',
-	province: 'MI',
-	longitude: '9.19',
-	latitude: '45.46'
+	addressComplete: '1 Main Street, 02109 Boston (MA)',
+	street: '1 Main Street',
+	postalCode: '02109',
+	city: 'Boston',
+	province: 'MA',
+	longitude: '-71.06',
+	latitude: '42.36'
 }
 
 const outcome = (patch: Record<string, unknown> = {}) => companySchema.safeParse({ ...VALID, ...patch })
@@ -94,37 +94,37 @@ describe('companySchema — required fields', () => {
 	})
 
 	it('trims a required field before measuring it', () => {
-		expect(value({ contactPerson: '  Mario Rossi  ' }).contactPerson).toBe('Mario Rossi')
+		expect(value({ contactPerson: '  Mark Rivers  ' }).contactPerson).toBe('Mark Rivers')
 	})
 })
 
 describe('companySchema — tax identifiers', () => {
-	it('refuses a partita IVA with anything either side of the eleven digits', () => {
+	it('refuses a VAT number with anything either side of the eleven digits', () => {
 		expect(messages({ vatNumber: 'a12345678901' })).toEqual(['The VAT number is 11 digits'])
 		expect(messages({ vatNumber: '12345678901a' })).toEqual(['The VAT number is 11 digits'])
 	})
 
-	it('trims the partita IVA before matching it', () => {
+	it('trims the VAT number before matching it', () => {
 		expect(value({ vatNumber: '  12345678901  ' }).vatNumber).toBe('12345678901')
 	})
 
 	/*
-	 * Eleven and not sixteen: this is the company's codice fiscale, which for a legal entity is the
+	 * Eleven and not sixteen: this is the company's tax code, which for a legal entity is the
 	 * eleven-digit form. Blank is how it is removed — no company stored before the extraction has one,
 	 * because the field did not exist — and the collection checks the length and not the characters, so
 	 * neither does this.
 	 */
-	it('accepts an empty codice fiscale and refuses one of the wrong length', () => {
+	it('accepts an empty tax code and refuses one of the wrong length', () => {
 		expect(messages({ taxCode: '' })).toEqual([])
 		expect(messages({ taxCode: '9876543210' })).toEqual(['The tax code is 11 characters'])
 		expect(messages({ taxCode: '987654321098' })).toEqual(['The tax code is 11 characters'])
 	})
 
-	it('accepts a codice fiscale that is not digits, because the collection does', () => {
-		expect(messages({ taxCode: 'RSSMRA80A01' })).toEqual([])
+	it('accepts a tax code that is not digits, because the collection does', () => {
+		expect(messages({ taxCode: 'ABCDEF80A01' })).toEqual([])
 	})
 
-	it('trims the codice fiscale before measuring it', () => {
+	it('trims the tax code before measuring it', () => {
 		expect(value({ taxCode: '  98765432109  ' }).taxCode).toBe('98765432109')
 	})
 
@@ -142,16 +142,16 @@ describe('companySchema — tax identifiers', () => {
 
 describe('companySchema — certified email', () => {
 	it('trims the Certified email before matching it', () => {
-		expect(value({ certifiedEmail: '  rossi@pec.it  ' }).certifiedEmail).toBe('rossi@pec.it')
+		expect(value({ certifiedEmail: '  certified@rivers.test  ' }).certifiedEmail).toBe('certified@rivers.test')
 	})
 
 	/*
 	 * The address rule is deliberately loose — one `@`, a dot in the domain, no whitespace — but it is
-	 * anchored at both ends. Unanchored it would approve "Mario Rossi <mario@rossi.it>", which the
+	 * anchored at both ends. Unanchored it would approve "Mark Rivers <mark@rivers.test>", which the
 	 * collection stores verbatim and no mail server will ever accept.
 	 */
 	it('refuses a Certified email that is not an address', () => {
-		expect(messages({ certifiedEmail: 'rossi-pec.it' })).toEqual(['The certified email is not a valid address'])
+		expect(messages({ certifiedEmail: 'certified-rivers.test' })).toEqual(['The certified email is not a valid address'])
 		expect(messages({ certifiedEmail: 'a b@c.de' })).toEqual(['The certified email is not a valid address'])
 		expect(messages({ certifiedEmail: 'a@b.cd e' })).toEqual(['The certified email is not a valid address'])
 	})
@@ -177,7 +177,7 @@ describe('companySchema — postal code and province', () => {
 	})
 
 	it('trims and upper-cases the province', () => {
-		expect(value({ province: '  mi  ' }).province).toBe('MI')
+		expect(value({ province: '  ma  ' }).province).toBe('MA')
 	})
 })
 
@@ -191,30 +191,30 @@ describe('companySchema — postal code and province', () => {
  */
 describe('companySchema — the composed address', () => {
 	it('refuses a line that is not the address the fields under it spell out', () => {
-		expect(messages({ addressComplete: 'Via Roma 2, 20100 Milano (MI)' })).toEqual(['Select the address from the list'])
-		expect(messages({ addressComplete: 'Via Roma 1' })).toEqual(['Select the address from the list'])
+		expect(messages({ addressComplete: '2 Main Street, 02109 Boston (MA)' })).toEqual(['Select the address from the list'])
+		expect(messages({ addressComplete: '1 Main Street' })).toEqual(['Select the address from the list'])
 		expect(messages({ addressComplete: '' })).toEqual(['Select the address from the list'])
 	})
 
 	// Whichever of the four moved, the line stops matching — the rule is the whole address and not the
 	// street half of it.
 	it('refuses a line left behind by any one of the four fields', () => {
-		expect(messages({ postalCode: '20121' })).toEqual(['Select the address from the list'])
-		expect(messages({ city: 'Roma' })).toEqual(['Select the address from the list'])
-		expect(messages({ province: 'RM' })).toEqual(['Select the address from the list'])
+		expect(messages({ postalCode: '02108' })).toEqual(['Select the address from the list'])
+		expect(messages({ city: 'New York' })).toEqual(['Select the address from the list'])
+		expect(messages({ province: 'NY' })).toEqual(['Select the address from the list'])
 	})
 
 	// It is reported on the box, because the box is where the owner can do something about it: the
 	// four fields it is really about have no input on the page at all.
 	it('reports it on the box and not on a field with no input', () => {
-		const result = outcome({ addressComplete: 'Via Roma 2, 20100 Milano (MI)' })
+		const result = outcome({ addressComplete: '2 Main Street, 02109 Boston (MA)' })
 
 		expect(result.success).toBe(false)
 		expect(result.error?.issues.map((issue) => issue.path)).toEqual([['addressComplete']])
 	})
 
 	it('compares against the upper-cased province code, not the one that was typed', () => {
-		expect(messages({ province: '  mi  ' })).toEqual([])
+		expect(messages({ province: '  ma  ' })).toEqual([])
 	})
 })
 

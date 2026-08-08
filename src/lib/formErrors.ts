@@ -11,12 +11,12 @@ const ADDRESS_FIELDS: ReadonlySet<string> = new Set(FIELDS_ADDRESS)
  * Every message under one branch of the error tree, in the order react-hook-form stores them.
  *
  * Recursive because an error is not always one level down: a field array puts its rows under numeric
- * keys — `errors.openingHours[2].giorno` — and a form that listed only its own top-level fields would refuse to
+ * keys — `errors.openingHours[2].day` — and a form that listed only its own top-level fields would refuse to
  * save over a row it never named.
  *
  * **A node that has a message stops the walk.** A field array with a rule of its own carries both the
  * array-level message and the rows' — and the array-level one is the one that describes the problem, so
- * repeating "il field is required" under it adds nothing. It is also what keeps the walk off a leaf's
+ * repeating "the field is required" under it adds nothing. It is also what keeps the walk off a leaf's
  * internals: a `FieldError` carries a `ref` pointing at the real DOM node, and descending into that is
  * a walk of the document.
  */
@@ -46,7 +46,7 @@ const collect = (node: unknown, messages: string[]): void => {
  * fires together with whichever field broke it, and both messages describe the same one box.
  *
  * Deduped, because two rows of the same field array refused for the same reason produce the same
- * sentence twice, and a toast that says "il field is required" three times says nothing three times.
+ * sentence twice, and a toast that says "the field is required" three times says nothing three times.
  */
 export const messagesToFix = (errors: FieldErrors): string[] => {
 	const messages: string[] = []

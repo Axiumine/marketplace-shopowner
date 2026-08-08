@@ -13,7 +13,7 @@ import { messagesToFix } from '@/lib/formErrors'
  */
 const errors = (tree: Record<string, unknown>): FieldErrors => tree as unknown as FieldErrors
 
-describe('messaggiDaCorreggere', () => {
+describe('messagesToFix', () => {
 	it('is empty for a form with nothing wrong', () => {
 		expect(messagesToFix(errors({}))).toEqual([])
 	})
@@ -37,16 +37,16 @@ describe('messaggiDaCorreggere', () => {
 	// stopped at the top level would refuse the save over a box it never named.
 	it('descends into a field array', () => {
 		const tree = {
-			openingHours: [{ day: { message: 'Day is required' } }, { da: { message: "L'apertura is required" } }]
+			openingHours: [{ day: { message: 'Day is required' } }, { from: { message: 'Opening time is required' } }]
 		}
 
-		expect(messagesToFix(errors(tree))).toEqual(['Day is required', "L'apertura is required"])
+		expect(messagesToFix(errors(tree))).toEqual(['Day is required', 'Opening time is required'])
 	})
 
 	// The rows of a field array are sparse — react-hook-form leaves a hole where a row is fine — and an
 	// object is the only thing that can carry a message.
 	it('walks past the holes and the values that are not objects', () => {
-		const tree = { openingHours: [undefined, null, 'rotto', { day: { message: 'Day is required' } }] }
+		const tree = { openingHours: [undefined, null, 'broken', { day: { message: 'Day is required' } }] }
 
 		expect(messagesToFix(errors(tree))).toEqual(['Day is required'])
 	})
@@ -55,14 +55,16 @@ describe('messaggiDaCorreggere', () => {
 	// would say the same thing twice in different words.
 	it('stops at a node that has a message of its own', () => {
 		const tree = {
-			openingHours: Object.assign([{ day: { message: 'Day is required' } }], { message: 'Serve almeno un openingHours' })
+			openingHours: Object.assign([{ day: { message: 'Day is required' } }], {
+				message: 'At least one openingHours is required'
+			})
 		}
 
-		expect(messagesToFix(errors(tree))).toEqual(['Serve almeno un openingHours'])
+		expect(messagesToFix(errors(tree))).toEqual(['At least one openingHours is required'])
 	})
 
-	// Two rows refused for the same reason are one sentence, not two: a toast that says "il field è
-	// obbligatorio" three times says nothing three times.
+	// Two rows refused for the same reason are one sentence, not two: a toast that says "the field is
+	// required" three times says nothing three times.
 	it('says the same sentence once', () => {
 		const tree = {
 			openingHours: [{ day: { message: 'Day is required' } }, { day: { message: 'Day is required' } }]
@@ -76,7 +78,7 @@ describe('messaggiDaCorreggere', () => {
 	 * that decides which one — six of the seven have no input of their own, so a list naming them would
 	 * send the operator looking for boxes that are not on screen.
 	 *
-	 * Two of them are wrong here on purpose: the CAP is the one reported, and the province's own message
+	 * Two of them are wrong here on purpose: the postal code is the one reported, and the province's own message
 	 * has to be absent rather than merely second.
 	 */
 	it('collapses the whole address to a single line', () => {
