@@ -55,8 +55,8 @@ const companyTwo = {
 	...company,
 	_id: '65f0000000000000000000a2',
 	legalName: 'White Trading Ltd',
-	// Both unique across the whole collection, so two rows seeded from one literal would be a pair no
-	// database would ever hold.
+	// Both unique across the whole collection, so two companies seeded from one literal would be a pair
+	// no database would ever hold.
 	vatNumber: '10987654321',
 	certifiedEmail: 'anna@pec.it'
 }
@@ -166,7 +166,7 @@ const MESSAGES_ADDRESS = [
 const OK = { CompanyUpdate: { data: { companyUpdate: true } } }
 /**
  * ⚠️ An object with an `_id`, not `true`. `companyAdd` answers `OnlyIdType` here and `Boolean` on the
- * Admin tier — the owner's flow is "create the card, then edit it", so the id of the row just stored is
+ * Admin tier — the owner's flow is "create the card, then edit it", so the id of the company just stored is
  * the one thing the response has to carry.
  */
 const OK_ADD = { CompanyAdd: { data: { companyAdd: { _id: '65f0000000000000000000a9' } } } }
@@ -379,10 +379,10 @@ describe('Companies — editing', () => {
 
 	/*
 	 * A company nobody touched is not merely nothing to send — it must not be *validated* either, or a
-	 * stored row the current rules would reject blocks a save the owner made on a different card.
+	 * stored company the current rules would reject blocks a save the owner made on a different card.
 	 *
-	 * The blank registryExtract is what such a row looks like: the field was unbounded and unchecked before the
-	 * extraction, so companies lifted out of a shop can carry one this form would refuse.
+	 * The blank registryExtract is what such a company looks like: the field was unbounded and unchecked before
+	 * the extraction, so companies lifted out of a shop can carry one this form would refuse.
 	 */
 	it('leaves an untouched company alone while another is saved', async () => {
 		const stub = stubGraphQL({ ...companies([{ ...company, registryExtract: '' }, companyTwo]), ...OK })
@@ -707,8 +707,8 @@ describe('Companies — the registered office', () => {
  * The trash beside a company's name. Queued exactly like the field editors: a click marks the card and
  * nothing reaches the server until Save.
  *
- * ⚠️ `companyDel` is a **soft** delete — it stamps `deleted` and the row keeps its VAT number — and it
- * still answers 403 for a company this owner does not own or has already retired, because
+ * ⚠️ `companyDel` is a **soft** delete — it stamps `deleted` and the company keeps its VAT number — and
+ * it still answers 403 for a company this owner does not own or has already retired, because
  * `throwIfShopOwnerDontOwnCompany` filters `deleted`. That message has to reach the owner, which is why
  * the card's toast sits outside the mask that covers everything else.
  */
