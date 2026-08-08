@@ -138,8 +138,8 @@ That is what lets a page be rendered in a test without a router assertion in the
   hook refuses it; `env` (no dot) is the committed template and is safe to read. To inspect the dotted
   one, print key names only: `grep -oE '^[A-Za-z_0-9]+' .env`.
 - **This repo has no remote yet.** Where it gets published, and under which org, is the user's call and
-  has not been made. Like every repo here except `marketplace-common`, it is **push-on-request**: never
-  run `git push` unless the user asked for it in that message.
+  has not been made. It is **push-on-request**: never run `git push` unless the user asked for it in
+  that message.
 - **The pre-push hook selects node itself**, ahead of its gates. It reads `engines.node` from
   `package.json` — never a hard-coded version — and sources nvm to switch if the current node does not
   satisfy it. Necessary because every gate shells out to yarn and yarn's `engines` check is a hard
