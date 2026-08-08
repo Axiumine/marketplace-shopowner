@@ -2,7 +2,7 @@
 
 exports[`Button > renders the danger variant 1`] = `
 <button
-  class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-app-error text-palette-white hover:bg-pomodoro px-4"
+  class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-app-error text-palette-white hover:bg-tomato px-4"
   type="button"
 >
   Action
@@ -20,7 +20,7 @@ exports[`Button > renders the ghost variant 1`] = `
 
 exports[`Button > renders the loading state 1`] = `
 <button
-  class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-third text-palette-white hover:bg-pomodoro px-4"
+  class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-third text-palette-white hover:bg-tomato px-4"
   disabled=""
   type="button"
 >
@@ -44,7 +44,7 @@ exports[`Button > renders the loading state 1`] = `
 
 exports[`Button > renders the primary variant 1`] = `
 <button
-  class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-third text-palette-white hover:bg-pomodoro px-4"
+  class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-third text-palette-white hover:bg-tomato px-4"
   type="button"
 >
   Action

@@ -5,7 +5,7 @@ import { Alert } from '@/components/ui/Alert'
 
 describe('Alert', () => {
 	// `alert` is an assertive live region and interrupts whatever a screen reader is saying. Right for a
-	// failed login, wrong for "salvato" — so the tone decides the role, and that mapping is the one
+	// failed login, wrong for "saved" — so the tone decides the role, and that mapping is the one
 	// thing in this component that can be wrong.
 	it('announces an error assertively', () => {
 		render(<Alert tone="error">Invalid credentials</Alert>)

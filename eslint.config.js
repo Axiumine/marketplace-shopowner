@@ -25,7 +25,7 @@ import globals from 'globals'
  * one impossible, because a path that matches no `files` glob is never linted whether or not anyone
  * thought to ignore it.
  */
-const SORGENTI = ['src/**/*.{ts,tsx}', 'test/**/*.{ts,tsx}']
+const SOURCES = ['src/**/*.{ts,tsx}', 'test/**/*.{ts,tsx}']
 const CONFIG_ROOT = ['*.{ts,js,mjs}']
 
 export default [
@@ -36,9 +36,9 @@ export default [
 		// and the eight backend repos list the same paths, so the nine configs stay comparable.
 		ignores: ['dist/**', 'coverage/**', '.stryker-tmp/**', 'reports/**', '.gitnexus/**', '.qodana/**', 'src/gql/**']
 	},
-	{ ...js.configs.recommended, files: [...SORGENTI, ...CONFIG_ROOT] },
+	{ ...js.configs.recommended, files: [...SOURCES, ...CONFIG_ROOT] },
 	{
-		files: [...SORGENTI, '*.ts'],
+		files: [...SOURCES, '*.ts'],
 		languageOptions: {
 			parser: tsParser,
 			parserOptions: { ecmaVersion: 'latest', sourceType: 'module', ecmaFeatures: { jsx: true } },
@@ -90,11 +90,7 @@ export default [
 		// Turned off here rather than with an inline directive because the rule reports through the
 		// compiler's own diagnostic channel: `eslint --fix` classifies an `eslint-disable-next-line` for
 		// it as unused and deletes the comment, while the warning stays. A config override survives.
-		files: [
-			'src/features/shopOwners/TblShopOwners.tsx',
-			'src/features/shopOwners/ShopOwnerAddForm.tsx',
-			'src/features/shopOwners/PuntiVendita.tsx'
-		],
+		files: ['src/features/shopOwners/TblShopOwners.tsx', 'src/features/shopOwners/ShopOwnerAddForm.tsx'],
 		rules: { 'react-hooks/incompatible-library': 'off' }
 	},
 	{
@@ -118,5 +114,5 @@ export default [
 	// disagree with `prettier --write` about formatting. Scoped like the rest — a bare entry here
 	// would be harmless (it only switches rules off) but would still say the config applies to files
 	// this repo does not own.
-	{ ...prettierConfig, files: [...SORGENTI, ...CONFIG_ROOT] }
+	{ ...prettierConfig, files: [...SOURCES, ...CONFIG_ROOT] }
 ]

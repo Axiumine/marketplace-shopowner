@@ -4,18 +4,18 @@ import { addressError, composedAddress, coordinatesText, mapPoint } from '@/lib/
 
 /**
  * A GeoJSON Point is `[longitude, latitude]` — longitude first. Every mapping UI and every human writes
- * it the other way round, so a pair passed on in the order it arrived puts the marker in the sea off
- * Somalia about half the time.
+ * it the other way round, so a pair passed on in the order it arrived puts the marker in the Southern
+ * Ocean about half the time.
  */
-describe('puntoDiMap', () => {
+describe('mapPoint', () => {
 	it('reads the pair longitude first and hands it on by name', () => {
-		expect(mapPoint([9.19, 45.4642])).toEqual({ lat: 45.4642, lon: 9.19 })
+		expect(mapPoint([-71.06, 42.3601])).toEqual({ lat: 42.3601, lon: -71.06 })
 	})
 
 	// No map at all rather than a map of somewhere else: an address whose position did not arrive has no
 	// place on one, and a frame centred on a fallback would be a claim instead of a gap.
 	it('is nothing for a malformed pair', () => {
-		expect(mapPoint([9.19])).toBeNull()
+		expect(mapPoint([-71.06])).toBeNull()
 	})
 
 	// The case an shopOwner is normally in: `position` is optional on that collection and the caller
@@ -43,7 +43,7 @@ describe('puntoDiMap', () => {
  */
 describe('coordinateTesto', () => {
 	it('writes the pair as the two strings the form holds, longitude first', () => {
-		expect(coordinatesText([9.19, 45.4642])).toEqual({ longitude: '9.19', latitude: '45.4642' })
+		expect(coordinatesText([-71.06, 42.3601])).toEqual({ longitude: '-71.06', latitude: '42.3601' })
 	})
 
 	// Empty boxes, not the word "undefined" for the operator to delete: a pair of the wrong length is the
@@ -53,7 +53,7 @@ describe('coordinateTesto', () => {
 	})
 
 	it('leaves the missing half empty and keeps the one that came', () => {
-		expect(coordinatesText([9.19])).toEqual({ longitude: '9.19', latitude: '' })
+		expect(coordinatesText([-71.06])).toEqual({ longitude: '-71.06', latitude: '' })
 	})
 
 	// `0` again: the equator is a position, and `String(0)` is `'0'` rather than the fallback.
@@ -62,10 +62,10 @@ describe('coordinateTesto', () => {
 	})
 })
 
-describe('addressComposto', () => {
+describe('composedAddress', () => {
 	it('writes the four fields as one line', () => {
-		expect(composedAddress({ street: 'Via Roma 1', postalCode: '20100', city: 'Milano', province: 'MI' })).toBe(
-			'Via Roma 1, 20100 Milano (MI)'
+		expect(composedAddress({ street: '1 Main Street', postalCode: '02109', city: 'Boston', province: 'MA' })).toBe(
+			'1 Main Street, 02109 Boston (MA)'
 		)
 	})
 
@@ -73,8 +73,8 @@ describe('addressComposto', () => {
 	// otherwise seed a box that disagrees with the composite rule before anything was typed — and the
 	// save would demand an address be re-picked for a letter nobody can see.
 	it('upper-cases the province, as the schemas do', () => {
-		expect(composedAddress({ street: 'Via Roma 1', postalCode: '20100', city: 'Milano', province: 'mi' })).toBe(
-			'Via Roma 1, 20100 Milano (MI)'
+		expect(composedAddress({ street: '1 Main Street', postalCode: '02109', city: 'Boston', province: 'ma' })).toBe(
+			'1 Main Street, 02109 Boston (MA)'
 		)
 	})
 })

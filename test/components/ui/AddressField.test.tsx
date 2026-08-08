@@ -7,14 +7,14 @@ import type { FoundAddress } from '@/lib/nominatim'
 
 import { installOsm, resultOsm } from '../../helpers/nominatim'
 
-const MILAN = resultOsm()
+const BOSTON = resultOsm()
 
-const COMO = resultOsm({
+const SALEM = resultOsm({
 	place_id: 12,
-	display_name: 'Via Roma, 4, Como, CO, 22100, Italia',
-	lat: '45.80800',
-	lon: '9.08520',
-	address: { road: 'Via Roma', house_number: '4', postcode: '22100', city: 'Como', 'ISO3166-2-lvl6': 'IT-CO' }
+	display_name: 'Oak Avenue, 4, Salem, MA, 01970, USA',
+	lat: '42.51950',
+	lon: '-70.89670',
+	address: { road: 'Oak Avenue', house_number: '4', postcode: '01970', city: 'Salem', 'ISO3166-2-lvl4': 'US-MA' }
 })
 
 /**
@@ -77,7 +77,7 @@ const write = (text: string) => {
 }
 
 /** Runs out the debounce and lets the request that follows settle. */
-const attendiSearch = async () => {
+const awaitSearch = async () => {
 	await act(async () => {
 		await vi.advanceTimersByTimeAsync(SEARCH_DEBOUNCE_MS)
 	})
@@ -86,11 +86,11 @@ const attendiSearch = async () => {
 const map = () => screen.getByTitle('Address map')
 
 describe('AddressField', () => {
-	it('renders a map of Italy before anything is typed', () => {
+	it('renders the country centre before anything is typed', () => {
 		installOsm()
 		const { container } = render(<Host />)
 
-		expect(map().getAttribute('src')).toContain('marker=41.90280,12.49640')
+		expect(map().getAttribute('src')).toContain('marker=39.82830,-98.57950')
 		expect(container).toMatchSnapshot()
 	})
 
@@ -98,38 +98,38 @@ describe('AddressField', () => {
 	 * Nominatim is a donated service with a one-request-per-second policy, so the two guards that keep
 	 * requests off it are behaviour, not optimisation.
 	 *
-	 * The padded value is the one that matters: `'  Via  '` is seven characters and three letters, and a
+	 * The padded value is the one that matters: `'  Oak  '` is seven characters and three letters, and a
 	 * length check that forgot to trim would spend a request on a box that looks empty.
 	 */
-	it.each(['Via', '  Via  '])('does not geocode %o — too short to be an address', async (text) => {
-		const osm = installOsm({ results: [MILAN] })
+	it.each(['Oak', '  Oak  '])('does not geocode %o — too short to be an address', async (text) => {
+		const osm = installOsm({ results: [BOSTON] })
 		render(<Host />)
 
 		write(text)
-		await attendiSearch()
+		await awaitSearch()
 
 		expect(osm.calls).toHaveLength(0)
 		expect(screen.queryByRole('list')).not.toBeInTheDocument()
 	})
 
-	// Exactly at the minimum, which is the boundary the guard is written on: `Roma` is four characters
+	// Exactly at the minimum, which is the boundary the guard is written on: `Main` is four characters
 	// and is geocodable.
 	it('geocodes a value exactly at the minimum length', async () => {
-		const osm = installOsm({ results: [MILAN] })
+		const osm = installOsm({ results: [BOSTON] })
 		render(<Host />)
 
 		expect(MIN_LENGTH).toBe(4)
-		write('Roma')
-		await attendiSearch()
+		write('Main')
+		await awaitSearch()
 
 		expect(osm.calls).toHaveLength(1)
 	})
 
 	it('waits for the typing to stop before spending a request', async () => {
-		const osm = installOsm({ results: [MILAN] })
+		const osm = installOsm({ results: [BOSTON] })
 		render(<Host />)
 
-		write('Via Rom')
+		write('Main Str')
 		await act(async () => {
 			await vi.advanceTimersByTimeAsync(SEARCH_DEBOUNCE_MS - 1)
 		})
@@ -138,24 +138,24 @@ describe('AddressField', () => {
 		// between two words. One that appears on the first keystroke is on screen for the whole address.
 		expect(screen.queryByRole('status')).not.toBeInTheDocument()
 
-		write('Via Roma 1')
-		await attendiSearch()
+		write('1 Main Street')
+		await awaitSearch()
 
 		expect(osm.calls).toHaveLength(1)
-		expect(osm.calls[0]).toContain('q=Via+Roma+1')
+		expect(osm.calls[0]).toContain('q=1+Main+Street')
 	})
 
 	it('shows the suggestions OSM answered with', async () => {
-		installOsm({ results: [MILAN, COMO] })
+		installOsm({ results: [BOSTON, SALEM] })
 		const { container } = render(<Host />)
 
-		write('Via Roma 1')
-		await attendiSearch()
+		write('1 Main Street')
+		await awaitSearch()
 
-		const suggerimenti = screen.getAllByRole('button')
-		expect(suggerimenti.map((b) => b.textContent)).toEqual([
-			'Via Roma, 1, Milano, MI, 20121, Italia',
-			'Via Roma, 4, Como, CO, 22100, Italia'
+		const suggestions = screen.getAllByRole('button')
+		expect(suggestions.map((b) => b.textContent)).toEqual([
+			'Main Street, 1, Boston, MA, 02108, USA',
+			'Oak Avenue, 4, Salem, MA, 01970, USA'
 		])
 		expect(container).toMatchSnapshot()
 	})
@@ -164,8 +164,8 @@ describe('AddressField', () => {
 		installOsm({ pending: true })
 		const { container } = render(<Host />)
 
-		write('Via Roma 1')
-		await attendiSearch()
+		write('1 Main Street')
+		await awaitSearch()
 
 		expect(screen.getByRole('status')).toHaveTextContent('Searching addresses')
 		expect(container).toMatchSnapshot()
@@ -175,21 +175,21 @@ describe('AddressField', () => {
 	// "the map updates as you write" means, and it is the only feedback that says the geocoder
 	// understood the address.
 	it('moves the map onto the best match while the address is being typed', async () => {
-		installOsm({ results: [MILAN, COMO] })
+		installOsm({ results: [BOSTON, SALEM] })
 		render(<Host />)
 
-		write('Via Roma 1')
-		await attendiSearch()
+		write('1 Main Street')
+		await awaitSearch()
 
-		expect(map().getAttribute('src')).toContain('marker=45.46420,9.18950')
+		expect(map().getAttribute('src')).toContain('marker=42.36010,-71.05890')
 	})
 
 	it('says so when the address matches nothing', async () => {
 		installOsm({ results: [] })
 		const { container } = render(<Host />)
 
-		write('Via Inesistente 99')
-		await attendiSearch()
+		write('99 Nowhere Street')
+		await awaitSearch()
 
 		expect(screen.getByRole('status')).toHaveTextContent('No address found')
 		expect(screen.queryByRole('list')).not.toBeInTheDocument()
@@ -202,8 +202,8 @@ describe('AddressField', () => {
 		installOsm({ status: 429, body: 'Too Many Requests' })
 		const { container } = render(<Host />)
 
-		write('Via Roma 1')
-		await attendiSearch()
+		write('1 Main Street')
+		await awaitSearch()
 
 		expect(screen.getByRole('alert')).toHaveTextContent('Address search unavailable')
 		expect(container).toMatchSnapshot()
@@ -213,29 +213,29 @@ describe('AddressField', () => {
 	 * The request the operator has already typed past is abandoned, and abandoning it is what keeps the
 	 * answers in order.
 	 *
-	 * Nominatim answers a vague address slowly and a precise one quickly, so the slow answer to `Via
-	 * Roma` can land well after the quick one to `Via Roma 4 Como` — and a client that lets both through
+	 * Nominatim answers a vague address slowly and a precise one quickly, so the slow answer to `Main
+	 * Street` can land well after the quick one to `4 Oak Avenue Salem` — and a client that lets both through
 	 * shows the older matches last, over the newer ones, with the map on a city the operator has
 	 * finished correcting.
 	 */
 	it('lets the newer answer win over an older one still in flight', async () => {
-		installOsm([{ results: [MILAN], delay: 3000 }, { results: [COMO] }])
+		installOsm([{ results: [BOSTON], delay: 3000 }, { results: [SALEM] }])
 		render(<Host />)
 
-		write('Via Roma')
-		await attendiSearch()
+		write('Main Street')
+		await awaitSearch()
 
-		write('Via Roma 4 Como')
-		await attendiSearch()
+		write('4 Oak Avenue Salem')
+		await awaitSearch()
 
 		// Where the first answer would have landed, had it not been given up on.
 		await act(async () => {
 			await vi.advanceTimersByTimeAsync(3000)
 		})
 
-		expect(screen.getByRole('button', { name: 'Via Roma, 4, Como, CO, 22100, Italia' })).toBeInTheDocument()
-		expect(screen.queryByRole('button', { name: 'Via Roma, 1, Milano, MI, 20121, Italia' })).not.toBeInTheDocument()
-		expect(map().getAttribute('src')).toContain('marker=45.80800,9.08520')
+		expect(screen.getByRole('button', { name: 'Oak Avenue, 4, Salem, MA, 01970, USA' })).toBeInTheDocument()
+		expect(screen.queryByRole('button', { name: 'Main Street, 1, Boston, MA, 02108, USA' })).not.toBeInTheDocument()
+		expect(map().getAttribute('src')).toContain('marker=42.51950,-70.89670')
 	})
 
 	/*
@@ -249,12 +249,12 @@ describe('AddressField', () => {
 		installOsm({ pending: true })
 		render(<Host />)
 
-		write('Via Roma')
-		await attendiSearch()
+		write('Main Street')
+		await awaitSearch()
 		expect(screen.getByRole('status')).toHaveTextContent('Searching addresses')
 
-		write('Via')
-		await attendiSearch()
+		write('Oak')
+		await awaitSearch()
 
 		expect(screen.queryByRole('alert')).not.toBeInTheDocument()
 		expect(screen.queryByRole('status')).not.toBeInTheDocument()
@@ -271,50 +271,50 @@ describe('AddressField', () => {
 		installOsm({ pending: true })
 		render(<Host />)
 
-		write('Via Roma')
-		await attendiSearch()
+		write('Main Street')
+		await awaitSearch()
 
-		write('Via')
-		await attendiSearch()
+		write('Oak')
+		await awaitSearch()
 
-		write('Via Roma')
-		await attendiSearch()
+		write('Main Street')
+		await awaitSearch()
 
 		expect(screen.queryByRole('alert')).not.toBeInTheDocument()
 		expect(screen.getByRole('status')).toHaveTextContent('Searching addresses')
 	})
 
 	it('hands the whole geocoded address up and closes the list when one is picked', async () => {
-		installOsm({ results: [MILAN, COMO] })
+		installOsm({ results: [BOSTON, SALEM] })
 		const onSelect = vi.fn()
 		render(<Host onSelect={onSelect} />)
 
-		write('Via Roma')
-		await attendiSearch()
-		fireEvent.click(screen.getByRole('button', { name: 'Via Roma, 4, Como, CO, 22100, Italia' }))
+		write('Main Street')
+		await awaitSearch()
+		fireEvent.click(screen.getByRole('button', { name: 'Oak Avenue, 4, Salem, MA, 01970, USA' }))
 
 		expect(onSelect).toHaveBeenCalledWith({
 			id: '12',
-			label: 'Via Roma, 4, Como, CO, 22100, Italia',
-			street: 'Via Roma 4',
-			postalCode: '22100',
-			city: 'Como',
-			province: 'CO',
-			lat: 45.808,
-			lon: 9.0852
+			label: 'Oak Avenue, 4, Salem, MA, 01970, USA',
+			street: '4 Oak Avenue',
+			postalCode: '01970',
+			city: 'Salem',
+			province: 'MA',
+			lat: 42.5195,
+			lon: -70.8967
 		})
 		expect(screen.queryByRole('list')).not.toBeInTheDocument()
 	})
 
 	it('leaves the map on the address that was picked, not on the best match', async () => {
-		installOsm({ results: [MILAN, COMO] })
+		installOsm({ results: [BOSTON, SALEM] })
 		render(<Host />)
 
-		write('Via Roma')
-		await attendiSearch()
-		fireEvent.click(screen.getByRole('button', { name: 'Via Roma, 4, Como, CO, 22100, Italia' }))
+		write('Main Street')
+		await awaitSearch()
+		fireEvent.click(screen.getByRole('button', { name: 'Oak Avenue, 4, Salem, MA, 01970, USA' }))
 
-		expect(map().getAttribute('src')).toContain('marker=45.80800,9.08520')
+		expect(map().getAttribute('src')).toContain('marker=42.51950,-70.89670')
 	})
 
 	/*
@@ -323,13 +323,13 @@ describe('AddressField', () => {
 	 * spending a second request to be told what the operator already accepted.
 	 */
 	it('does not geocode the address it just filled in', async () => {
-		const osm = installOsm({ results: [MILAN] })
+		const osm = installOsm({ results: [BOSTON] })
 		render(<Host />)
 
-		write('via roma milano')
-		await attendiSearch()
-		fireEvent.click(screen.getByRole('button', { name: 'Via Roma, 1, Milano, MI, 20121, Italia' }))
-		await attendiSearch()
+		write('main street boston')
+		await awaitSearch()
+		fireEvent.click(screen.getByRole('button', { name: 'Main Street, 1, Boston, MA, 02108, USA' }))
+		await awaitSearch()
 
 		expect(osm.calls).toHaveLength(1)
 		expect(screen.queryByRole('list')).not.toBeInTheDocument()
@@ -347,20 +347,20 @@ describe('AddressField', () => {
 	 * business. Only the keyboard is geocoded, and a pick is not the keyboard.
 	 */
 	it('does not geocode what a form writes back, whatever it writes', async () => {
-		const osm = installOsm({ results: [MILAN] })
+		const osm = installOsm({ results: [BOSTON] })
 		render(<Host compose={composed} />)
 
-		write('via roma milano')
-		await attendiSearch()
-		fireEvent.click(screen.getByRole('button', { name: 'Via Roma, 1, Milano, MI, 20121, Italia' }))
+		write('main street boston')
+		await awaitSearch()
+		fireEvent.click(screen.getByRole('button', { name: 'Main Street, 1, Boston, MA, 02108, USA' }))
 
-		expect(screen.getByLabelText('Address')).toHaveValue('Via Roma 1, 20121 Milano (MI)')
+		expect(screen.getByLabelText('Address')).toHaveValue('1 Main Street, 02108 Boston (MA)')
 		expect(screen.queryByRole('list')).not.toBeInTheDocument()
 		// Nothing at all under the box, not even the spinner. The debounce is still holding the text that led
 		// to the pick, and a field that reads that instead of the keyboard starts searching for it.
 		expect(screen.queryByRole('status')).not.toBeInTheDocument()
 
-		await attendiSearch()
+		await awaitSearch()
 
 		expect(osm.calls).toHaveLength(1)
 		expect(screen.queryByRole('list')).not.toBeInTheDocument()
@@ -369,20 +369,20 @@ describe('AddressField', () => {
 	// And it stays shut for as long as nobody types: the debounce has nothing left to settle onto, so no
 	// number of ticks brings the list back.
 	it('leaves the list shut until something is typed again', async () => {
-		const osm = installOsm({ results: [MILAN] })
+		const osm = installOsm({ results: [BOSTON] })
 		render(<Host compose={composed} />)
 
-		write('via roma milano')
-		await attendiSearch()
-		fireEvent.click(screen.getByRole('button', { name: 'Via Roma, 1, Milano, MI, 20121, Italia' }))
-		await attendiSearch()
-		await attendiSearch()
+		write('main street boston')
+		await awaitSearch()
+		fireEvent.click(screen.getByRole('button', { name: 'Main Street, 1, Boston, MA, 02108, USA' }))
+		await awaitSearch()
+		await awaitSearch()
 
 		expect(osm.calls).toHaveLength(1)
 		expect(screen.queryByRole('list')).not.toBeInTheDocument()
 
-		write('Via Roma 1, 20121 Milano (MI) 2')
-		await attendiSearch()
+		write('1 Main Street, 02108 Boston (MA) 2')
+		await awaitSearch()
 
 		expect(osm.calls).toHaveLength(2)
 		expect(screen.getByRole('list')).toBeInTheDocument()
@@ -394,26 +394,26 @@ describe('AddressField', () => {
 	 * about, and spend a request on a donated service to do it.
 	 */
 	it('does not geocode the address it was opened with', async () => {
-		const osm = installOsm({ results: [MILAN] })
-		render(<Host valueInitial="Via Verdi 8, 20100 Milano (MI)" />)
+		const osm = installOsm({ results: [BOSTON] })
+		render(<Host valueInitial="Green Street 8, 20100 Boston (MA)" />)
 
-		await attendiSearch()
+		await awaitSearch()
 
 		expect(osm.calls).toHaveLength(0)
 		expect(screen.queryByRole('list')).not.toBeInTheDocument()
 	})
 
-	// The shop the editor was opened on, and not the middle of Italy: the position exists, the card was
+	// The shop the editor was opened on, and not the middle of the country: the position exists, the card was
 	// drawing it a moment ago, and the first four characters typed are no reason to lose it.
 	it('frames the map on the point it was given until the geocoder answers', async () => {
-		installOsm({ results: [COMO] })
-		render(<Host initialCenter={{ lat: 45.4642, lon: 9.19 }} />)
+		installOsm({ results: [SALEM] })
+		render(<Host initialCenter={{ lat: 42.3601, lon: -71.06 }} />)
 
-		expect(map().getAttribute('src')).toContain('marker=45.46420,9.19000')
+		expect(map().getAttribute('src')).toContain('marker=42.36010,-71.06000')
 
-		write('Via Roma 4 Como')
-		await attendiSearch()
+		write('4 Oak Avenue Salem')
+		await awaitSearch()
 
-		expect(map().getAttribute('src')).toContain('marker=45.80800,9.08520')
+		expect(map().getAttribute('src')).toContain('marker=42.51950,-70.89670')
 	})
 })

@@ -10,8 +10,8 @@ describe('TextField', () => {
 		render(<TextField label="Email" />)
 
 		const input = screen.getByLabelText('Email')
-		await userEvent.type(input, 'operator@marketplace.it')
-		expect(input).toHaveValue('operator@marketplace.it')
+		await userEvent.type(input, 'operator@marketplace.test')
+		expect(input).toHaveValue('operator@marketplace.test')
 	})
 
 	it('generates an id when none is given, so two fields on one page do not collide', () => {
@@ -42,7 +42,7 @@ describe('TextField', () => {
 	})
 
 	// The message has to be announced *with* the field, not float unattached beneath it — otherwise a
-	// screen-reader user hears "Email, field di testo" and never learns why the form refused.
+	// screen-reader user hears "Email, text field" and never learns why the form refused.
 	it('wires the error message to the input', () => {
 		render(<TextField label="Email" id="field-email" error="Enter a valid email address" />)
 

@@ -28,12 +28,12 @@ beforeEach(async () => {
 const ISO = '2026-02-01T08:05:45.000Z'
 
 describe('formatDateTime', () => {
-	it('renders an ISO timestamp in Italian long form', () => {
-		expect(format.formatDateTime(ISO)).toBe('1 febbraio 2026 alle ore 08:05:45')
+	it('renders an ISO timestamp in long form', () => {
+		expect(format.formatDateTime(ISO)).toBe('1 February 2026 at 08:05:45')
 	})
 
 	it('renders NO_VALUE for an unparseable timestamp instead of "Invalid Date"', () => {
-		expect(format.formatDateTime('non una data')).toBe(format.NO_VALUE)
+		expect(format.formatDateTime('not a date')).toBe(format.NO_VALUE)
 		expect(format.NO_VALUE).toBe('---')
 	})
 })
@@ -72,7 +72,7 @@ describe('handleNullDate', () => {
 	})
 
 	it('formats a present timestamp', () => {
-		expect(format.handleNullDate(ISO)).toBe('1 febbraio 2026 alle ore 08:05:45')
+		expect(format.handleNullDate(ISO)).toBe('1 February 2026 at 08:05:45')
 	})
 })
 
@@ -87,13 +87,13 @@ describe('handleNullHash', () => {
 	})
 
 	it('does not pad a hash shorter than the cut', () => {
-		expect(format.handleNullHash('corto')).toBe('corto...')
+		expect(format.handleNullHash('short')).toBe('short...')
 	})
 })
 
 describe('handleNullBoolYN', () => {
-	it('renders only `true` as Sì', () => {
-		expect(format.handleNullBoolYN(true)).toBe('Sì')
+	it('renders only `true` as Yes', () => {
+		expect(format.handleNullBoolYN(true)).toBe('Yes')
 	})
 
 	it('renders false, null and undefined alike as No', () => {
@@ -118,28 +118,28 @@ describe('toDateInput', () => {
 	// The empty string, not NO_VALUE: this feeds a form control, where `---` is three characters the
 	// operator has to delete rather than an empty field.
 	it('is empty for an unparseable value', () => {
-		expect(format.toDateInput('non una data')).toBe('')
+		expect(format.toDateInput('not a date')).toBe('')
 	})
 })
 
-describe('toOraInput', () => {
+describe('toTimeInput', () => {
 	it('keeps the `HH:MM` half an `input type="time"` accepts', () => {
-		expect(format.toOraInput('2026-01-10T11:30:00.000Z')).toBe('11:30')
+		expect(format.toTimeInput('2026-01-10T11:30:00.000Z')).toBe('11:30')
 	})
 
 	it('is empty for an unparseable value', () => {
-		expect(format.toOraInput('mezzogiorno')).toBe('')
+		expect(format.toTimeInput('noon')).toBe('')
 	})
 })
 
-describe('toOraWire', () => {
+describe('toTimeWire', () => {
 	// The `Z` is the whole point: graphql-scalars' `Time` throws on a value with no timezone designator.
 	it('stamps the seconds and the designator the Time scalar insists on', () => {
-		expect(format.toOraWire('11:30')).toBe('11:30:00Z')
+		expect(format.toTimeWire('11:30')).toBe('11:30:00Z')
 	})
 })
 
-describe('vuotoInNull', () => {
+describe('emptyInNull', () => {
 	// `''` is a string of the right bsonType, so it would be *written* — a landline of no digits — while
 	// `null` is what the services' validators turn into an absent key.
 	it('turns a cleared box into null', () => {
@@ -154,8 +154,8 @@ describe('vuotoInNull', () => {
 
 describe('formatAddress', () => {
 	it('composes the one-line address the tables and cards show', () => {
-		expect(format.formatAddress({ street: 'via Roma 1', postalCode: '20100', city: 'Milano', province: 'MI' })).toBe(
-			'via Roma 1, 20100 Milano (MI)'
+		expect(format.formatAddress({ street: '1 main street', postalCode: '02109', city: 'Boston', province: 'MA' })).toBe(
+			'1 main street, 02109 Boston (MA)'
 		)
 	})
 })

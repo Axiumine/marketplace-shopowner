@@ -4,7 +4,7 @@ import { formatAddress } from '@/lib/format'
  * The GeoJSON pair, as the map component wants it.
  *
  * `null` and not a fallback point: there is no sensible place to draw an address whose position did not
- * arrive, and a map centred on Rome for it would be a claim rather than a gap. A shop always
+ * arrive, and a map centred on the country for it would be a claim rather than a gap. A shop always
  * has one — the field is required on its collection — while an shopOwner may not, since the point
  * was added there as optional and nothing backfilled it.
  *

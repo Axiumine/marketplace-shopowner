@@ -20,17 +20,17 @@ const OSM_EMBED = 'https://www.openstreetmap.org/export/embed.html'
 /** Nominatim's own cap is 50; five is what fits under a text field without becoming a page. */
 export const MAX_RESULTS = 5
 
-/** Half the side of the box the embed frames around a point, in degrees — roughly 450 m at Italian latitudes. */
+/** Half the side of the box the embed frames around a point, in degrees — roughly 450 m at mid latitudes. */
 export const DELTA_BBOX = 0.004
 
 /**
- * The province is read from `ISO3166-2-lvl6`, not from `county`.
+ * The province is read from `ISO3166-2-lvl4`, not from `county`.
  *
- * Level 6 is the Italian province and its value is already the code the form wants, prefixed with the
- * country: `IT-MI`. `county` is the province's *name*, and it arrives spelled in whichever way the
- * mappers wrote it — `Milano`, `Città Metropolitana di Milano` — with no way to reach `MI` from it.
+ * Level 4 is the first-level subdivision and its value is already the code the form wants, prefixed with the
+ * country: `US-MA`. `county` is the subdivision's *name*, and it arrives spelled in whichever way the
+ * mappers wrote it — `Boston`, `Greater Boston` — with no way to reach `MA` from it.
  */
-const ISO_PROVINCE = 'ISO3166-2-lvl6'
+const ISO_PROVINCE = 'ISO3166-2-lvl4'
 
 /**
  * A city is tagged by size, not by role: a city is `city`, a small town `town`, a village `village`.
@@ -54,7 +54,7 @@ const addressSchema = z.object({
 	[ISO_PROVINCE]: z.string().default('')
 })
 
-/** `lat` and `lon` arrive as strings — `"45.4642035"` — which is why they are coerced and not declared numeric. */
+/** `lat` and `lon` arrive as strings — `"42.3601035"` — which is why they are coerced and not declared numeric. */
 const resultSchema = z.object({
 	place_id: z.coerce.string(),
 	display_name: z.string(),
@@ -74,11 +74,11 @@ export interface FoundAddress {
 	readonly id: string
 	/** The full one-line address, as OSM writes it. What the suggestion list shows. */
 	readonly label: string
-	/** Street and house number, in Italian order: `Via Roma 1`. */
+	/** House number and street, in reading order: `1 Main Street`. */
 	readonly street: string
 	readonly postalCode: string
 	readonly city: string
-	/** The two-letter province code, upper-case: `MI`. Empty when OSM has no province for the point. */
+	/** The two-letter province code, upper-case: `MA`. Empty when OSM has no province for the point. */
 	readonly province: string
 	readonly lat: number
 	readonly lon: number
@@ -86,7 +86,7 @@ export interface FoundAddress {
 
 type AddressOsm = z.infer<typeof addressSchema>
 
-const cityDi = (address: AddressOsm): string => CITY_KEYS.map((key) => address[key]).find((v) => v !== '') ?? ''
+const cityOf = (address: AddressOsm): string => CITY_KEYS.map((key) => address[key]).find((v) => v !== '') ?? ''
 
 const map = (result: z.infer<typeof resultSchema>): FoundAddress => {
 	const address = result.address ?? EMPTY_ADDRESS
@@ -96,10 +96,10 @@ const map = (result: z.infer<typeof resultSchema>): FoundAddress => {
 		label: result.display_name,
 		// Filtered before joining: a road with no house number must not come back with a trailing space,
 		// and a point with neither must be the empty string the form treats as "nothing found".
-		street: [address.road, address.house_number].filter((part) => part !== '').join(' '),
+		street: [address.house_number, address.road].filter((part) => part !== '').join(' '),
 		postalCode: address.postcode,
-		city: cityDi(address),
-		// `IT-MI` → `MI`. An absent code is the empty string, and `''.slice(-2)` is `''`.
+		city: cityOf(address),
+		// `US-MA` → `MA`. An absent code is the empty string, and `''.slice(-2)` is `''`.
 		province: address[ISO_PROVINCE].slice(-2),
 		lat: result.lat,
 		lon: result.lon
@@ -109,8 +109,8 @@ const map = (result: z.infer<typeof resultSchema>): FoundAddress => {
 /**
  * Geocodes free text through Nominatim.
  *
- * Restricted to Italy: every field around it — a five-digit postal code, a two-letter province — is an Italian
- * address, so a Roman street in Texas is noise the owner has to read past. `signal` is required
+ * Restricted to one country: every field around it — a five-digit postal code, a two-letter province — is a domestic
+ * address, so a same-named street abroad is noise the owner has to read past. `signal` is required
  * rather than optional because the caller types faster than the network answers, and an unaborted
  * earlier request can land after a later one and overwrite the newer suggestions with older ones.
  *
@@ -124,12 +124,12 @@ export const searchAddresses = async (query: string, signal: AbortSignal): Promi
 		format: 'jsonv2',
 		addressdetails: '1',
 		limit: String(MAX_RESULTS),
-		countrycodes: 'it',
-		'accept-language': 'it'
+		countrycodes: 'us',
+		'accept-language': 'en'
 	})
 
 	const response = await fetch(`${NOMINATIM_SEARCH}?${params.toString()}`, { signal })
-	if (!response.ok) throw new Error(`Nominatim ha risposto ${String(response.status)}`)
+	if (!response.ok) throw new Error(`Nominatim answered ${String(response.status)}`)
 
 	return responseSchema.parse(await response.json()).map(map)
 }
@@ -143,7 +143,7 @@ export const searchAddresses = async (query: string, signal: AbortSignal): Promi
  * means the map always answers the same question — what is around this address.
  *
  * Fixed to five decimals (about a metre) so the URL is a pure function of the point: binary floating
- * point would otherwise write `9.190000000000001` into it and change the frame's `src` for nothing.
+ * point would otherwise write `-71.060000000000001` into it and change the frame's `src` for nothing.
  */
 export const urlMap = (lat: number, lon: number): string => {
 	const bbox = [lon - DELTA_BBOX, lat - DELTA_BBOX, lon + DELTA_BBOX, lat + DELTA_BBOX]

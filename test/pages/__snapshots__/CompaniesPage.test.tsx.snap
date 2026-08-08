@@ -81,7 +81,7 @@ exports[`CompaniesPage — the frame > renders 1`] = `
     class="mt-8 flex items-center justify-end gap-4"
   >
     <button
-      class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-third text-palette-white hover:bg-pomodoro px-[30px]"
+      class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-third text-palette-white hover:bg-tomato px-[30px]"
       disabled=""
       type="button"
     >

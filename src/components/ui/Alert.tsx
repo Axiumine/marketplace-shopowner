@@ -12,7 +12,7 @@ const TONE_CLASS: Record<AlertTone, string> = {
  * `role="alert"` only for the error tone.
  *
  * `alert` is an assertive live region: it interrupts whatever a screen reader is saying. That is
- * right for a failed login and wrong for "salvato", which is why the other tones use the polite
+ * right for a failed login and wrong for "saved", which is why the other tones use the polite
  * `status` role instead.
  */
 export const Alert = ({ tone, children }: { tone: AlertTone; children: ReactNode }) => (

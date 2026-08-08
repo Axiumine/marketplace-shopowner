@@ -208,7 +208,7 @@ describe('useSaving', () => {
 	})
 
 	/*
-	 * `salvaTutto` reports the refusal itself, rather than leaving it to be inferred from the page still
+	 * `saveAll` reports the refusal itself, rather than leaving it to be inferred from the page still
 	 * being dirty. A refused section is normally dirty too, which hides the difference — but not always:
 	 * the shop panel refuses a queued deletion whose mutation failed while its form holds nothing.
 	 */
@@ -420,7 +420,7 @@ const FormFirstName = ({ write }: { write: (values: FirstNameValues) => Promise<
 	)
 }
 
-describe('salvaValidato', () => {
+describe('saveValidated', () => {
 	it('does not write, and answers false, when the form does not validate', async () => {
 		const form = formFirstName('   ')
 		const write = vi.fn(async () => true)
@@ -431,7 +431,7 @@ describe('salvaValidato', () => {
 	})
 
 	it('writes, and answers true, when the form validates', async () => {
-		const form = formFirstName('Mario')
+		const form = formFirstName('Mark')
 		const write = vi.fn(async () => true)
 
 		expect(await outcomeOf(async () => await saveValidated(form.current.handleSubmit, write))).toBe(true)
@@ -441,7 +441,7 @@ describe('salvaValidato', () => {
 	// A valid form whose mutation came back with an error is still a refusal — the page has to stop at it
 	// exactly as it stops at an invalid one, or the sections after it write on top of a failed save.
 	it('answers false when the write itself fails', async () => {
-		const form = formFirstName('Mario')
+		const form = formFirstName('Mark')
 
 		expect(await outcomeOf(async () => await saveValidated(form.current.handleSubmit, async () => false))).toBe(false)
 	})
@@ -453,7 +453,7 @@ describe('salvaValidato', () => {
 	 * and a lower-case province to the server.
 	 */
 	it('hands the writer the parsed values, transforms and all', async () => {
-		const form = formFirstName('  Mario  ')
+		const form = formFirstName('  Mark  ')
 		const write = vi.fn(async () => true)
 
 		await outcomeOf(async () => await saveValidated(form.current.handleSubmit, write))
@@ -461,7 +461,7 @@ describe('salvaValidato', () => {
 		// The second argument is the submit event, and there is none: the save is a button press routed
 		// through the page's registry, not a `<form onSubmit>`. Asserted rather than left off, since a
 		// handler reading `event.preventDefault()` would be reading `undefined`.
-		expect(write).toHaveBeenCalledWith({ firstName: 'Mario' }, undefined)
+		expect(write).toHaveBeenCalledWith({ firstName: 'Mark' }, undefined)
 	})
 
 	/*
@@ -489,7 +489,7 @@ describe('salvaValidato', () => {
 		expect(screen.getByLabelText('First name')).toHaveClass('border-2', 'bg-app-error/10')
 		expect(screen.getByText('First name is required')).toBeInTheDocument()
 
-		await userEvent.type(screen.getByLabelText('First name'), 'Mario')
+		await userEvent.type(screen.getByLabelText('First name'), 'Mark')
 
 		expect(screen.getByLabelText('First name')).toHaveClass('border', 'bg-white')
 		expect(screen.getByLabelText('First name')).not.toHaveClass('bg-app-error/10')

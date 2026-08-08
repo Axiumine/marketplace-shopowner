@@ -26,13 +26,14 @@ export default defineConfig({
 		globals: true,
 		environment: 'jsdom',
 		// Every date on the operator screens is formatted through `Intl`, which reads the ambient zone.
-		// Without a fixed one the same assertion passes in Rome and fails in UTC — and the failure is an
-		// hour, which reads as a bug in the formatter rather than as a machine difference.
+		// Without a fixed one the same assertion passes on a machine an hour ahead of UTC and fails in
+		// UTC — and the failure is an hour, which reads as a bug in the formatter rather than as a
+		// machine difference.
 		//
 		// The test scripts export `TZ=UTC` as well, and both are needed. This setting reaches the worker
 		// through `process.env`, which is enough for vitest's own pool; Stryker's runner uses a pool where
-		// assigning `process.env.TZ` does not move ICU's zone, and its dry run failed on a `Europe/Rome`
-		// machine with an assertion an hour out. A process-level `TZ` is the only one that always holds.
+		// assigning `process.env.TZ` does not move ICU's zone, and its dry run failed on a machine an hour
+		// ahead of UTC with an assertion an hour out. A process-level `TZ` is the only one that always holds.
 		env: { TZ: 'UTC' },
 		// Order matters: the polyfill has to run before anything imports react-dom, and `vitest.setup.ts`
 		// imports it transitively on its second line. See the file for what breaks without it.

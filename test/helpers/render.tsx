@@ -12,7 +12,7 @@ import type { ShopOwnerIdentity } from '@/auth/session'
 import { setSession } from '@/auth/session'
 import { createAppRouter } from '@/router'
 
-export const OWNER: ShopOwnerIdentity = { email: 'owner@marketplace.it' }
+export const OWNER: ShopOwnerIdentity = { email: 'owner@marketplace.test' }
 
 export interface RenderOptions {
 	/**

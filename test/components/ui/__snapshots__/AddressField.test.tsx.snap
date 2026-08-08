@@ -22,7 +22,7 @@ exports[`AddressField > announces the wait while the geocoder is answering 1`] =
           autocomplete="off"
           class="w-full rounded-box border-tip py-2 pl-3 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border bg-white pr-3"
           id=":id-0:"
-          value="Via Roma 1"
+          value="1 Main Street"
         />
       </div>
     </div>
@@ -43,7 +43,7 @@ exports[`AddressField > announces the wait while the geocoder is answering 1`] =
     <iframe
       class="w-full rounded-box border border-tip"
       height="400"
-      src="https://www.openstreetmap.org/export/embed.html?bbox=12.49240,41.89880,12.50040,41.90680&layer=mapnik&marker=41.90280,12.49640"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=-98.58350,39.82430,-98.57550,39.83230&layer=mapnik&marker=39.82830,-98.57950"
       title="Address map"
     />
     <p
@@ -66,7 +66,7 @@ exports[`AddressField > announces the wait while the geocoder is answering 1`] =
 </div>
 `;
 
-exports[`AddressField > renders a map of Italy before anything is typed 1`] = `
+exports[`AddressField > renders the country centre before anything is typed 1`] = `
 <div>
   <div
     class="flex flex-col gap-2 "
@@ -95,7 +95,7 @@ exports[`AddressField > renders a map of Italy before anything is typed 1`] = `
     <iframe
       class="w-full rounded-box border border-tip"
       height="400"
-      src="https://www.openstreetmap.org/export/embed.html?bbox=12.49240,41.89880,12.50040,41.90680&layer=mapnik&marker=41.90280,12.49640"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=-98.58350,39.82430,-98.57550,39.83230&layer=mapnik&marker=39.82830,-98.57950"
       title="Address map"
     />
     <p
@@ -140,7 +140,7 @@ exports[`AddressField > reports a geocoder failure instead of pretending there a
           autocomplete="off"
           class="w-full rounded-box border-tip py-2 pl-3 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border bg-white pr-3"
           id=":id-0:"
-          value="Via Roma 1"
+          value="1 Main Street"
         />
       </div>
     </div>
@@ -153,7 +153,7 @@ exports[`AddressField > reports a geocoder failure instead of pretending there a
     <iframe
       class="w-full rounded-box border border-tip"
       height="400"
-      src="https://www.openstreetmap.org/export/embed.html?bbox=12.49240,41.89880,12.50040,41.90680&layer=mapnik&marker=41.90280,12.49640"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=-98.58350,39.82430,-98.57550,39.83230&layer=mapnik&marker=39.82830,-98.57950"
       title="Address map"
     />
     <p
@@ -198,7 +198,7 @@ exports[`AddressField > says so when the address matches nothing 1`] = `
           autocomplete="off"
           class="w-full rounded-box border-tip py-2 pl-3 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border bg-white pr-3"
           id=":id-0:"
-          value="Via Inesistente 99"
+          value="99 Nowhere Street"
         />
       </div>
     </div>
@@ -211,7 +211,7 @@ exports[`AddressField > says so when the address matches nothing 1`] = `
     <iframe
       class="w-full rounded-box border border-tip"
       height="400"
-      src="https://www.openstreetmap.org/export/embed.html?bbox=12.49240,41.89880,12.50040,41.90680&layer=mapnik&marker=41.90280,12.49640"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=-98.58350,39.82430,-98.57550,39.83230&layer=mapnik&marker=39.82830,-98.57950"
       title="Address map"
     />
     <p
@@ -256,7 +256,7 @@ exports[`AddressField > shows the suggestions OSM answered with 1`] = `
           autocomplete="off"
           class="w-full rounded-box border-tip py-2 pl-3 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border bg-white pr-3"
           id=":id-0:"
-          value="Via Roma 1"
+          value="1 Main Street"
         />
       </div>
     </div>
@@ -271,7 +271,7 @@ exports[`AddressField > shows the suggestions OSM answered with 1`] = `
           class="w-full rounded-box px-3 py-2 text-left text-sm hover:bg-palette-bg1 focus-visible:bg-palette-bg1 focus-visible:outline-none"
           type="button"
         >
-          Via Roma, 1, Milano, MI, 20121, Italia
+          Main Street, 1, Boston, MA, 02108, USA
         </button>
       </li>
       <li
@@ -281,14 +281,14 @@ exports[`AddressField > shows the suggestions OSM answered with 1`] = `
           class="w-full rounded-box px-3 py-2 text-left text-sm hover:bg-palette-bg1 focus-visible:bg-palette-bg1 focus-visible:outline-none"
           type="button"
         >
-          Via Roma, 4, Como, CO, 22100, Italia
+          Oak Avenue, 4, Salem, MA, 01970, USA
         </button>
       </li>
     </ul>
     <iframe
       class="w-full rounded-box border border-tip"
       height="400"
-      src="https://www.openstreetmap.org/export/embed.html?bbox=9.18550,45.46020,9.19350,45.46820&layer=mapnik&marker=45.46420,9.18950"
+      src="https://www.openstreetmap.org/export/embed.html?bbox=-71.06290,42.35610,-71.05490,42.36410&layer=mapnik&marker=42.36010,-71.05890"
       title="Address map"
     />
     <p

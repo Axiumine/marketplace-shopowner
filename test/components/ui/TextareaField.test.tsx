@@ -45,7 +45,7 @@ describe('TextareaField', () => {
 	})
 
 	// The message has to be announced *with* the field, not float unattached beneath it — otherwise a
-	// screen-reader user hears "Note, casella di testo" and never learns why the form refused.
+	// screen-reader user hears "Note, text box" and never learns why the form refused.
 	it('wires the error message to the textarea', () => {
 		render(<TextareaField label="Notes" id="field-note" error="The notes cannot exceed 2000 characters" />)
 

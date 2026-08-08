@@ -19,7 +19,7 @@ describe('coordinate', () => {
 	const longitude = coordinate('Longitude', 180)
 
 	it('takes a number inside its bound', () => {
-		expect(longitude.parse('9.19')).toBe('9.19')
+		expect(longitude.parse('-71.06')).toBe('-71.06')
 	})
 
 	// The trim is the rule, not a tidy-up: `Number('   ')` is `0`, so a box holding nothing but spaces
@@ -43,7 +43,7 @@ describe('required', () => {
 	// The trim is what makes "empty" mean what an operator means by it: a box holding three spaces looks
 	// blank and would otherwise pass a bare `min(1)`, storing whitespace as a legal name.
 	it('trims, and answers the label when what is left is nothing', () => {
-		expect(legalName.parse('  Rossi   ')).toBe('Rossi')
+		expect(legalName.parse('  Rivers   ')).toBe('Rivers')
 		expect(legalName.safeParse('   ').error?.issues[0]?.message).toBe('Legal name is required')
 	})
 
@@ -84,17 +84,17 @@ describe('optionalEmail', () => {
 	})
 
 	it('takes an address that looks like one', () => {
-		expect(contact().parse('mario@rossi.it')).toBe('mario@rossi.it')
+		expect(contact().parse('mark@rivers.test')).toBe('mark@rivers.test')
 	})
 
 	it('refuses anything else', () => {
-		expect(contact().safeParse('mario@rossi').error?.issues[0]?.message).toBe('The contact email is not a valid address')
+		expect(contact().safeParse('mark@rivers').error?.issues[0]?.message).toBe('The contact email is not a valid address')
 	})
 
 	// The cap is checked before the shape, so an over-length address is reported as too long rather than
 	// as malformed — two different mistakes, and the first is the one the operator made.
 	it('caps before it checks the shape', () => {
-		const long = `${'v'.repeat(250)}@rossi.it`
+		const long = `${'v'.repeat(250)}@rivers.test`
 
 		expect(contact().safeParse(long).error?.issues[0]?.message).toBe('The contact email cannot exceed 250 characters')
 	})
@@ -103,14 +103,14 @@ describe('optionalEmail', () => {
 /*
  * Deliberately loose, and the same shape the services use. Asserted as a pattern rather than through a
  * form because the interesting cases are the ones a form's own `type="email"` would refuse first: jsdom
- * enforces interactive validation, so a bare `mario` never reaches zod from a keyboard at all.
+ * enforces interactive validation, so a bare `mark` never reaches zod from a keyboard at all.
  */
 describe('SHAPE_EMAIL', () => {
-	it.each(['mario@rossi.it', 'a+tag@sub.domain.co.uk'])('accepts %s', (address) => {
+	it.each(['mark@rivers.test', 'a+tag@sub.domain.co.uk'])('accepts %s', (address) => {
 		expect(SHAPE_EMAIL.test(address)).toBe(true)
 	})
 
-	it.each(['mario', 'mario@rossi', 'mario@@rossi.it', 'ma rio@rossi.it', 'mario@ros si.it', ''])('refuses %s', (address) => {
+	it.each(['mark', 'mark@rivers', 'mark@@rivers.test', 'ma rk@rivers.test', 'mark@ros si.it', ''])('refuses %s', (address) => {
 		expect(SHAPE_EMAIL.test(address)).toBe(false)
 	})
 })

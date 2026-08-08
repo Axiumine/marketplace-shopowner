@@ -112,8 +112,8 @@ to need them yet — the first test that renders a date or a form will.
 **Timezone.** Every date on screen goes through `Intl`, which reads the ambient zone. `vitest.config.ts`
 sets `env: { TZ: 'UTC' }`, and that is enough for a plain `vitest run` — but Stryker's vitest runner
 uses a worker pool where assigning `process.env.TZ` does not move ICU's zone, so the dry run failed with
-`expected '10 gennaio 2026 alle ore 10:30:00' to be '…09:30:00'` on a developer machine in
-`Europe/Rome`. The scripts therefore export `TZ=UTC` at process level as well; keep both.
+`expected '10 January 2026 at 10:30:00' to be '…09:30:00'` on a developer machine one hour ahead of
+UTC. The scripts therefore export `TZ=UTC` at process level as well; keep both.
 
 **`useId`.** React counts per test *file*, so inserting a test above a snapshot renumbers `id` and
 `aria-labelledby` in a snapshot nobody touched. `vitest.setup.ts` installs a serializer that renumbers

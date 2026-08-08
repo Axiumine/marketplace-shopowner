@@ -19,8 +19,8 @@ export const SEARCH_DEBOUNCE_MS = 700
 /** Below this nothing is geocodable — `Via` matches every street in the country. */
 export const MIN_LENGTH = 4
 
-/** Rome. What the map frames when there is nothing else to frame, so the frame is never blank. */
-const ITALY_CENTER = { lat: 41.9028, lon: 12.4964 }
+/** The country's geographic centre. What the map frames when there is nothing else to frame. */
+const COUNTRY_CENTER = { lat: 39.8283, lon: -98.5795 }
 
 /** A point the map can be framed on. Same two names the geocoder answers with. */
 interface Point {
@@ -37,8 +37,8 @@ interface Point {
  */
 type Outcome =
 	| { readonly type: 'searching' }
-	| { readonly type: 'trovati'; readonly results: readonly FoundAddress[] }
-	| { readonly type: 'vuoto' }
+	| { readonly type: 'found'; readonly results: readonly FoundAddress[] }
+	| { readonly type: 'empty' }
 	| { readonly type: 'error' }
 
 /**
@@ -59,13 +59,13 @@ const geocodable = (text: string): boolean => text.trim().length >= MIN_LENGTH
  * What sits under the box: the answer to what is being asked, the wait for it, or nothing at all.
  *
  * All three are read off what is already known, and none of them is a state of its own. That matters
- * beyond tidiness — the alternative is writing "sto cercando" from inside the effect that starts the
+ * beyond tidiness — the alternative is writing "searching" from inside the effect that starts the
  * request, and a synchronous write there is a second render for every keystroke that survives the
  * debounce, which is what `react-hooks/set-state-in-effect` is about.
  *
  * The three questions, in order:
  *
- * 1. Is there anything in the box worth geocoding? A pick empties `digitato` — the box then holds
+ * 1. Is there anything in the box worth geocoding? A pick empties `typed` — the box then holds
  *    whatever the *form* wrote, which is not something anybody typed — so a pick closes the list here,
  *    and it stays closed until a key is pressed.
  * 2. Has the geocoder answered the query being asked? Then that answer, whatever it was. While the
@@ -103,10 +103,10 @@ interface AddressFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
 	/** Called with the whole geocoded address, so the form can fill postal code, city and province from it. */
 	onSelect: (address: FoundAddress) => void
 	/**
-	 * Where to frame the map before anything is typed. Rome when nothing is given.
+	 * Where to frame the map before anything is typed. The country centre when nothing is given.
 	 *
 	 * For a form editing an address that already exists: the shop is somewhere, the map knows where, and
-	 * opening the editor on the middle of Italy loses that for no reason. A form creating one passes
+	 * opening the editor on the middle of the country loses that for no reason. A form creating one passes
 	 * nothing, because there is nothing to pass.
 	 */
 	initialCenter?: Point | null | undefined
@@ -171,13 +171,13 @@ export const AddressField = ({
 			.then((found) => {
 				const first = found[0]
 				if (first === undefined) {
-					setResponse({ query, outcome: { type: 'vuoto' } })
+					setResponse({ query, outcome: { type: 'empty' } })
 					return
 				}
 
 				// The map follows the best match as the address is typed, before anything is picked.
 				setPoint(first)
-				setResponse({ query, outcome: { type: 'trovati', results: found } })
+				setResponse({ query, outcome: { type: 'found', results: found } })
 			})
 			.catch(() => {
 				// An aborted request is this effect's own cleanup, not a failure: the owner typed another
@@ -187,8 +187,8 @@ export const AddressField = ({
 				setResponse({ query, outcome: { type: 'error' } })
 			})
 
-		// Aborting is what keeps the answers in order. Without it a slow request for `Via Rom` can land
-		// after a fast one for `Via Roma 1` and replace the newer suggestions with older ones.
+		// Aborting is what keeps the answers in order. Without it a slow request for `Main Str` can land
+		// after a fast one for `1 Main Street` and replace the newer suggestions with older ones.
 		return () => {
 			controller.abort()
 		}
@@ -201,7 +201,7 @@ export const AddressField = ({
 		onSelect(address)
 	}
 
-	const center = point ?? initialCenter ?? ITALY_CENTER
+	const center = point ?? initialCenter ?? COUNTRY_CENTER
 
 	return (
 		<div className={`flex flex-col gap-2 ${className}`}>
@@ -220,12 +220,12 @@ export const AddressField = ({
 
 			{outcome?.type === 'searching' ? <Spinner label="Searching addresses" /> : null}
 			{outcome?.type === 'error' ? <Alert tone="error">Address search unavailable</Alert> : null}
-			{outcome?.type === 'vuoto' ? (
+			{outcome?.type === 'empty' ? (
 				<p role="status" className="text-sm text-tip">
 					No address found
 				</p>
 			) : null}
-			{outcome?.type === 'trovati' ? (
+			{outcome?.type === 'found' ? (
 				<ul aria-label="Addresses found" className="rounded-box border border-tip bg-white">
 					{outcome.results.map((result) => (
 						<li key={result.id} className="border-b border-palette-bg1 last:border-b-0">

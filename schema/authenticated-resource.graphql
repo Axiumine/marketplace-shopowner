@@ -48,7 +48,7 @@ type MutationsApi {
 
 	A duplicate `vatNumber` or `certifiedEmail` surfaces as a 409 through `tryCatchRethrow`, not as a
 	`false`: both indexes are plain global uniques with no partial filter, so a retired company keeps its
-	partita IVA occupied for good.
+	VAT number occupied for good.
 	"""
 	companyAdd(company: GraphQLInputCompany!): OnlyIdType!
 
@@ -83,21 +83,21 @@ type GraphQLCompany {
 	_id: ID!
 	idShopOwner: ID!
 	"""
-	Ragione sociale.
+	Legal name.
 	"""
 	legalName: String!
 	"""
-	Partita IVA. Globally unique across the platform, forever — see `companyAdd`.
+	VAT number. Globally unique across the platform, forever — see `companyAdd`.
 	"""
 	vatNumber: String!
 	"""
-	Codice fiscale, when it differs from the partita IVA.
+	Tax code, when it differs from the VAT number.
 	"""
 	taxCode: String
 	contactPerson: String!
 	administrator: String!
 	"""
-	Codice univoco / SDI, for electronic invoicing.
+	Unique code / SDI, for electronic invoicing.
 	"""
 	uniqueCode: String
 	"""

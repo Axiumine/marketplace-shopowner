@@ -80,7 +80,7 @@ describe('LoginPage', () => {
 		const stub = stubGraphQL({})
 		await renderRoute('/', signedOut)
 
-		await userEvent.type(screen.getByLabelText('Email'), 'owner@marketplace.it')
+		await userEvent.type(screen.getByLabelText('Email'), 'owner@marketplace.test')
 		await submit()
 
 		expect(await screen.findByText('Enter the password')).toBeInTheDocument()
@@ -93,20 +93,20 @@ describe('LoginPage', () => {
 		const stub = stubGraphQL({ Login: { errors: [graphQLError('Invalid credentials', undefined, 400)], status: 400 } })
 		await renderRoute('/', signedOut)
 
-		await fillIn('owner@marketplace.it', 'corta')
+		await fillIn('owner@marketplace.test', 'short')
 		await submit()
 
 		await waitFor(() => {
 			expect(stub.calls).toHaveLength(1)
 		})
-		expect(stub.calls[0]?.variables).toEqual({ email: 'owner@marketplace.it', password: 'corta', rememberMe: false })
+		expect(stub.calls[0]?.variables).toEqual({ email: 'owner@marketplace.test', password: 'short', rememberMe: false })
 	})
 
 	it('signs in, stores the token and lands on the dashboard', async () => {
 		const stub = stubGraphQL({ ...OK_LOGIN, ...PROBE })
 		const { router } = await renderRoute('/', signedOut)
 
-		await fillIn('owner@marketplace.it', 'password123')
+		await fillIn('owner@marketplace.test', 'password123')
 		await submit()
 
 		expect(await screen.findByRole('heading', { name: 'Dashboard' })).toBeInTheDocument()
@@ -125,14 +125,14 @@ describe('LoginPage', () => {
 		stubGraphQL({ ...OK_LOGIN, ...PROBE })
 		const { router } = await renderRoute('/', signedOut)
 
-		await fillIn('owner@marketplace.it', 'password123')
+		await fillIn('owner@marketplace.test', 'password123')
 		await submit()
 
 		expect(await screen.findByRole('heading', { name: 'Dashboard' })).toBeInTheDocument()
-		expect(getPendingEmail()).toBe('owner@marketplace.it')
-		expect(getSession()).toEqual({ email: 'owner@marketplace.it' })
-		expect(router.history.location.href).not.toContain('owner%40marketplace.it')
-		expect(router.history.location.href).not.toContain('owner@marketplace.it')
+		expect(getPendingEmail()).toBe('owner@marketplace.test')
+		expect(getSession()).toEqual({ email: 'owner@marketplace.test' })
+		expect(router.history.location.href).not.toContain('owner%40marketplace.test')
+		expect(router.history.location.href).not.toContain('owner@marketplace.test')
 	})
 
 	// `rememberMe` controls the lifetime of the refresh-token cookie server-side, so the checkbox has to
@@ -142,13 +142,13 @@ describe('LoginPage', () => {
 		const stub = stubGraphQL({ ...OK_LOGIN, ...PROBE })
 		await renderRoute('/', signedOut)
 
-		await fillIn('owner@marketplace.it', 'password123')
+		await fillIn('owner@marketplace.test', 'password123')
 		await userEvent.click(screen.getByLabelText('Remember me on this device'))
 		await submit()
 
 		await waitFor(() => {
 			expect(stub.calls[0]?.variables).toEqual({
-				email: 'owner@marketplace.it',
+				email: 'owner@marketplace.test',
 				password: 'password123',
 				rememberMe: true
 			})
@@ -164,7 +164,7 @@ describe('LoginPage', () => {
 		})
 		const { router } = await renderRoute('/', signedOut)
 
-		await fillIn('owner@marketplace.it', 'password123')
+		await fillIn('owner@marketplace.test', 'password123')
 		await submit()
 
 		expect(await screen.findByRole('alert')).toHaveTextContent('Wrong email or password')
@@ -180,7 +180,7 @@ describe('LoginPage', () => {
 		stubGraphQL({ Login: { data: { login: { accessToken: '', onboardingStep: '', onboardingDone: false } } } })
 		const { router } = await renderRoute('/', signedOut)
 
-		await fillIn('owner@marketplace.it', 'password123')
+		await fillIn('owner@marketplace.test', 'password123')
 		await submit()
 
 		expect(await screen.findByRole('alert')).toHaveTextContent('Invalid credentials')
@@ -204,7 +204,7 @@ describe('LoginPage', () => {
 		})
 		const { router } = await renderRoute('/', signedOut)
 
-		await fillIn('owner@marketplace.it', 'password123')
+		await fillIn('owner@marketplace.test', 'password123')
 		await submit()
 
 		expect(await screen.findByRole('heading', { name: 'Dashboard' })).toBeInTheDocument()

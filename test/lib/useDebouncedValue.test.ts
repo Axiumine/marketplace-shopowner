@@ -26,14 +26,14 @@ describe('useDebouncedValue', () => {
 	it('holds a new value back until the delay has elapsed', () => {
 		const { result, rerender } = renderHook(({ value }) => useDebouncedValue(value, 300), { initialProps: { value: 'ros' } })
 
-		rerender({ value: 'rossi' })
+		rerender({ value: 'rivers' })
 		expect(result.current).toBe('ros')
 
 		advance(299)
 		expect(result.current).toBe('ros')
 
 		advance(1)
-		expect(result.current).toBe('rossi')
+		expect(result.current).toBe('rivers')
 	})
 
 	// The cleanup is what makes this a debounce rather than a queue of delayed updates: without it every
@@ -45,12 +45,12 @@ describe('useDebouncedValue', () => {
 		advance(200)
 		rerender({ value: 'ros' })
 		advance(200)
-		rerender({ value: 'rossi' })
+		rerender({ value: 'rivers' })
 		advance(200)
 		expect(result.current).toBe('r')
 
 		advance(100)
-		expect(result.current).toBe('rossi')
+		expect(result.current).toBe('rivers')
 	})
 
 	it('restarts the wait when the delay itself changes', () => {
@@ -58,14 +58,14 @@ describe('useDebouncedValue', () => {
 			initialProps: { value: 'ros', delay: 300 }
 		})
 
-		rerender({ value: 'rossi', delay: 300 })
+		rerender({ value: 'rivers', delay: 300 })
 		advance(200)
-		rerender({ value: 'rossi', delay: 1000 })
+		rerender({ value: 'rivers', delay: 1000 })
 		advance(800)
 		expect(result.current).toBe('ros')
 
 		advance(200)
-		expect(result.current).toBe('rossi')
+		expect(result.current).toBe('rivers')
 	})
 
 	it('clears the pending timer on unmount', () => {

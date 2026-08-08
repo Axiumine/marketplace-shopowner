@@ -12,20 +12,20 @@ const PAGE = '/companies'
 const company = {
 	__typename: 'GraphQLCompany',
 	_id: '65f0000000000000000000a1',
-	legalName: 'Rossi Mario S.r.l.',
+	legalName: 'Rivers Trading Ltd',
 	vatNumber: '12345678901',
 	taxCode: null,
-	contactPerson: 'Mario Rossi',
-	administrator: 'Mario Rossi',
+	contactPerson: 'Mark Rivers',
+	administrator: 'Mark Rivers',
 	uniqueCode: null,
-	certifiedEmail: 'rossi@pec.it',
-	registryExtract: 'MI-123456',
+	certifiedEmail: 'certified@rivers.test',
+	registryExtract: 'MA-123456',
 	address: {
-		street: 'Via Dante 3',
-		postalCode: '20121',
-		city: 'Milano',
-		province: 'MI',
-		position: { type: 'Point', coordinates: [9.1859, 45.4668] }
+		street: '3 Oak Street',
+		postalCode: '02108',
+		city: 'Boston',
+		province: 'MA',
+		position: { type: 'Point', coordinates: [-71.0636, 42.3626] }
 	}
 }
 
@@ -42,7 +42,7 @@ const respond = (response: boolean) => vi.spyOn(window, 'confirm').mockReturnVal
 
 const dirty = async () => {
 	await userEvent.click(screen.getByRole('button', { name: 'Change Contact person' }))
-	fireEvent.change(screen.getByLabelText('Contact person'), { target: { value: 'Anna Bianchi' } })
+	fireEvent.change(screen.getByLabelText('Contact person'), { target: { value: 'Anna White' } })
 	await waitFor(() => {
 		expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled()
 	})
@@ -62,7 +62,7 @@ describe('CompaniesPage — unsaved edits', () => {
 		stubGraphQL(list)
 		const { router } = await renderRoute(PAGE)
 
-		await screen.findByRole('heading', { name: 'Rossi Mario S.r.l.', level: 3 })
+		await screen.findByRole('heading', { name: 'Rivers Trading Ltd', level: 3 })
 		await dirty()
 
 		const confirm = respond(false)
@@ -81,14 +81,14 @@ describe('CompaniesPage — unsaved edits', () => {
 		expect(router.state.location.pathname).toBe(PAGE)
 		// The edit is still there to go back to — a guard that held the navigation but dropped the form
 		// state would be worse than no guard at all.
-		expect(screen.getByLabelText('Contact person')).toHaveValue('Anna Bianchi')
+		expect(screen.getByLabelText('Contact person')).toHaveValue('Anna White')
 	})
 
 	it('leaves when the answer is yes', async () => {
 		stubGraphQL(list)
 		const { router } = await renderRoute(PAGE)
 
-		await screen.findByRole('heading', { name: 'Rossi Mario S.r.l.', level: 3 })
+		await screen.findByRole('heading', { name: 'Rivers Trading Ltd', level: 3 })
 		await dirty()
 
 		const confirm = respond(true)
@@ -111,7 +111,7 @@ describe('CompaniesPage — unsaved edits', () => {
 		stubGraphQL(list)
 		const { router } = await renderRoute(PAGE)
 
-		await screen.findByRole('heading', { name: 'Rossi Mario S.r.l.', level: 3 })
+		await screen.findByRole('heading', { name: 'Rivers Trading Ltd', level: 3 })
 
 		const confirm = respond(false)
 		await router.navigate({ to: '/home' })
@@ -126,7 +126,7 @@ describe('CompaniesPage — unsaved edits', () => {
 		stubGraphQL({ ...list, ...OK })
 		const { router } = await renderRoute(PAGE)
 
-		await screen.findByRole('heading', { name: 'Rossi Mario S.r.l.', level: 3 })
+		await screen.findByRole('heading', { name: 'Rivers Trading Ltd', level: 3 })
 		await dirty()
 		await userEvent.click(screen.getByRole('button', { name: 'Save' }))
 		await screen.findByText('Changes saved.')
@@ -150,7 +150,7 @@ describe('CompaniesPage — after the save', () => {
 		stubGraphQL({ ...list, ...OK })
 		await renderRoute(PAGE)
 
-		await screen.findByRole('heading', { name: 'Rossi Mario S.r.l.', level: 3 })
+		await screen.findByRole('heading', { name: 'Rivers Trading Ltd', level: 3 })
 		await dirty()
 
 		expect(screen.queryByRole('button', { name: 'Change Contact person' })).not.toBeInTheDocument()
@@ -169,12 +169,12 @@ describe('CompaniesPage — after the save', () => {
 		stubGraphQL({ ...list, CompanyUpdate: { data: { companyUpdate: false } } })
 		await renderRoute(PAGE)
 
-		await screen.findByRole('heading', { name: 'Rossi Mario S.r.l.', level: 3 })
+		await screen.findByRole('heading', { name: 'Rivers Trading Ltd', level: 3 })
 		await dirty()
 		await userEvent.click(screen.getByRole('button', { name: 'Save' }))
 
 		expect(await screen.findByText('Save failed.')).toBeInTheDocument()
-		expect(screen.getByLabelText('Contact person')).toHaveValue('Anna Bianchi')
+		expect(screen.getByLabelText('Contact person')).toHaveValue('Anna White')
 	})
 })
 

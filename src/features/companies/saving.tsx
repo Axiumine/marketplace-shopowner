@@ -24,7 +24,7 @@ export type RegisterSection = (id: string, section: SavableSection | null) => vo
  * The page-level registry behind the single Save button.
  *
  * It exists because each company card is its own form with its own mutation, while the owner gets one
- * button at the bottom for all of them — and because one card failing on a duplicate partita IVA must
+ * button at the bottom for all of them — and because one card failing on a duplicate VAT number must
  * not discard what is in the others.
  * The button therefore has to reach forms it does not render, and the forms have to tell it whether
  * they are dirty.
@@ -48,7 +48,7 @@ export const useSaving = () => {
 	 * A remount is the whole mechanism behind "after Save the page looks freshly loaded": every open
 	 * `EditableRow` goes back to a value and a pen, every address editor folds away, every form re-seeds
 	 * itself from the data the save just invalidated in the cache. ⚠️ It has to be a remount and cannot be
-	 * a `chiudi()` passed down — `EditableRow` deliberately has no way to close, because closing a row
+	 * a `close()` passed down — `EditableRow` deliberately has no way to close, because closing a row
 	 * while react-hook-form still holds its edited value is how a page comes to display the server's
 	 * value and save a different one (see the note on that component). Unmounting takes the form with the
 	 * row, so there is no stale value left to disagree with.
@@ -213,7 +213,7 @@ export const SaveChanges = ({ changed, saveAll }: { changed: boolean; saveAll: (
 	const [saved, setSaved] = useState(false)
 
 	/*
-	 * No clearing of `salvato` on the way in, deliberately. Every save produces its own toast anyway, and
+	 * No clearing of `saved` on the way in, deliberately. Every save produces its own toast anyway, and
 	 * `!changed` is what guarantees it: the button is dead unless something is dirty, so by the time a
 	 * second save can be pressed the condition below has already gone false and unmounted the first
 	 * confirmation — dismissed or not. A pre-clear here could only re-state that, and stated twice it

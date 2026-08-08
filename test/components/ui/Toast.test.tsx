@@ -36,7 +36,7 @@ describe('Toast', () => {
 
 		expect(container).toBeEmptyDOMElement()
 
-		const stack = document.getElementById('pila-toast')
+		const stack = document.getElementById('toast-stack')
 		expect(stack).not.toBeNull()
 		expect(stack).toContainElement(toast())
 
@@ -57,14 +57,14 @@ describe('Toast', () => {
 			</>
 		)
 
-		const stack = document.getElementById('pila-toast') as HTMLElement
+		const stack = document.getElementById('toast-stack') as HTMLElement
 
 		expect(stack).toHaveClass('flex', 'flex-col')
 		expect(stack.textContent).toBe('Save failed.Changes saved.')
 	})
 
 	// Assertive for a refusal, polite for a confirmation — the same split `Alert` makes, and for the same
-	// reason: "salvato" interrupting whatever a screen reader is saying is not worth the interruption.
+	// reason: "saved" interrupting whatever a screen reader is saying is not worth the interruption.
 	it('announces an error assertively and everything else politely', () => {
 		render(
 			<>
@@ -80,7 +80,7 @@ describe('Toast', () => {
 
 	/*
 	 * Five seconds, linear, and held at the end rather than snapping back — spelled out here rather than
-	 * compared against `DURATA_OK`, since a constant asserted against itself passes whatever it holds and
+	 * compared against `DURATION_OK`, since a constant asserted against itself passes whatever it holds and
 	 * five seconds is the actual requirement.
 	 *
 	 * `forwards` is not cosmetic. The animation is the clock: the toast closes on `animationend`, and
