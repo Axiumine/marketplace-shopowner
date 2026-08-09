@@ -123,9 +123,8 @@ what lets a page be rendered in a test without a router assertion in the way.
   and *are* bound to the `ShopOwner` model, so this tier can have it — the screens simply are not built.
   See `src/pages/LoginPage.tsx`.
 - **Every block in `eslint.config.js` carries a `files` glob.** A flat-config entry without one applies to
-  *every* file eslint walks into — in the operator app a glob-less `js.configs.recommended` linted a
-  minified Qodana HTML report and turned `yarn lint` into 1601 `no-undef` errors in code nobody wrote. The
-  globs live in `SOURCES` and `CONFIG_ROOT` at the top of the file; add a block by reusing them, never by
+  *every* file eslint walks into, including minified Qodana HTML reports — thousands of `no-undef` errors
+  in code nobody wrote. The globs live in `SOURCES` and `CONFIG_ROOT` at the top of the file; add a block by reusing them, never by
   omitting `files`.
 - **Tabs, not spaces** (eslint `indent: ['error','tab']`). Prettier: no semicolons, single quotes,
   `trailingComma: "none"`, `printWidth: 129`, `useTabs: true` — byte-identical to the other twelve repos
@@ -147,7 +146,7 @@ what lets a page be rendered in a test without a router assertion in the way.
 
 ## Tests
 
-**497 tests over 38 files, 100% coverage on all four metrics, 100% mutation score** — the same bar as every
+**100% coverage on all four metrics, 100% mutation score** — the same bar as every
 other repo. `git commit --no-verify` is not needed here and must not be used; a red gate is fixed with a
 test, never by lowering a threshold or deleting the gate. [`COVERAGE.md`](./COVERAGE.md) has the layers and what to do with
 a Stryker survivor.
