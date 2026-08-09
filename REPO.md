@@ -1,8 +1,8 @@
 # Repository mechanics
 
 How this repo's git plumbing and lint scope behave, and why. Nothing here changes what you write — it
-explains what happens when you commit, push, or watch a gate fail. `CLAUDE.md` carries the rules
-themselves, `COVERAGE.md` the thresholds.
+explains what happens when you commit, push, or watch a gate fail. [`CLAUDE.md`](./CLAUDE.md) carries the rules
+themselves, [`COVERAGE.md`](./COVERAGE.md) the thresholds.
 
 ## The hooks
 
@@ -55,11 +55,11 @@ did. All thirteen sub-repos that have a lint config (every one but `marketplace-
 What is out of scope lives in `.prettierignore`, and markdown is in there on purpose: `proseWrap: "never"`
 would flatten every hand-wrapped paragraph in these docs onto one line.
 
-The backend nine never hit the flat-config `files`-glob bug described in `CLAUDE.md`, because
+The backend nine never hit the flat-config `files`-glob bug described in [`CLAUDE.md`](./CLAUDE.md), because
 `@axiumine/eslint-config-be` scopes everything to `src/**`.
 
 ## Bypasses
 
 `SKIP_QODANA=1` (scan only — the other gates stay) · `git commit --no-verify` / `git push --no-verify` (the
-whole hook). Both are gate removals. See `CLAUDE.md` for when they may be used, which is: when the user
+whole hook). Both are gate removals. See [`CLAUDE.md`](./CLAUDE.md) for when they may be used, which is: when the user
 says so, and not otherwise.

@@ -85,7 +85,7 @@ yarn test:mutation  # Stryker, gated at a score of 100
 
 **497 tests over 38 files, 100% coverage, 100% mutation score** — the same bar as every other repo on
 the platform, so no commit here needs `--no-verify`. The suite was seeded from the operator app's and
-adapted screen by screen; `COVERAGE.md` has the gate layers and the recipe for a surviving mutant.
+adapted screen by screen; [`COVERAGE.md`](./COVERAGE.md) has the gate layers and the recipe for a surviving mutant.
 
 `.githooks/pre-push` runs lint → typecheck → coverage → mutation → Qodana, all blocking, and
 `.githooks/pre-commit` runs lint → typecheck → coverage → Qodana on top of the secret guard. Qodana is
@@ -94,7 +94,7 @@ revision a commit-time scan never sees, and Qodana Cloud files each report under
 only the pre-push scan, standing on `main` after the merge, produces a report the "new problems"
 baseline can use. `SKIP_QODANA=1` skips the scan alone. The scan needs a `QODANA_TOKEN` from **this
 repo's own** qodana.cloud project; a backend service's token files these reports under that service and
-corrupts its baseline. See `COVERAGE.md`.
+corrupts its baseline. See [`COVERAGE.md`](./COVERAGE.md).
 
 ## Endpoints
 
