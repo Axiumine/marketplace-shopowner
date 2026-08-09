@@ -2,15 +2,14 @@
 
 Shop-owner SPA, `ShopOwner` tier. Vite + React + TypeScript. Dev port **3044** (operator app is 3043).
 
-**Read parent first** — `../CLAUDE.md`
-(<https://github.com/Axiumine/fullstack-marketplace-blueprint> if you are reading this on GitHub).
+**Read parent first** — [`../CLAUDE.md`](https://github.com/Axiumine/fullstack-marketplace-blueprint/blob/main/CLAUDE.md)
 One of fifteen sub-repos; almost nothing here is changeable on its own.
 
 | Need | File |
 |---|---|
-| what the app is, screens that do not exist yet | `README.md` |
-| hooks, gate order, node selection, lint scope | `REPO.md` |
-| gate policy, Stryker survivors | `COVERAGE.md` |
+| what the app is, screens that do not exist yet | [`README.md`](./README.md) |
+| hooks, gate order, node selection, lint scope | [`REPO.md`](./REPO.md) |
+| gate policy, Stryker survivors | [`COVERAGE.md`](./COVERAGE.md) |
 | anything cross-repo | parent `CLAUDE.md` |
 
 Mirror of `marketplace-admin`. Same stack, conventions, hooks. Thinner because the ShopOwner-tier backend
@@ -150,7 +149,7 @@ what lets a page be rendered in a test without a router assertion in the way.
 
 **497 tests over 38 files, 100% coverage on all four metrics, 100% mutation score** — the same bar as every
 other repo. `git commit --no-verify` is not needed here and must not be used; a red gate is fixed with a
-test, never by lowering a threshold or deleting the gate. `COVERAGE.md` has the layers and what to do with
+test, never by lowering a threshold or deleting the gate. [`COVERAGE.md`](./COVERAGE.md) has the layers and what to do with
 a Stryker survivor.
 
 Seeded from the operator app's suite and adapted file by file, so its conventions are the ones below. Where
@@ -175,7 +174,7 @@ two-section sidebar, a `CompaniesPage.test.tsx` with no counterpart there.
 ## Gates
 
 commit → secret guard, lint, typecheck, coverage, Qodana. push → same + mutation. All blocking. Why:
-`REPO.md`.
+[`REPO.md`](./REPO.md).
 
 ## Cross-repo
 
