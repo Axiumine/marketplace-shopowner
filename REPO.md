@@ -43,7 +43,7 @@ This is necessary because every gate shells out to yarn and yarn's `engines` che
 the wrong node the push used to die at step 1 with `The engine "node" is incompatible with this module`,
 printed under the banner about type errors, which is not what had gone wrong. If nvm is absent or the
 version is not installed, the hook blocks with the `nvm install` line instead of letting yarn report
-nonsense. All fourteen sub-repos carry the same block now; it started in `marketplace-common`'s
+nonsense. All fourteen sub-repos that carry hooks have the same block now; it started in `marketplace-common`'s
 *pre-commit*, which is where it was copied from.
 
 ## Lint scope
