@@ -6,8 +6,13 @@
  * not really configuration — the env vars exist only so the app can be relocated behind a different
  * nginx prefix without a code change. A missing variable is therefore the normal case, not an error.
  *
- * The Sentry DSN is the one genuinely optional value: empty means "do not report", which is what a
- * developer machine wants.
+ * The Sentry DSN and the Turnstile site key are the two genuinely optional values: empty means "do not
+ * report" and "do not render the widget", which is what a developer machine wants.
+ *
+ * ⚠️ Only public values may be added here. Every `VITE_`-prefixed variable is substituted into the
+ * client bundle at build time, so it is published rather than merely read — not `INTROSPECTION_CODE`,
+ * and not a Turnstile *secret* key. The site key below is the half Cloudflare puts in the page on
+ * purpose; its secret half is `TURNSTILE_SECRET` on the backend service and never leaves it.
  *
  * ⚠️ The three authenticated paths here are the ShopOwner tier's — the ones **without** `admin` in the
  * name. They are different services from the operator app's, on different ports, backed by a different
@@ -21,6 +26,8 @@ export interface AppEnv {
 	readonly shopOwnerAuthorization: string
 	readonly shopOwnerResource: string
 	readonly logout: string
+	/** Public half of the Turnstile key pair. Empty disables the widget, which is what a dev box wants. */
+	readonly turnstileSiteKey: string
 	readonly sentryDsn: string
 	readonly sentryEnvironment: string
 }
@@ -49,6 +56,7 @@ export const readEnv = (source: ImportMetaEnv): AppEnv => ({
 	),
 	shopOwnerResource: value(source.VITE_GRAPHQL_ENDPOINT_AUTHENTICATED_RESOURCE, DEFAULT_ENDPOINTS.shopOwnerResource),
 	logout: value(source.VITE_GRAPHQL_ENDPOINT_LOGOUT, DEFAULT_ENDPOINTS.logout),
+	turnstileSiteKey: value(source.VITE_TURNSTILE_SITE_KEY, ''),
 	sentryDsn: value(source.VITE_SENTRY_DSN, ''),
 	sentryEnvironment: value(source.VITE_SENTRY_ENVIRONMENT, 'development')
 })

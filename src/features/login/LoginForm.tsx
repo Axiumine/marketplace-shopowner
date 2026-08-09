@@ -13,6 +13,9 @@ import { Button } from '@/components/ui/Button'
 import { PasswordField } from '@/components/ui/PasswordField'
 import { TextField } from '@/components/ui/TextField'
 import { Toast } from '@/components/ui/Toast'
+import { Turnstile } from '@/components/ui/Turnstile'
+
+import { useTurnstileToken } from './useTurnstileToken'
 
 /**
  * Client-side validation is a courtesy, not a gate.
@@ -39,9 +42,15 @@ type LoginValues = z.infer<typeof loginSchema>
  *
  * `rememberMe` is a real checkbox: it sets the lifetime of the refresh-token cookie server-side, and
  * pinning it here would silently decide how long an owner stays signed in.
+ *
+ * The Turnstile widget below the checkbox is the client half of the platform's login gate; the other
+ * half is `guardPublicLogin` on the service, which also meters this page at twenty attempts an hour per
+ * IP. With no site key configured the widget renders nothing and the form submits a `null` token, which
+ * is the correct request for a deployment whose server holds no secret key either.
  */
 export const LoginForm = () => {
 	const navigate = useNavigate()
+	const turnstile = useTurnstileToken()
 	const [loginState, executeLogin] = useMutation(LoginDocument)
 
 	// No `defaultValues`: all three fields are registered, uncontrolled inputs, so react-hook-form reads
@@ -54,8 +63,10 @@ export const LoginForm = () => {
 		formState: { errors }
 	} = useForm<LoginValues>({ resolver: zodResolver(loginSchema) })
 
+	// `turnstile.read()` rather than the state value: a widget that solves itself between the click and
+	// this line would otherwise be missed, and an expired token would be sent anyway.
 	const onSubmit = handleSubmit(async (values) => {
-		const result = await executeLogin(values, CTX_PUBLIC_AUTHORIZATION)
+		const result = await executeLogin({ ...values, turnstileToken: turnstile.read() }, CTX_PUBLIC_AUTHORIZATION)
 		const accessToken = result.data?.login.accessToken
 
 		if (accessToken !== undefined && accessToken !== '') {
@@ -111,6 +122,8 @@ export const LoginForm = () => {
 				<input type="checkbox" {...register('rememberMe')} />
 				Remember me on this device
 			</label>
+
+			<Turnstile onToken={turnstile.onToken} />
 
 			{loginState.error === undefined ? null : <Toast tone="error">{messageOf(loginState.error)}</Toast>}
 			{failed ? <Toast tone="error">Invalid credentials</Toast> : null}
