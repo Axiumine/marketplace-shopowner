@@ -23,6 +23,16 @@ VITE_GRAPHQL_ENDPOINT_AUTHENTICATED_AUTHORIZATION=/authenticated-authorization
 VITE_GRAPHQL_ENDPOINT_AUTHENTICATED_RESOURCE=/authenticated-resource
 VITE_GRAPHQL_ENDPOINT_LOGOUT=/logout
 
+# ── Cloudflare Turnstile ──────────────────────────────────────────────────────
+# The PUBLIC half of the key pair. It is meant to be seen — it is rendered into the widget's markup —
+# which is why it may live in a `VITE_` variable at all. The secret half is `TURNSTILE_SECRET` in
+# `marketplace-dev-public-authorization`'s dotted env file and must never appear in this repo.
+#
+# Empty disables the widget entirely, which is what a developer machine wants: with no secret
+# configured server-side, `guardPublicLogin` passes a missing token through outside production, so the
+# two halves agree on "off".
+VITE_TURNSTILE_SITE_KEY=
+
 # ── Sentry ────────────────────────────────────────────────────────────────────
 # Leave the DSN empty to disable reporting entirely (src/instrument.ts skips init without one).
 # The real DSN is a secret: it lives in .env only.

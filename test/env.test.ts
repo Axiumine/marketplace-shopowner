@@ -11,6 +11,7 @@ describe('readEnv', () => {
 			shopOwnerAuthorization: '/authenticated-authorization',
 			shopOwnerResource: '/authenticated-resource',
 			logout: '/logout',
+			turnstileSiteKey: '',
 			sentryDsn: '',
 			sentryEnvironment: 'development'
 		})
@@ -33,6 +34,7 @@ describe('readEnv', () => {
 					VITE_GRAPHQL_ENDPOINT_AUTHENTICATED_AUTHORIZATION: '/a-auth',
 					VITE_GRAPHQL_ENDPOINT_AUTHENTICATED_RESOURCE: '/a-res',
 					VITE_GRAPHQL_ENDPOINT_LOGOUT: '/bye',
+					VITE_TURNSTILE_SITE_KEY: '0x4AAAAAAABBBBBBBBCCCCCC',
 					VITE_SENTRY_DSN: 'https://key@sentry.example/1',
 					VITE_SENTRY_ENVIRONMENT: 'production'
 				})
@@ -42,6 +44,7 @@ describe('readEnv', () => {
 			shopOwnerAuthorization: '/a-auth',
 			shopOwnerResource: '/a-res',
 			logout: '/bye',
+			turnstileSiteKey: '0x4AAAAAAABBBBBBBBCCCCCC',
 			sentryDsn: 'https://key@sentry.example/1',
 			sentryEnvironment: 'production'
 		})
@@ -57,6 +60,7 @@ describe('readEnv', () => {
 					VITE_GRAPHQL_ENDPOINT_AUTHENTICATED_AUTHORIZATION: '',
 					VITE_GRAPHQL_ENDPOINT_AUTHENTICATED_RESOURCE: '',
 					VITE_GRAPHQL_ENDPOINT_LOGOUT: '',
+					VITE_TURNSTILE_SITE_KEY: '',
 					VITE_SENTRY_DSN: '',
 					VITE_SENTRY_ENVIRONMENT: ''
 				})
@@ -66,6 +70,7 @@ describe('readEnv', () => {
 			shopOwnerAuthorization: '/authenticated-authorization',
 			shopOwnerResource: '/authenticated-resource',
 			logout: '/logout',
+			turnstileSiteKey: '',
 			sentryDsn: '',
 			sentryEnvironment: 'development'
 		})
