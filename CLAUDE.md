@@ -2,8 +2,9 @@
 
 Shop-owner SPA, `ShopOwner` tier. Vite + React + TypeScript. Dev port **3044** (operator app is 3043).
 
-**Read parent first** — `/media/nvme/websites/fullstack-marketplace-blueprint/CLAUDE.md`. One of fourteen
-sub-repos; almost nothing here is changeable on its own.
+**Read parent first** — `/media/nvme/websites/fullstack-marketplace-blueprint/CLAUDE.md`
+(<https://github.com/Axiumine/fullstack-marketplace-blueprint> if you are reading this on GitHub).
+One of fourteen sub-repos; almost nothing here is changeable on its own.
 
 | Need | File |
 |---|---|
