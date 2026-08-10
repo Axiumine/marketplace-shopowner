@@ -300,6 +300,21 @@ describe('Companies', () => {
  * one button.
  */
 describe('Companies — editing', () => {
+	/**
+	 * Both companies edited under one press: a contact person typed into each card, then Save. The tests
+	 * that start here differ only in what the stub answers back, which is the whole of what they are about.
+	 */
+	const editBothContactPersons = async () => {
+		await renderRoute(PAGE)
+
+		await screen.findByRole('heading', { name: 'White Trading Ltd', level: 3 })
+		await open('Company data', 'Contact person')
+		write('Company data', 'Contact person', 'Anna White')
+		await open('Company data', 'Contact person', 'White Trading Ltd')
+		write('Company data', 'Contact person', 'Louis Green', 'White Trading Ltd')
+		await userEvent.click(save())
+	}
+
 	it('turns a row into its editor, seeded with the stored value', async () => {
 		stubGraphQL(companies([company]))
 		await renderRoute(PAGE)
@@ -439,14 +454,7 @@ describe('Companies — editing', () => {
 			...companies([company, companyTwo]),
 			CompanyUpdate: { errors: [graphQLError('Server error', 'Certified email already registered', 409)], status: 409 }
 		})
-		await renderRoute(PAGE)
-
-		await screen.findByRole('heading', { name: 'White Trading Ltd', level: 3 })
-		await open('Company data', 'Contact person')
-		write('Company data', 'Contact person', 'Anna White')
-		await open('Company data', 'Contact person', 'White Trading Ltd')
-		write('Company data', 'Contact person', 'Louis Green', 'White Trading Ltd')
-		await userEvent.click(save())
+		await editBothContactPersons()
 
 		expect(await screen.findByRole('alert')).toHaveTextContent('Certified email already registered')
 		expect(writes(stub)).toHaveLength(1)
@@ -470,14 +478,7 @@ describe('Companies — editing', () => {
 				{ errors: [graphQLError('Server error', 'VAT number already registered', 409)], status: 409 }
 			]
 		})
-		await renderRoute(PAGE)
-
-		await screen.findByRole('heading', { name: 'White Trading Ltd', level: 3 })
-		await open('Company data', 'Contact person')
-		write('Company data', 'Contact person', 'Anna White')
-		await open('Company data', 'Contact person', 'White Trading Ltd')
-		write('Company data', 'Contact person', 'Louis Green', 'White Trading Ltd')
-		await userEvent.click(save())
+		await editBothContactPersons()
 
 		expect(await screen.findByText('Certified email already registered')).toBeInTheDocument()
 
@@ -581,6 +582,21 @@ describe('Companies — the registered office', () => {
 
 	const list = () => screen.queryByRole('button', { name: HINT })
 
+	/**
+	 * A line typed into the box, never picked out of the list, and then saved — which the composite rule
+	 * refuses. Returns with that refusal on screen, because that is the state both tests using it start from.
+	 */
+	const saveTypedAddress = async () => {
+		await renderRoute(PAGE)
+
+		await screen.findByRole('heading', { name: 'Rivers Trading Ltd', level: 3 })
+		await open('Registered office', 'Address')
+		fireEvent.change(addressBox(), { target: { value: '2 Main Street, 02108 Boston (MA)' } })
+		await userEvent.click(save())
+
+		expect(await page().findByText('Select the address from the list')).toBeInTheDocument()
+	}
+
 	it('opens on the composed line, with no box for the fields behind it', async () => {
 		stubNetwork(companies([company]))
 		await renderRoute(PAGE)
@@ -653,14 +669,7 @@ describe('Companies — the registered office', () => {
 	 */
 	it('clears the composite refusal once an address is picked', async () => {
 		stubNetwork({ ...companies([company]), ...OK }, withAddress)
-		await renderRoute(PAGE)
-
-		await screen.findByRole('heading', { name: 'Rivers Trading Ltd', level: 3 })
-		await open('Registered office', 'Address')
-		fireEvent.change(addressBox(), { target: { value: '2 Main Street, 02108 Boston (MA)' } })
-		await userEvent.click(save())
-
-		expect(await page().findByText('Select the address from the list')).toBeInTheDocument()
+		await saveTypedAddress()
 
 		fireEvent.click(await hintOsm(HINT))
 
@@ -699,14 +708,8 @@ describe('Companies — the registered office', () => {
 	// the one control the owner can do something about.
 	it('refuses a line the owner typed over', async () => {
 		const stub = stubNetwork({ ...companies([company]), ...OK })
-		await renderRoute(PAGE)
+		await saveTypedAddress()
 
-		await screen.findByRole('heading', { name: 'Rivers Trading Ltd', level: 3 })
-		await open('Registered office', 'Address')
-		fireEvent.change(addressBox(), { target: { value: '2 Main Street, 02108 Boston (MA)' } })
-		await userEvent.click(save())
-
-		expect(await page().findByText('Select the address from the list')).toBeInTheDocument()
 		expect(writes(stub)).toEqual([])
 	})
 })
@@ -880,6 +883,22 @@ describe('Companies — new company', () => {
 		write('Company data', 'Registry extract', 'MA-999999', target)
 		fireEvent.change(box('Registered office', target).getByLabelText('Address'), { target: { value: '1 Main Street Boston' } })
 		fireEvent.click(await hintOsm(HINT))
+	}
+
+	/**
+	 * One press carrying two sections: an edit to the company that exists, and a filled new card behind it.
+	 * The order is the point — the stored company is written first, so what the stub answers to the *add*
+	 * is what each test using this is asking about.
+	 */
+	const editAndAdd = async () => {
+		await renderRoute(PAGE)
+
+		await screen.findByRole('heading', { name: 'Rivers Trading Ltd', level: 3 })
+		await add()
+		await open('Company data', 'Contact person')
+		write('Company data', 'Contact person', 'Anna White')
+		await fill()
+		await userEvent.click(save())
 	}
 
 	// The plus belongs to the section rather than to the list, so it is there before the query answers and
@@ -1201,14 +1220,7 @@ describe('Companies — new company', () => {
 	// to a stored company and a new card are written in that order, by one press of one button.
 	it('saves an edited company and a new card in the same press', async () => {
 		const stub = stubNetwork({ ...companies([company]), ...OK, ...OK_ADD }, withAddress)
-		await renderRoute(PAGE)
-
-		await screen.findByRole('heading', { name: 'Rivers Trading Ltd', level: 3 })
-		await add()
-		await open('Company data', 'Contact person')
-		write('Company data', 'Contact person', 'Anna White')
-		await fill()
-		await userEvent.click(save())
+		await editAndAdd()
 
 		await screen.findByText('Changes saved.')
 		expect(writes(stub)[0]?.variables).toMatchObject({ _id: ID_COMPANY, company: { contactPerson: 'Anna White' } })
@@ -1223,14 +1235,7 @@ describe('Companies — new company', () => {
 	 */
 	it('leaves the company above it written when the card is refused', async () => {
 		const stub = stubNetwork({ ...companies([company]), CompanyAdd: { data: { companyAdd: false } }, ...OK }, withAddress)
-		await renderRoute(PAGE)
-
-		await screen.findByRole('heading', { name: 'Rivers Trading Ltd', level: 3 })
-		await add()
-		await open('Company data', 'Contact person')
-		write('Company data', 'Contact person', 'Anna White')
-		await fill()
-		await userEvent.click(save())
+		await editAndAdd()
 
 		expect(await screen.findByRole('alert')).toHaveTextContent('Save failed.')
 		expect(writes(stub)).toHaveLength(1)
