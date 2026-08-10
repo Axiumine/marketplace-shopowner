@@ -1,0 +1,111 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`LoginForm > renders 1`] = `
+<form
+  class="flex w-full max-w-sm flex-col gap-4"
+>
+  <div>
+    <h2
+      class="text-xl font-bold"
+    >
+      Login
+    </h2>
+    <p
+      class="text-sm text-tip"
+    >
+      Enter your credentials to sign in.
+    </p>
+  </div>
+  <div
+    class="flex flex-col gap-1"
+  >
+    <label
+      class="text-sm font-semibold"
+      for=":id-0:"
+    >
+      Email
+    </label>
+    <div
+      class="relative"
+    >
+      <input
+        aria-invalid="false"
+        autocomplete="username"
+        class="w-full rounded-box border-tip py-2 pl-3 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border bg-white pr-3"
+        id=":id-0:"
+        maxlength="50"
+        name="email"
+        type="email"
+      />
+    </div>
+  </div>
+  <div
+    class="flex flex-col gap-1"
+  >
+    <label
+      class="text-sm font-semibold"
+      for=":id-1:"
+    >
+      Password
+    </label>
+    <div
+      class="relative"
+    >
+      <input
+        aria-invalid="false"
+        autocomplete="current-password"
+        class="w-full rounded-box border-tip py-2 pl-3 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border bg-white pr-10"
+        id=":id-1:"
+        maxlength="72"
+        name="password"
+        type="password"
+      />
+      <span
+        class="absolute inset-y-0 right-1 flex items-center"
+      >
+        <button
+          aria-label="Show password"
+          class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third"
+          title="Show password"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.75"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"
+            />
+            <circle
+              cx="12"
+              cy="12"
+              r="3"
+            />
+          </svg>
+        </button>
+      </span>
+    </div>
+  </div>
+  <label
+    class="flex items-center gap-2 text-sm"
+  >
+    <input
+      name="rememberMe"
+      type="checkbox"
+    />
+    Remember me on this device
+  </label>
+  <button
+    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-third text-palette-white hover:bg-tomato px-4"
+    type="submit"
+  >
+    Sign in
+  </button>
+</form>
+`;

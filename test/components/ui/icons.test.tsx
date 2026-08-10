@@ -46,4 +46,9 @@ describe('icons', () => {
 		expect(container.querySelector('circle')).toHaveAttribute('r', '9')
 		expect(container.querySelectorAll('path')).toHaveLength(1)
 	})
+
+	it.each(ICONS)('renders %s', (_name, Icon) => {
+		const { container } = render(<Icon />)
+		expect(container.firstChild).toMatchSnapshot()
+	})
 })

@@ -1,0 +1,19 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`WigButton > renders 1`] = `
+<a
+  class="block rounded-box border-4 border-third bg-white p-4 shadow transition-shadow hover:shadow-lg"
+  href="/companies"
+>
+  <h2
+    class="font-bold"
+  >
+    Companies
+  </h2>
+  <p
+    class="text-sm text-tip"
+  >
+    Manage your companies
+  </p>
+</a>
+`;

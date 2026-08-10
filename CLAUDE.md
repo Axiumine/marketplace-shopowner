@@ -165,6 +165,10 @@ two-section sidebar, a `CompaniesPage.test.tsx` with no counterpart there.
   `owner@marketplace` (no TLD), not `owner`.
 - **`fireEvent.change`, not `userEvent.type`,** for any field with a `maxLength` or a date input.
 - `Alert` is `role="alert"` only for the error tone; success and info are `role="status"`.
+- **Every component under `src/components/`, `src/pages/` and `src/features/` carries a snapshot.** A new
+  component keeps that whole, and `vitest.setup.ts` normalises React's `useId` output so an unrelated test
+  inserted above one does not renumber it. `vitest run` never rewrites a snapshot, so drift fails the suite
+  — `yarn test -u` is for an intended markup change, and it accepts a regression as readily as a fix.
 - `TZ=UTC` is exported by the test scripts *and* set in `vitest.config.ts`. Both are needed: Stryker's
   worker pool ignores the config one.
 - The route tree is built by a factory (`createAppRouteTree()`) rather than a module constant, so Stryker's

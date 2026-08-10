@@ -1,0 +1,541 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Companies > renders 1`] = `
+<main
+  class="flex-1 overflow-auto p-6"
+>
+  <header
+    class="mb-6 flex flex-col gap-3 border-b border-tip pb-4"
+  >
+    <nav
+      aria-label="Path"
+    >
+      <ol
+        class="flex flex-wrap gap-2 text-xs text-tip"
+      >
+        <li
+          class="after:ml-2 after:content-['/'] last:after:content-['']"
+        >
+          <a
+            href="/home"
+          >
+            Dashboard
+          </a>
+        </li>
+        <li
+          class="after:ml-2 after:content-['/'] last:after:content-['']"
+        >
+          Companies
+        </li>
+      </ol>
+    </nav>
+    <div
+      class="flex flex-wrap items-center justify-between gap-4"
+    >
+      <h1
+        class="text-2xl font-bold"
+      >
+        Companies
+      </h1>
+    </div>
+  </header>
+  <div
+    class="mt-8 mb-2 flex items-center justify-between gap-2"
+  >
+    <h2
+      class="text-lg font-bold"
+    >
+      Companies
+    </h2>
+    <button
+      aria-label="Add company"
+      class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+      title="Add company"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class="h-4 w-4"
+        fill="none"
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="1.75"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M12 5v14"
+        />
+        <path
+          d="M5 12h14"
+        />
+      </svg>
+    </button>
+  </div>
+  <div
+    class="flex flex-col gap-6"
+  >
+    <section>
+      <div
+        class="mb-1 flex items-center justify-between gap-2"
+      >
+        <h3
+          class="text-lg font-bold "
+        >
+          Rivers Trading Ltd
+        </h3>
+        <button
+          aria-label="Delete company"
+          class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+          title="Delete company"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.75"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M4 7h16"
+            />
+            <path
+              d="M9 7V4h6v3"
+            />
+            <path
+              d="m6 7 1 13h10l1-13"
+            />
+            <path
+              d="M10 11v6"
+            />
+            <path
+              d="M14 11v6"
+            />
+          </svg>
+        </button>
+      </div>
+      <div
+        class="relative"
+      >
+        <div
+          class="grid gap-4 md:grid-cols-2"
+        >
+          <section
+            aria-labelledby=":id-0:"
+            class="h-full overflow-hidden rounded-box border-4 border-third bg-white p-[10px] shadow "
+          >
+            <div
+              class="mb-2 flex items-center justify-between gap-2"
+            >
+              <h3
+                class="font-bold"
+                id=":id-0:"
+              >
+                Company data
+              </h3>
+            </div>
+            <div
+              class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
+            >
+              <span
+                class="text-tip"
+              >
+                Legal name
+              </span>
+              <span
+                class="flex items-center gap-1 text-right"
+              >
+                Rivers Trading Ltd
+                <button
+                  aria-label="Change Legal name"
+                  class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+                  title="Change Legal name"
+                  type="button"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.75"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M12 20h9"
+                    />
+                    <path
+                      d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+                    />
+                  </svg>
+                </button>
+              </span>
+            </div>
+            <div
+              class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
+            >
+              <span
+                class="text-tip"
+              >
+                VAT number
+              </span>
+              <span
+                class="flex items-center gap-1 text-right"
+              >
+                12345678901
+                <button
+                  aria-label="Change VAT number"
+                  class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+                  title="Change VAT number"
+                  type="button"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.75"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M12 20h9"
+                    />
+                    <path
+                      d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+                    />
+                  </svg>
+                </button>
+              </span>
+            </div>
+            <div
+              class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
+            >
+              <span
+                class="text-tip"
+              >
+                Tax code
+              </span>
+              <span
+                class="flex items-center gap-1 text-right"
+              >
+                ---
+                <button
+                  aria-label="Change Tax code"
+                  class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+                  title="Change Tax code"
+                  type="button"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.75"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M12 20h9"
+                    />
+                    <path
+                      d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+                    />
+                  </svg>
+                </button>
+              </span>
+            </div>
+            <div
+              class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
+            >
+              <span
+                class="text-tip"
+              >
+                Contact person
+              </span>
+              <span
+                class="flex items-center gap-1 text-right"
+              >
+                Mark Rivers
+                <button
+                  aria-label="Change Contact person"
+                  class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+                  title="Change Contact person"
+                  type="button"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.75"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M12 20h9"
+                    />
+                    <path
+                      d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+                    />
+                  </svg>
+                </button>
+              </span>
+            </div>
+            <div
+              class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
+            >
+              <span
+                class="text-tip"
+              >
+                Administrator
+              </span>
+              <span
+                class="flex items-center gap-1 text-right"
+              >
+                Mark Rivers
+                <button
+                  aria-label="Change Administrator"
+                  class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+                  title="Change Administrator"
+                  type="button"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.75"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M12 20h9"
+                    />
+                    <path
+                      d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+                    />
+                  </svg>
+                </button>
+              </span>
+            </div>
+            <div
+              class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
+            >
+              <span
+                class="text-tip"
+              >
+                Unique code
+              </span>
+              <span
+                class="flex items-center gap-1 text-right"
+              >
+                ---
+                <button
+                  aria-label="Change Unique code"
+                  class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+                  title="Change Unique code"
+                  type="button"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.75"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M12 20h9"
+                    />
+                    <path
+                      d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+                    />
+                  </svg>
+                </button>
+              </span>
+            </div>
+            <div
+              class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
+            >
+              <span
+                class="text-tip"
+              >
+                Certified email
+              </span>
+              <span
+                class="flex items-center gap-1 text-right"
+              >
+                certified@rivers.test
+                <button
+                  aria-label="Change Certified email"
+                  class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+                  title="Change Certified email"
+                  type="button"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.75"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M12 20h9"
+                    />
+                    <path
+                      d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+                    />
+                  </svg>
+                </button>
+              </span>
+            </div>
+            <div
+              class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
+            >
+              <span
+                class="text-tip"
+              >
+                Registry extract
+              </span>
+              <span
+                class="flex items-center gap-1 text-right"
+              >
+                MA-123456
+                <button
+                  aria-label="Change Registry extract"
+                  class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+                  title="Change Registry extract"
+                  type="button"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.75"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M12 20h9"
+                    />
+                    <path
+                      d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+                    />
+                  </svg>
+                </button>
+              </span>
+            </div>
+          </section>
+          <section
+            aria-labelledby=":id-1:"
+            class="h-full overflow-hidden rounded-box border-4 border-third bg-white p-[10px] shadow "
+          >
+            <div
+              class="mb-2 flex items-center justify-between gap-2"
+            >
+              <h3
+                class="font-bold"
+                id=":id-1:"
+              >
+                Registered office
+              </h3>
+            </div>
+            <div
+              class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
+            >
+              <span
+                class="text-tip"
+              >
+                Address
+              </span>
+              <span
+                class="flex items-center gap-1 text-right"
+              >
+                3 Oak Street, 02108 Boston (MA)
+                <button
+                  aria-label="Change Address"
+                  class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+                  title="Change Address"
+                  type="button"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.75"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M12 20h9"
+                    />
+                    <path
+                      d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+                    />
+                  </svg>
+                </button>
+              </span>
+            </div>
+            <div
+              class="flex flex-col gap-2 pt-2"
+            >
+              <iframe
+                class="w-full rounded-box border border-tip"
+                height="400"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=-71.06760,42.35860,-71.05960,42.36660&layer=mapnik&marker=42.36260,-71.06360"
+                title="Map of Rivers Trading Ltd"
+              />
+              <p
+                class="text-xs text-tip"
+              >
+                Map data ©
+                 
+                <a
+                  class="underline"
+                  href="https://www.openstreetmap.org/copyright"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  OpenStreetMap
+                </a>
+                 
+                contributors
+              </p>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div
+    class="mt-8 flex items-center justify-end gap-4"
+  >
+    <button
+      class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-third text-palette-white hover:bg-tomato px-[30px]"
+      disabled=""
+      type="button"
+    >
+      Save
+    </button>
+  </div>
+</main>
+`;

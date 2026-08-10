@@ -244,6 +244,13 @@ describe('rendering the widget', () => {
 		expect(onToken).not.toHaveBeenCalled()
 		expect(screen.queryByRole('alert')).not.toBeInTheDocument()
 	})
+
+	it('renders', async () => {
+		const { container } = await mount()
+		await scriptLoads()
+
+		expect(container.firstChild).toMatchSnapshot()
+	})
 })
 
 describe('the token', () => {

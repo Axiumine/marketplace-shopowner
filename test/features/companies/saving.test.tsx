@@ -355,6 +355,12 @@ describe('SaveChanges', () => {
 		unblock()
 		expect(await screen.findByText('Changes saved.')).toBeInTheDocument()
 	})
+
+	it('renders', () => {
+		const { container } = render(<SaveChanges changed saveAll={async () => true} />)
+
+		expect(container.firstChild).toMatchSnapshot()
+	})
 })
 
 /**
