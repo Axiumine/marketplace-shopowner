@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`rendering the widget > renders 1`] = `
+<div>
+  <div />
+</div>
+`;

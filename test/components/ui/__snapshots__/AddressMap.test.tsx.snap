@@ -1,0 +1,28 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`AddressMap > renders 1`] = `
+<div>
+  <iframe
+    class="w-full rounded-box border border-tip"
+    height="400"
+    src="https://www.openstreetmap.org/export/embed.html?bbox=-71.06400,42.35610,-71.05600,42.36410&layer=mapnik&marker=42.36010,-71.06000"
+    title="Address map"
+  />
+  <p
+    class="text-xs text-tip"
+  >
+    Map data ©
+     
+    <a
+      class="underline"
+      href="https://www.openstreetmap.org/copyright"
+      rel="noreferrer"
+      target="_blank"
+    >
+      OpenStreetMap
+    </a>
+     
+    contributors
+  </p>
+</div>
+`;

@@ -1,0 +1,55 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PageHeader > renders the title alone, with no breadcrumb trail 1`] = `
+<header
+  class="mb-6 flex flex-col gap-3 border-b border-tip pb-4"
+>
+  <div
+    class="flex flex-wrap items-center justify-between gap-4"
+  >
+    <h1
+      class="text-2xl font-bold"
+    >
+      Dashboard
+    </h1>
+  </div>
+</header>
+`;
+
+exports[`PageHeader > renders the title with a breadcrumb trail 1`] = `
+<header
+  class="mb-6 flex flex-col gap-3 border-b border-tip pb-4"
+>
+  <nav
+    aria-label="Path"
+  >
+    <ol
+      class="flex flex-wrap gap-2 text-xs text-tip"
+    >
+      <li
+        class="after:ml-2 after:content-['/'] last:after:content-['']"
+      >
+        <a
+          href="/home"
+        >
+          Dashboard
+        </a>
+      </li>
+      <li
+        class="after:ml-2 after:content-['/'] last:after:content-['']"
+      >
+        Companies
+      </li>
+    </ol>
+  </nav>
+  <div
+    class="flex flex-wrap items-center justify-between gap-4"
+  >
+    <h1
+      class="text-2xl font-bold"
+    >
+      Companies
+    </h1>
+  </div>
+</header>
+`;

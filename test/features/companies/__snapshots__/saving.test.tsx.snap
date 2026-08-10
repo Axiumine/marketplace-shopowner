@@ -1,0 +1,14 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SaveChanges > renders 1`] = `
+<div
+  class="mt-8 flex items-center justify-end gap-4"
+>
+  <button
+    class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-third text-palette-white hover:bg-tomato px-[30px]"
+    type="button"
+  >
+    Save
+  </button>
+</div>
+`;
