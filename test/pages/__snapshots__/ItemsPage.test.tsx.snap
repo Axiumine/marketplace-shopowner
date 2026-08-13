@@ -1,0 +1,100 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ItemsPage — before a shop is chosen > renders 1`] = `
+<main
+  class="flex-1 overflow-auto p-6"
+>
+  <header
+    class="mb-6 flex flex-col gap-3 border-b border-tip pb-4"
+  >
+    <nav
+      aria-label="Path"
+    >
+      <ol
+        class="flex flex-wrap gap-2 text-xs text-tip"
+      >
+        <li
+          class="after:ml-2 after:content-['/'] last:after:content-['']"
+        >
+          <a
+            href="/home"
+          >
+            Dashboard
+          </a>
+        </li>
+        <li
+          class="after:ml-2 after:content-['/'] last:after:content-['']"
+        >
+          Items
+        </li>
+      </ol>
+    </nav>
+    <div
+      class="flex flex-wrap items-center justify-between gap-4"
+    >
+      <h1
+        class="text-2xl font-bold"
+      >
+        Items
+      </h1>
+    </div>
+  </header>
+  <div
+    class="max-w-md"
+  >
+    <div
+      class="flex flex-col gap-1"
+    >
+      <label
+        class="text-sm font-semibold"
+        for=":id-0:"
+      >
+        Shop
+      </label>
+      <div
+        class="relative"
+      >
+        <select
+          aria-invalid="false"
+          class="w-full appearance-none rounded-box border-tip py-2 pl-3 pr-9 text-sm outline-none focus:border-third disabled:cursor-not-allowed disabled:bg-palette-bg1 border bg-white"
+          id=":id-0:"
+        >
+          <option
+            value=""
+          >
+            Select a shop
+          </option>
+          <option
+            value="65f0000000000000000000a1"
+          >
+            Rivers Trading Ltd
+          </option>
+        </select>
+        <span
+          class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-tip"
+        >
+          <svg
+            aria-hidden="true"
+            class="h-4 w-4"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.75"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="m6 9 6 6 6-6"
+            />
+          </svg>
+        </span>
+      </div>
+    </div>
+  </div>
+  <p
+    class="mt-8 text-tip"
+  >
+    Select a shop to see its items.
+  </p>
+</main>
+`;

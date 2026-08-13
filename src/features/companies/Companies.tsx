@@ -27,8 +27,8 @@ import { ADDRESS_MESSAGE, coordinate, EMPTY_ADDRESS, required, SHAPE_EMAIL } fro
 import { emptyInNull, formatAddress, handleNull } from '@/lib/format'
 import type { FoundAddress } from '@/lib/nominatim'
 
-import type { RegisterSection } from './saving'
-import { saveValidated, useSavableSection } from './saving'
+import type { RegisterSection } from '../saving'
+import { saveValidated, useSavableSection } from '../saving'
 
 /*
  * From marketplace-db-setup/migrations/20260803000000-create-company.js, by way of the service's own

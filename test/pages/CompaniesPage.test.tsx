@@ -2,7 +2,7 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { DISCARD_WARNING } from '@/features/companies/saving'
+import { DISCARD_WARNING } from '@/features/saving'
 
 import { stubGraphQL } from '../helpers/graphql'
 import { renderRoute } from '../helpers/render'

@@ -43,19 +43,23 @@ describe('isSectionActive', () => {
 
 describe('SideMenu', () => {
 	/*
-	 * ⚠️ Two entries, and the assertion is that there are exactly two. The operator app's sidebar carries
-	 * a third — Settings, whose only mutation is `adminUpdatePwd` on the Admin tier. This tier has no
+	 * ⚠️ Three entries, and the assertion is that there are exactly three. The operator app's sidebar
+	 * carries a Settings one, whose only mutation is `adminUpdatePwd` on the Admin tier. This tier has no
 	 * `shopOwnerUpdatePwd` and no self-service personal-data mutation at all, so a Settings entry copied
 	 * across would light up a route with nothing to submit.
+	 *
+	 * Items is its own section rather than a tab inside Companies: a catalogue is per shop, but the page
+	 * is about the items and the shop is one select at the top of it.
 	 */
-	it('lists the two sections and no third', async () => {
+	it('lists the three sections and no fourth', async () => {
 		stubGraphQL({})
 		await renderRoute('/home')
 
 		const menu = within(screen.getByRole('navigation', { name: 'Main menu' }))
 		expect(menu.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/home')
 		expect(menu.getByRole('link', { name: 'Companies' })).toHaveAttribute('href', '/companies')
-		expect(menu.getAllByRole('link')).toHaveLength(2)
+		expect(menu.getByRole('link', { name: 'Items' })).toHaveAttribute('href', '/items')
+		expect(menu.getAllByRole('link')).toHaveLength(3)
 		expect(menu.queryByRole('link', { name: 'Settings' })).not.toBeInTheDocument()
 	})
 
@@ -66,6 +70,7 @@ describe('SideMenu', () => {
 		const menu = within(screen.getByRole('navigation', { name: 'Main menu' }))
 		expect(menu.getByRole('link', { name: 'Dashboard' })).toHaveClass('font-bold')
 		expect(menu.getByRole('link', { name: 'Companies' })).not.toHaveClass('font-bold')
+		expect(menu.getByRole('link', { name: 'Items' })).not.toHaveClass('font-bold')
 	})
 
 	// The other way round, so neither test can pass on a sidebar that hardcodes one highlight. Scoped to
@@ -78,6 +83,16 @@ describe('SideMenu', () => {
 		const menu = within(screen.getByRole('navigation', { name: 'Main menu' }))
 		expect(menu.getByRole('link', { name: 'Companies' })).toHaveClass('font-bold')
 		expect(menu.getByRole('link', { name: 'Dashboard' })).not.toHaveClass('font-bold')
+	})
+
+	// The third section, on the page that carries one select and no cards until a shop is chosen.
+	it('highlights the catalogue on its own route', async () => {
+		stubGraphQL(noCompanies)
+		await renderRoute('/items')
+
+		const menu = within(screen.getByRole('navigation', { name: 'Main menu' }))
+		expect(menu.getByRole('link', { name: 'Items' })).toHaveClass('font-bold')
+		expect(menu.getByRole('link', { name: 'Companies' })).not.toHaveClass('font-bold')
 	})
 
 	it('shows who is signed in', async () => {

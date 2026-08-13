@@ -6,6 +6,7 @@ import { getSession } from '@/auth/session'
 import { AppShell } from '@/components/layout/AppShell'
 import { CompaniesPage } from '@/pages/CompaniesPage'
 import { HomePage } from '@/pages/HomePage'
+import { ItemsPage } from '@/pages/ItemsPage'
 import { LoadingPage } from '@/pages/LoadingPage'
 import { LoginPage } from '@/pages/LoginPage'
 
@@ -81,12 +82,19 @@ const createAppRouteTree = () => {
 	const homeRoute = createRoute({ getParentRoute: () => appRoute, path: '/home', component: HomePage })
 
 	/**
-	 * The one domain route. No `$_id` segment and no search params: `shopOwnerCompanies` takes no
+	 * The first domain route. No `$_id` segment and no search params: `shopOwnerCompanies` takes no
 	 * arguments and the three writes take no owner id, so there is nothing about this page a URL could
 	 * usefully carry. The operator app's equivalent is `/p/shopOwners/id/$_id`, and the missing parameter
 	 * is the tenant boundary, not an omission.
 	 */
 	const companiesRoute = createRoute({ getParentRoute: () => appRoute, path: '/companies', component: CompaniesPage })
+
+	/**
+	 * The catalogue. Also parameterless, and this one had a choice: `companyItems` takes an `idCompany`,
+	 * so `/items/$idCompany` would work. The shop is page state instead — see the note on `ItemsPage` —
+	 * which keeps every id out of this app's URL space rather than most of them.
+	 */
+	const itemsRoute = createRoute({ getParentRoute: () => appRoute, path: '/items', component: ItemsPage })
 
 	/*
 	 * A function declaration, not an arrow constant, so it can be named in the route definition above
@@ -98,7 +106,7 @@ const createAppRouteTree = () => {
 		return <LoadingPage redirect={target} />
 	}
 
-	return rootRoute.addChildren([loginRoute, loadingRoute, appRoute.addChildren([homeRoute, companiesRoute])])
+	return rootRoute.addChildren([loginRoute, loadingRoute, appRoute.addChildren([homeRoute, companiesRoute, itemsRoute])])
 }
 
 /**

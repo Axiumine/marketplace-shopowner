@@ -1,23 +1,34 @@
 # Endpoint: /authenticated-resource (marketplace-dev-authenticated-resource, port 4026)
 #
 # Hand-maintained slice — see the header of public-authorization.graphql for why there is no SDL to
-# pull. Verified field by field on 2026-08-04 against:
-#   src/graphQLApi/schema/queries.mts               → shopOwnerCompanies
-#   src/graphQLApi/schema/mutations.mts             → companyAdd, companyDel, companyUpdate
+# pull. Verified field by field on 2026-08-13 against:
+#   src/graphQLApi/schema/queries.mts               → companyItems, itemCategories, shopOwnerCompanies
+#   src/graphQLApi/schema/mutations.mts             → companyAdd, companyDel, companyUpdate,
+#                                                     itemAdd, itemDel, itemUpdate
 #   src/graphQLApi/schema/types/GraphQLCompany.mts
+#   src/graphQLApi/schema/types/GraphQLItem.mts
+#   src/graphQLApi/schema/types/GraphQLItemCategory.mts
 #   src/graphQLApi/schema/GraphQLInput/GraphQLInputCompany.mts
+#   src/graphQLApi/schema/GraphQLInput/GraphQLInputItem.mts
 #   @axiumine/marketplace-common/schema/types/fragments/GraphQLBaseAddressFrag
 #   @axiumine/marketplace-common/schema/types/fragments/GraphQLAddressFrag
 #   @axiumine/marketplace-common/schema/types/fragments/GraphQLPositionFrag
+#   @axiumine/marketplace-common/schema/types/fragments/GraphQLItemFrag
+#   @axiumine/marketplace-common/schema/types/fragments/GraphQLItemCategoryFrag
 #   @axiumine/koa-utils/graphQL/schema/types/OnlyIdType
 #
-# ⚠️ **This is the whole authenticated surface of the ShopOwner tier — one query and three mutations.**
+# ⚠️ **This is the whole authenticated surface of the ShopOwner tier — three queries and six mutations.**
 # It is not a subset kept small for this app's benefit; the service has nothing else. Anything the
 # operator app does that is missing here (a profile after login, a password change, stats, a period
 # breakdown, a paginated table) has no ShopOwner-tier resolver at all, and adding a screen for it means
 # writing one in `marketplace-dev-authenticated-resource` first.
 #
-# ⚠️ **Three of these four names also exist on the Admin tier with different signatures.** There,
+# ⚠️ Until 2026-08-13 this file declared the company half alone and said so in this header — "one query
+# and three mutations" — while the service had carried the item half for months. The catalogue screens
+# were the gap E05-S07 records, and a slice that stops at what the app happens to call is how a gap stops
+# being visible. What is here is the service's whole surface, called or not.
+#
+# ⚠️ **Three of these names also exist on the Admin tier with different signatures.** There,
 # `shopOwnerCompanies` takes `idShopOwner`, and `companyAdd` takes `(idShopOwner, company)` and answers
 # `Boolean`. Point this app's resource endpoint at `/admin-authenticated-resource` by mistake and the
 # failure is a GraphQL *validation* error about unknown arguments, never a 404 — see the note in
@@ -37,6 +48,31 @@ type QueriesApi {
 	`deleted: { $exists: false }`. There is no id for a client to supply and none for it to get wrong.
 	"""
 	shopOwnerCompanies: [GraphQLCompany!]!
+
+	"""
+	The live items of one of the signed-in owner's shops — drafts included.
+
+	⚠️ Takes `idCompany`, and that argument is the one place on this tier where the client names something.
+	An owner may hold several companies and a catalogue is a per-shop screen, so the id cannot come from
+	the session; `throwIfShopOwnerDontOwnCompany` runs first and answers 403 for a shop the session does
+	not hold, which is what keeps a guessed id from reading a stranger's drafts.
+
+	Both drafts and published items come back: this is the owner's own management list, and `published` is
+	what the listing renders. The public tier filters on it; this one must not.
+	"""
+	companyItems(idCompany: ID!): [GraphQLItem!]!
+
+	"""
+	The whole live category tree, flat, sorted by `position` then `_id`.
+
+	Read-only on this tier: the taxonomy is platform-wide and only the Admin tier writes it. An owner
+	picks a category when filing an item and can add nothing to it — which is the point of a shared
+	taxonomy, since a per-owner one would make the public category pages meaningless.
+
+	No argument and no session filter, so there is nothing here belonging to anybody. `idParent` carries
+	the two-level shape and the client assembles it.
+	"""
+	itemCategories: [GraphQLItemCategory!]!
 }
 
 type MutationsApi {
@@ -70,6 +106,38 @@ type MutationsApi {
 	runs. Both are correct: liveness belongs on the ownership guard, not on the delete write itself.
 	"""
 	companyDel(_id: ID!): Boolean!
+
+	"""
+	Files an item into one of the signed-in owner's shops.
+
+	Answers the new `_id`, like `companyAdd` — the owner's flow continues with the item that was just
+	created, and the id is what a second step would need.
+
+	Two guards, in this order: `throwIfShopOwnerDontOwnCompany` refuses an `idCompany` the session does
+	not hold, then `throwIfItemCategoryMissing` refuses a category that does not exist. Ownership first,
+	so a caller who does not own the shop learns nothing about which category ids are real.
+
+	A `slug` already taken **inside the same company** surfaces as a 409. It is unique per company and not
+	globally: the public route is `/shop/:slug/item/:itemSlug`, so the shop segment already disambiguates.
+	"""
+	itemAdd(item: GraphQLInputItem!): OnlyIdType!
+
+	"""
+	Saves an item of the signed-in owner.
+
+	⚠️ **Also a transfer.** `idCompany` is part of the input, so a save can move the item between the
+	owner's shops — and three guards run, not two: where the item is now, where it is going, and whether
+	the category exists. The whole object is `$set`, so send every field rather than a diff.
+	"""
+	itemUpdate(_id: ID!, item: GraphQLInputItem!): Boolean!
+
+	"""
+	Withdraws an item: stamps `deleted` and leaves the document in place, like `companyDel`.
+
+	The ownership guard filters `deleted` too, so a second call on the same item answers 403 rather than
+	repeating the stamp. The slug stays occupied inside that shop afterwards.
+	"""
+	itemDel(_id: ID!): Boolean!
 }
 
 """
@@ -155,6 +223,78 @@ input GraphQLInputCompanyAddress {
 input GraphQLInputCompanyPosition {
 	type: String!
 	coordinates: [Float!]!
+}
+
+"""
+One thing a shop sells, as its owner sees it.
+
+`published` is here because this is a tier that can see a draft; the public tier spreads the same
+fragment and leaves the flag out, since an item it can return is published by definition. `deleted` is
+exposed nowhere — every read path on this tier filters it, so the only value it could carry is null.
+
+⚠️ There is no `price`, and its absence is a platform decision rather than an omission in this slice:
+cart, order, delivery and payment have no model anywhere yet, so a price would be a guess at a currency,
+a precision and a VAT treatment at once. See the header of the `item` validator.
+"""
+type GraphQLItem {
+	_id: ID!
+	"""
+	The shop that sells this — a company IS the shop here.
+	"""
+	idCompany: ID!
+	"""
+	An `itemCategory`, at either of its two levels.
+	"""
+	idCategory: ID!
+	name: String!
+	description: String!
+	"""
+	URL segment of `/shop/:slug/item/:itemSlug`. Unique within the company, not globally.
+	"""
+	slug: String!
+	"""
+	False while a draft. A public read also requires the item's company to be published — the two
+	compose, so publishing an item in a draft shop is legal and simply shows nobody anything.
+	"""
+	published: Boolean!
+}
+
+"""
+A category as the shop owner sees it, which is read-only — the writes live on the Admin tier.
+
+`idParent` is nullable and that nullability *is* the tree: absent means top level, present means a
+subcategory of the one it names. Depth is capped at two by the Admin tier, so the whole shape assembles
+from one flat list without recursing.
+"""
+type GraphQLItemCategory {
+	_id: ID!
+	idParent: ID
+	name: String!
+	slug: String!
+	"""
+	A sort ordinal set by the operator — ⚠️ not the GeoJSON `position` of `GraphQLCompanyPosition`.
+	"""
+	position: Int!
+}
+
+"""
+The item as its owner fills it in: `GraphQLItem` minus `_id`, which the server mints.
+
+⚠️ `idCompany` **is** here, where `GraphQLInputCompany` has no `idShopOwner`. An owner may hold several
+companies, so which shop an item belongs to is a choice the client makes rather than something the
+session determines — and it is checked against the session on every write, because an id the client
+sends is an id the client can guess.
+
+Every field is non-null, matching the collection's `required` list, and `itemUpdate` `$set`s the whole
+object — so an optional field here would be a field that can never be cleared.
+"""
+input GraphQLInputItem {
+	idCompany: ID!
+	idCategory: ID!
+	name: String!
+	description: String!
+	slug: String!
+	published: Boolean!
 }
 
 """

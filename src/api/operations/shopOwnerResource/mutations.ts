@@ -40,3 +40,44 @@ export const CompanyDelDocument = graphql(`
 		companyDel(_id: $_id)
 	}
 `)
+
+/**
+ * The three writes on an item — the catalogue half of this service's mutation surface.
+ *
+ * ⚠️ **`idCompany` travels inside `GraphQLInputItem` on all three writes that carry the item**, which is
+ * what makes `ItemUpdate` a transfer as well as a save: changing that one field moves the item to
+ * another of the owner's shops. The service runs three guards for exactly that reason — where the item
+ * is now, where it is going, and whether the category exists — so a save that only meant to fix a typo
+ * still has to send the `idCompany` the item already had, never a blank.
+ *
+ * `ItemAdd` answers `OnlyIdType`, like `CompanyAdd` and unlike the operator tier's namesakes. A `slug`
+ * already taken **inside the same company** comes back as a 409 through `tryCatchRethrow`; the same slug
+ * in a different shop is legal, since the public route carries the shop segment ahead of the item's.
+ *
+ * `ItemDel` is a soft delete: the document stays, gains a `deleted` instant, and its slug stays occupied
+ * inside that shop for good. A second delete of the same item answers **403**, not `false` — the
+ * ownership guard filters `deleted` and refuses before the write is reached.
+ *
+ * All three need `additionalTypenames: ['GraphQLItem']` at the call site, for the reason the company
+ * writes need theirs: two answer a bare `Boolean` and the third an `OnlyIdType`, so nothing in any
+ * response names the type whose cached list has just gone stale.
+ */
+export const ItemAddDocument = graphql(`
+	mutation ItemAdd($item: GraphQLInputItem!) {
+		itemAdd(item: $item) {
+			_id
+		}
+	}
+`)
+
+export const ItemUpdateDocument = graphql(`
+	mutation ItemUpdate($_id: ID!, $item: GraphQLInputItem!) {
+		itemUpdate(_id: $_id, item: $item)
+	}
+`)
+
+export const ItemDelDocument = graphql(`
+	mutation ItemDel($_id: ID!) {
+		itemDel(_id: $_id)
+	}
+`)
