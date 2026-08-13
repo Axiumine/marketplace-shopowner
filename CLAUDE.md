@@ -176,7 +176,7 @@ two-section sidebar, a `CompaniesPage.test.tsx` with no counterpart there.
 
 ## Gates
 
-commit → secret guard, lint, typecheck, coverage, Qodana. push → same + mutation. All blocking. Why:
+commit → secret guard, lint, typecheck, coverage, Qodana. push → same + semgrep (SAST) + mutation. All blocking. Why:
 [`REPO.md`](./REPO.md).
 
 ## Cross-repo

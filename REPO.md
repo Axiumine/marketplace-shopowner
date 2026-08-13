@@ -6,15 +6,17 @@ themselves, [`COVERAGE.md`](./COVERAGE.md) the thresholds.
 
 ## The hooks
 
-`.githooks/pre-push` is a blocking five-step gate: `yarn lint:check`, then `tsc --noEmit`, then
+`.githooks/pre-push` is a blocking six-step gate: `yarn semgrep:ci` (Semgrep SAST, rules vendored under
+`semgrep/`, pinned image, `--network none`), then `yarn lint:check`, then `tsc --noEmit`, then
 `yarn test:cov` (100 on all four metrics), then `yarn test:mutation` (100), then `./qodana.sh`.
 
-`.githooks/pre-commit` repeats lint, typecheck, coverage and Qodana on top of the secret guard. Mutation is
-pre-push only. Both hooks pass `SKIP_TESTS=1` to the scan so it reuses the `coverage/lcov.info` the step
+`.githooks/pre-commit` repeats lint, typecheck, coverage and Qodana on top of the secret guard. Semgrep and
+mutation are push-only — both need Docker, and push is the layer that sees the merge commit. Both hooks pass `SKIP_TESTS=1` to the scan so it reuses the `coverage/lcov.info` the step
 before it just wrote.
 
-Lint is first because it is the cheapest of the five and the only one that can fail on a file the other
-four are perfectly happy with — the next `yarn lint` would rewrite it anyway. `.prettierrc` and
+Semgrep is first because it is the cheapest of the six by an order of magnitude — about three seconds
+against the minutes the rest take together. Lint leads the five that follow because it is the cheapest of
+them and the only one that can fail on a file the other four are perfectly happy with — the next `yarn lint` would rewrite it anyway. `.prettierrc` and
 `.prettierignore` joined `eslint.config.js` in the hooks' `RELEVANT_PATHS` at the same time, since the gate
 reads all three; before that, a commit touching only them skipped every gate there is.
 
@@ -36,7 +38,7 @@ project.
 
 ## Node selection
 
-Ahead of its five gates the pre-push hook selects node itself. It reads `engines.node` from `package.json`
+Ahead of its six gates the pre-push hook selects node itself. It reads `engines.node` from `package.json`
 — never a hard-coded version — and sources nvm to switch if the current node does not satisfy it.
 
 This is necessary because every gate shells out to yarn and yarn's `engines` check is a hard failure: on
