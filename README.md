@@ -74,7 +74,7 @@ yarn preview        # serve dist/
 yarn codegen        # regenerate src/gql/ (also codegen:watch)
 yarn typecheck      # tsc --noEmit
 yarn lint           # eslint --fix + prettier --write   (lint:check for CI)
-./qodana.sh         # Qodana Ultimate scan: inspections, SAST, SCA, licenses, coverage
+./qodana.sh         # Qodana Ultimate scan: inspections, SAST, licenses, coverage
 ```
 
 ```bash

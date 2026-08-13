@@ -6,16 +6,24 @@ themselves, [`COVERAGE.md`](./COVERAGE.md) the thresholds.
 
 ## The hooks
 
-`.githooks/pre-push` is a blocking six-step gate: `yarn semgrep:ci` (Semgrep SAST, rules vendored under
-`semgrep/`, pinned image, `--network none`), then `yarn lint:check`, then `tsc --noEmit`, then
+`.githooks/pre-push` is a blocking seven-step gate: `yarn semgrep:ci` (Semgrep SAST, rules vendored under
+`semgrep/`, pinned image, `--network none`), then trivy (dependency advisories over `yarn.lock`, HIGH and
+CRITICAL, production tree only), then `yarn lint:check`, then `tsc --noEmit`, then
 `yarn test:cov` (100 on all four metrics), then `yarn test:mutation` (100), then `./qodana.sh`.
 
-`.githooks/pre-commit` repeats lint, typecheck, coverage and Qodana on top of the secret guard. Semgrep and
-mutation are push-only — both need Docker, and push is the layer that sees the merge commit. Both hooks pass `SKIP_TESTS=1` to the scan so it reuses the `coverage/lcov.info` the step
+⚠️ **Trivy is what checks dependencies; Qodana's own inspection does not.** `VulnerableLibrariesLocal` is
+an offline heuristic that queries no advisory feed and reports zero everywhere, and the class that does
+query one is bundled with the image but is in no profile. Trivy reads `yarn.lock` natively, suppresses
+devDependencies, and blocks on HIGH or CRITICAL with the CVE id and the fixed version. Bypass for a Docker
+or network outage, never for a finding: `SKIP_TRIVY=1 git push`. E18-S11.
+
+`.githooks/pre-commit` repeats lint, typecheck, coverage and Qodana on top of the secret guard. Semgrep,
+trivy and mutation are push-only — all three need Docker, and push is the layer that sees the merge commit. Both hooks pass `SKIP_TESTS=1` to the scan so it reuses the `coverage/lcov.info` the step
 before it just wrote.
 
-Semgrep is first because it is the cheapest of the six by an order of magnitude — about three seconds
-against the minutes the rest take together. Lint leads the five that follow because it is the cheapest of
+Semgrep and trivy are first because they are the two cheap ones — about three seconds and, with the
+vulnerability database already pulled, under one — against the minutes the rest take together. Lint leads
+the five that follow because it is the cheapest of
 them and the only one that can fail on a file the other four are perfectly happy with — the next `yarn lint` would rewrite it anyway. `.prettierrc` and
 `.prettierignore` joined `eslint.config.js` in the hooks' `RELEVANT_PATHS` at the same time, since the gate
 reads all three; before that, a commit touching only them skipped every gate there is.
