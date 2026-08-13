@@ -35,6 +35,14 @@ exports[`AppShell > renders 1`] = `
             Companies
           </a>
         </li>
+        <li>
+          <a
+            class="block rounded-box px-3 py-2 text-sm "
+            href="/items"
+          >
+            Items
+          </a>
+        </li>
       </ul>
       <div
         class="mt-auto flex flex-col gap-2"

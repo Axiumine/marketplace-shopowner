@@ -5,7 +5,7 @@ import { useLogout } from '@/auth/useLogout'
 import { Button } from '@/components/ui/Button'
 
 /**
- * The two sections of the shop-owner app.
+ * The three sections of the shop-owner app.
  *
  * The `prefixes` list is kept even though every entry currently holds exactly one path equal to `to`.
  * It exists so a section whose pages live under a different prefix — the operator app puts its detail
@@ -20,7 +20,10 @@ import { Button } from '@/components/ui/Button'
  */
 const SECTIONS = [
 	{ to: '/home', label: 'Dashboard', prefixes: ['/home'] },
-	{ to: '/companies', label: 'Companies', prefixes: ['/companies'] }
+	{ to: '/companies', label: 'Companies', prefixes: ['/companies'] },
+	// Its own section rather than a tab inside Companies: a catalogue is per shop, but the page is about
+	// the items and the shop is one select at the top of it.
+	{ to: '/items', label: 'Items', prefixes: ['/items'] }
 ] as const
 
 export const isSectionActive = (pathname: string, prefixes: readonly string[]): boolean =>

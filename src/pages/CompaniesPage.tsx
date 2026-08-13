@@ -1,6 +1,6 @@
 import { PageHeader } from '@/components/layout/PageHeader'
 import { Companies } from '@/features/companies/Companies'
-import { SaveChanges, useDiscardWarning, useSaving } from '@/features/companies/saving'
+import { SaveChanges, useDiscardWarning, useSaving } from '@/features/saving'
 
 /**
  * The owner's companies.

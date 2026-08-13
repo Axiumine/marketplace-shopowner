@@ -2,10 +2,12 @@
 
 Marketplace shop-owner area (`ShopOwner` tier). Vite + React SPA, TypeScript strict.
 
-**Shop-owner tier only.** A shop owner logs in through `login` and manages their **own** companies —
-nothing else, and nobody else's. The tenant boundary is not a filter this app applies: the resolvers on
-this tier take no owner id at all and read it from the Redis session behind the access token, so there
-is nothing here that could be pointed at another owner's data.
+**Shop-owner tier only.** A shop owner logs in through `login` and manages their **own** companies and
+the items in them — nothing else, and nobody else's. The tenant boundary is not a filter this app
+applies: the company resolvers on this tier take no owner id at all and read it from the Redis session
+behind the access token, so there is nothing here that could be pointed at another owner's data. The
+item resolvers take an `idCompany`, which is the one thing this app names — and the server checks the
+session owns it before answering, so naming somebody else's shop is a 403 rather than a leak.
 
 Mirrored from `marketplace-admin`, the operator app for the `Admin` tier — same stack, same
 conventions. The customer (`User`) frontend is a third app that does not exist yet.
@@ -13,10 +15,14 @@ conventions. The customer (`User`) frontend is a third app that does not exist y
 ## What this app is not, yet
 
 The mirror is thinner than the original because the backend behind it is thinner.
-`marketplace-dev-authenticated-resource` exposes **one query and three mutations** in total —
-`shopOwnerCompanies`, `companyAdd`, `companyUpdate`, `companyDel` — and that is the whole authenticated
-surface of this tier. Every operator-app screen missing here is missing for the same reason: there is
-no resolver to call.
+`marketplace-dev-authenticated-resource` exposes **three queries and six mutations** in total —
+`shopOwnerCompanies`, `companyItems`, `itemCategories`, `companyAdd`, `companyUpdate`, `companyDel`,
+`itemAdd`, `itemUpdate`, `itemDel` — and that is the whole authenticated surface of this tier. Every
+operator-app screen missing here is missing for the same reason: there is no resolver to call.
+
+⚠️ `itemCategories` is the one read on this tier that answers the same list to everybody — the taxonomy
+is the operator's, and an owner only files items under it. Every other operation is scoped to the
+session, `companyItems` by `throwIfShopOwnerDontOwnCompany` rather than by an absent argument.
 
 | Operator app screen | Backed by | Here |
 |---|---|---|
@@ -144,10 +150,16 @@ schema slices; it describes nothing that exists.
 | `/loading` | session restore, then `?redirect=` |
 | `/home` | dashboard |
 | `/companies` | the owner's companies — add, edit, soft-delete |
+| `/items` | one shop's catalogue — pick the shop, then add, edit, delete |
 
-Four routes, and no path or search param anywhere except `/loading`'s `?redirect=`. That is the tenant
+Five routes, and no path or search param anywhere except `/loading`'s `?redirect=`. That is the tenant
 boundary showing up in the URL space: the operator app needs `/p/shopOwners/id/$_id` because an
 operator has to say *whose* companies they are looking at, and here there is nobody else to name.
+
+⚠️ `/items` is the one route that had a choice. `companyItems` takes an `idCompany`, so
+`/items/$idCompany` would have worked — the shop is page state instead, which keeps *every* id out of
+this app's URL space rather than most of them. The resolver refuses a shop the session does not hold
+either way; what the URL decides is whether a wrong id is something an owner can be handed in a link.
 
 Everything except `/` and `/loading` sits behind a pathless guarded route. An empty session redirects
 to `/loading`, not to `/`: only a round-trip can tell "never signed in" from "signed in and reloaded".
@@ -188,6 +200,26 @@ guard against all render as a working screen.
 - **Create and delete mutations pass `additionalTypenames`.** The document cache invalidates by the
   typenames a mutation's *response* mentions; `companyUpdate` and `companyDel` answer a bare `Boolean`
   and `companyAdd` an `OnlyIdType`, so without the list every write leaves the screen unchanged.
+  ⚠️ The list only reaches a cached response that *carries* the typename, and an empty one carries
+  none: the first item added to a shop whose `companyItems` answered `[]` does not appear by
+  invalidation. The new-item card drops itself on success for exactly that case, and every card after
+  the first is the invalidation doing its job.
+- **The catalogue is one page with a shop picker, not a tab inside a company.** A company card is
+  already the longest form in the app, and an owner with several shops moves between catalogues far
+  more often than between a shop's registration details and its items.
+- **`itemUpdate` is a transfer as well as an edit.** `idCompany` travels inside `GraphQLInputItem`, so
+  the same mutation that renames an item can move it to another of the owner's shops. Nothing on this
+  screen offers that yet — the field is sent back unchanged — but a "move to" control is a select, not
+  a new resolver.
+- **No price anywhere on the item form.** `item` carries none, deliberately: there is no cart, no
+  order, no delivery and no payment on this platform, and a price with nothing to charge it against
+  would be the first half of a design nobody has made. Adding the field starts in `marketplace-db-setup`
+  and the ADR index, not here.
+- **The category picker flattens the taxonomy into `Parent / Child` labels rather than an indented
+  tree.** `itemCategories` sorts by `position` then `_id` across both levels at once, so the list
+  arrives interleaved; one pass regroups it, and a subcategory whose parent is gone is kept at the end
+  under its bare name rather than dropped — dropping it would silently re-file every item pointing at
+  it on the next save.
 - **`context.url` objects are module constants.** urql compares context by key and re-executes when it
   changes, so a `{ url }` literal in a component body is a new object per render — an infinite refetch
   loop.
@@ -203,7 +235,7 @@ guard against all render as a working screen.
 | TanStack Virtual | not used | Nothing here is a long list — an owner has a handful of companies. |
 | TanStack Table | installed, unused | No table on this surface yet. |
 | Radix Dialog / Toast | not used | Nothing is modal, and errors belong next to what failed — `Alert` is inline and `role="alert"` only for the error tone. |
-| File-based routing | route tree in code | A generated `routeTree.gen.ts` cannot be tested, so it would have to be excluded from coverage and mutation — and every exclusion is a hole. Four routes do not need a generator. |
+| File-based routing | route tree in code | A generated `routeTree.gen.ts` cannot be tested, so it would have to be excluded from coverage and mutation — and every exclusion is a hole. Five routes do not need a generator. |
 | Schema from the server | `schema/*.graphql`, hand-maintained | The platform has no SDL: all nine services build their schema programmatically with graphql-js. These four files are hand-written slices, and they are a copy — verify against the resolvers, never the other way round. |
 
 ## License

@@ -5,8 +5,15 @@ import type { FieldValues, UseFormHandleSubmit } from 'react-hook-form'
 import { Button } from '@/components/ui/Button'
 import { Toast } from '@/components/ui/Toast'
 
+/*
+ * The one Save button, and the registry behind it. Shared by `/companies` and `/items`, which is why it
+ * sits directly under `features/` rather than inside either of them: both pages are a list of cards over
+ * a single button, and a second copy of this would be a second answer to "what happens when card three
+ * of five is refused".
+ */
+
 /**
- * One savable block of the page — one company card.
+ * One savable block of the page — one card, whatever the card holds.
  *
  * `save` answers whether the write went through, so the page can stop at the first failure instead of
  * firing the rest and leaving the owner with several half-applied cards and one error message.
@@ -23,9 +30,9 @@ export type RegisterSection = (id: string, section: SavableSection | null) => vo
 /**
  * The page-level registry behind the single Save button.
  *
- * It exists because each company card is its own form with its own mutation, while the owner gets one
- * button at the bottom for all of them — and because one card failing on a duplicate VAT number must
- * not discard what is in the others.
+ * It exists because each card is its own form with its own mutation, while the owner gets one
+ * button at the bottom for all of them — and because one card failing on a duplicate VAT number, or on a
+ * slug already taken inside the shop, must not discard what is in the others.
  * The button therefore has to reach forms it does not render, and the forms have to tell it whether
  * they are dirty.
  *
