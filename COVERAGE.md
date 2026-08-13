@@ -17,7 +17,8 @@ Two numbers, both 100, both blocking — plus a scan that re-checks the first on
 |---|---|---|
 | Coverage — statements, branches, functions, lines | `yarn test:cov` | `vitest.config.ts`, `qodana.yaml` |
 | Mutation score | `yarn test:mutation` | `stryker.config.mjs` (`thresholds.break: 100`) |
-| Inspections, SAST, SCA, license audit, coverage | `./qodana.sh` | `qodana.yaml` (`failureConditions`) |
+| Inspections, SAST, license audit, coverage | `./qodana.sh` | `qodana.yaml` (`failureConditions`) |
+| Dependency advisories, HIGH and CRITICAL | trivy, in `.githooks/pre-push` | pinned `aquasec/trivy:0.70.0`, no config file |
 
 All three run in `.githooks/pre-push`, after `tsc --noEmit`; coverage and Qodana run again in
 `.githooks/pre-commit`. Nothing may be lowered — the fix for a red run is a test, or the deletion of
