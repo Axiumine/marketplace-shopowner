@@ -4,7 +4,8 @@
 # pull. Verified field by field on 2026-08-13 against:
 #   src/graphQLApi/schema/queries.mts               → companyItems, itemCategories, shopOwnerCompanies
 #   src/graphQLApi/schema/mutations.mts             → companyAdd, companyDel, companyUpdate,
-#                                                     itemAdd, itemDel, itemUpdate
+#                                                     companyUpdatePublished, itemAdd, itemDel,
+#                                                     itemUpdate, itemUpdatePublished
 #   src/graphQLApi/schema/types/GraphQLCompany.mts
 #   src/graphQLApi/schema/types/GraphQLItem.mts
 #   src/graphQLApi/schema/types/GraphQLItemCategory.mts
@@ -17,7 +18,7 @@
 #   @axiumine/marketplace-common/schema/types/fragments/GraphQLItemCategoryFrag
 #   @axiumine/koa-utils/graphQL/schema/types/OnlyIdType
 #
-# ⚠️ **This is the whole authenticated surface of the ShopOwner tier — three queries and six mutations.**
+# ⚠️ **This is the whole authenticated surface of the ShopOwner tier — three queries and eight mutations.**
 # It is not a subset kept small for this app's benefit; the service has nothing else. Anything the
 # operator app does that is missing here (a profile after login, a password change, stats, a period
 # breakdown, a paginated table) has no ShopOwner-tier resolver at all, and adding a screen for it means
@@ -27,6 +28,12 @@
 # and three mutations" — while the service had carried the item half for months. The catalogue screens
 # were the gap E05-S07 records, and a slice that stops at what the app happens to call is how a gap stops
 # being visible. What is here is the service's whole surface, called or not.
+#
+# ⚠️ On 2026-08-14 `published` left `GraphQLInputItem` and the two `*UpdatePublished` mutations arrived
+# beside it. Publishing is its own operation on both tiers now: `itemUpdate` and `companyUpdate` `$set`
+# the whole object, so a flag inside their input made every save a write of the flag, and a card
+# reopened after somebody took the item down put it straight back. `itemAdd` and `companyAdd` stamp
+# `false`; the flag has exactly one writer per collection.
 #
 # ⚠️ **Three of these names also exist on the Admin tier with different signatures.** There,
 # `shopOwnerCompanies` takes `idShopOwner`, and `companyAdd` takes `(idShopOwner, company)` and answers
@@ -108,6 +115,21 @@ type MutationsApi {
 	companyDel(_id: ID!): Boolean!
 
 	"""
+	Publishes one of the signed-in owner's shops, or takes it off the public site.
+
+	Separate from `companyUpdate` by decision: the card is one thing the owner saves and the shop being
+	visible is another, and a flag inside `GraphQLInputCompany` made every save a write of it.
+	`companyAdd` stamps `false`, and this is the only mutation that changes it.
+
+	⚠️ **`published: true` can be refused by the collection.** A shop needs a stored `slug` and
+	`publicName` before it may go live — an `$expr` on `company`, deliberately not duplicated in
+	application code — so the card is saved first and published second. This app cannot reach that state
+	yet: neither field is in this slice's `GraphQLInputCompany`, and the companies screen offers no box
+	for them.
+	"""
+	companyUpdatePublished(_id: ID!, published: Boolean!): Boolean!
+
+	"""
 	Files an item into one of the signed-in owner's shops.
 
 	Answers the new `_id`, like `companyAdd` — the owner's flow continues with the item that was just
@@ -128,8 +150,23 @@ type MutationsApi {
 	⚠️ **Also a transfer.** `idCompany` is part of the input, so a save can move the item between the
 	owner's shops — and three guards run, not two: where the item is now, where it is going, and whether
 	the category exists. The whole object is `$set`, so send every field rather than a diff.
+
+	It does **not** touch `published` — that is `itemUpdatePublished`, and the flag is not in the input.
 	"""
 	itemUpdate(_id: ID!, item: GraphQLInputItem!): Boolean!
+
+	"""
+	Publishes an item of the signed-in owner, or withdraws it from the public site.
+
+	One guard, where `itemUpdate` runs three: nothing moves, so the only question is whether the item
+	named belongs to the session. The Admin tier has carried a mutation of this name since it gained
+	moderation, and an operator's takedown is undone by this call alone — never by the owner saving the
+	card, which is what the split is for.
+
+	A published item in an unpublished shop shows nobody anything: the two flags compose, and this one
+	answers `true` all the same.
+	"""
+	itemUpdatePublished(_id: ID!, published: Boolean!): Boolean!
 
 	"""
 	Withdraws an item: stamps `deleted` and leaves the document in place, like `companyDel`.
@@ -278,12 +315,17 @@ type GraphQLItemCategory {
 }
 
 """
-The item as its owner fills it in: `GraphQLItem` minus `_id`, which the server mints.
+The item as its owner fills it in: `GraphQLItem` minus `_id`, which the server mints, and `published`,
+which is not part of the card.
 
 ⚠️ `idCompany` **is** here, where `GraphQLInputCompany` has no `idShopOwner`. An owner may hold several
 companies, so which shop an item belongs to is a choice the client makes rather than something the
 session determines — and it is checked against the session on every write, because an id the client
 sends is an id the client can guess.
+
+⚠️ **`published` is deliberately absent.** It was a `Boolean!` here until 2026-08-14, which made every
+save of the card a write of the flag; `itemUpdatePublished` is the only writer now. Putting it back
+would republish, on the next ordinary save, whatever an operator had just taken down.
 
 Every field is non-null, matching the collection's `required` list, and `itemUpdate` `$set`s the whole
 object — so an optional field here would be a field that can never be cleared.
@@ -294,7 +336,6 @@ input GraphQLInputItem {
 	name: String!
 	description: String!
 	slug: String!
-	published: Boolean!
 }
 
 """
