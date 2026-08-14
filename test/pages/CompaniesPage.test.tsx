@@ -1,3 +1,12 @@
+// noinspection DuplicatedCode -- the fragment this shares with ItemsPage.test.tsx is the tail of "stops
+// asking once the edits are saved": save, wait for the confirmation, navigate away, expect no prompt. That
+// tail is the assertion, and the assertion is the point — both pages have to stop warning after a save, and
+// each has to be seen proving it. The two suites load different fixtures and reach the save differently, so
+// folding the shared end into a helper would leave the reader unable to tell which page was checked.
+//
+// The suppression is file-wide because Qodana honours this comment only at the top of a file: placed on the
+// statement it flags, or on the `it` around it, the note comes back.
+
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'

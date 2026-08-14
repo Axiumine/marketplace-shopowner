@@ -1,3 +1,13 @@
+// noinspection DuplicatedCode -- the fragment this shares with Items.test.tsx is the tail of "leaves the
+// row above it written when the card is refused": run the edit-and-add, expect the failure alert, expect one
+// write and one add, expect the card still on screen. That tail is the assertion, and the assertion is the
+// point — a half-failed save has to keep the unsaved half on both pages, and each has to be seen proving it.
+// The two suites stub different mutations against different documents, so folding the shared end into a
+// helper would leave the reader unable to tell which page was checked.
+//
+// The suppression is file-wide because Qodana honours this comment only at the top of a file: placed on the
+// statement it flags, or on the `it` around it, the note comes back.
+
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
