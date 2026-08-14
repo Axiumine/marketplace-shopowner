@@ -29,8 +29,7 @@ const VALID = {
 	name: 'Blue enamel mug',
 	description: 'Half a litre, dishwasher safe.',
 	slug: 'blue-enamel-mug',
-	idCategory: ID_CATEGORY,
-	published: true
+	idCategory: ID_CATEGORY
 }
 
 const outcome = (patch: Record<string, unknown> = {}) => itemSchema.safeParse({ ...VALID, ...patch })
@@ -134,7 +133,7 @@ describe('itemSchema — the slug', () => {
  * owner reaches without typing: it is what a stored item falls back to when the operator retires the
  * category it was filed under, so this message is what a taxonomy change looks like from inside the card.
  */
-describe('itemSchema — the category and the flag', () => {
+describe('itemSchema — the category', () => {
 	it('refuses the placeholder option', () => {
 		expect(messages({ idCategory: '' })).toEqual(['Category is required'])
 	})
@@ -143,12 +142,14 @@ describe('itemSchema — the category and the flag', () => {
 		expect(value({ idCategory: ID_CATEGORY }).idCategory).toBe(ID_CATEGORY)
 	})
 
-	// `published` is a checkbox, so the only value that ever reaches the schema is a boolean — asserted
-	// both ways because it travels in the same `$set` as everything else and a dropped `false` publishes
-	// a draft.
-	it('carries the published flag through as it was', () => {
-		expect(value({ published: false }).published).toBe(false)
-		expect(value({ published: true }).published).toBe(true)
+	/*
+	 * ⚠️ The flag is not in the schema and must not come back. `itemUpdate` `$set`s the whole object, so a
+	 * `published` the resolver parsed would be a `published` the save wrote, and `itemUpdatePublished`
+	 * would stop being the only writer of it. zod strips what it does not declare, which is what makes
+	 * this assertable: the card cannot smuggle the flag out even if something puts it back in the form.
+	 */
+	it('drops a published flag that reached it anyway', () => {
+		expect(value({ published: true })).not.toHaveProperty('published')
 	})
 })
 
@@ -245,27 +246,30 @@ describe('valuesInitial', () => {
 	}
 
 	/*
-	 * Every field, and `published: false` above all: a new item is a draft until its owner says otherwise,
-	 * which is the only default that cannot publish something by accident. A blank category is the
+	 * Every field, and no `published` among them: the flag is not part of the card any more, and `itemAdd`
+	 * stamps `false` on the server, so a new item is a draft whatever this holds. A blank category is the
 	 * placeholder the picker opens on, so the owner has to choose rather than accept whichever is first.
+	 *
+	 * `toEqual` and not `toMatchObject`, here and below: an extra key is exactly the regression this is
+	 * about, so the assertion has to fail on one.
 	 */
-	it('opens a new card blank and unpublished', () => {
+	it('opens a new card blank', () => {
 		expect(valuesInitial(null, OPTIONS)).toEqual({
 			name: '',
 			description: '',
 			slug: '',
-			idCategory: '',
-			published: false
+			idCategory: ''
 		})
 	})
 
+	// The stored flag is read past, not copied: `STORED` is published and the card it opens says nothing
+	// about it, because the header's button is what reads and writes that.
 	it('opens a stored card on what the collection holds', () => {
 		expect(valuesInitial(STORED, OPTIONS)).toEqual({
 			name: 'Blue enamel mug',
 			description: 'Half a litre, dishwasher safe.',
 			slug: 'blue-enamel-mug',
-			idCategory: 'c-3',
-			published: true
+			idCategory: 'c-3'
 		})
 	})
 

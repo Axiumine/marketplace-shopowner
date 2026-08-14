@@ -15,10 +15,17 @@ conventions. The customer (`User`) frontend is a third app that does not exist y
 ## What this app is not, yet
 
 The mirror is thinner than the original because the backend behind it is thinner.
-`marketplace-dev-authenticated-resource` exposes **three queries and six mutations** in total —
-`shopOwnerCompanies`, `companyItems`, `itemCategories`, `companyAdd`, `companyUpdate`, `companyDel`,
-`itemAdd`, `itemUpdate`, `itemDel` — and that is the whole authenticated surface of this tier. Every
-operator-app screen missing here is missing for the same reason: there is no resolver to call.
+`marketplace-dev-authenticated-resource` exposes **three queries and eight mutations** in total —
+`shopOwnerCompanies`, `companyItems`, `itemCategories`, `companyAdd`, `companyUpdate`,
+`companyUpdatePublished`, `companyDel`, `itemAdd`, `itemUpdate`, `itemUpdatePublished`, `itemDel` — and
+that is the whole authenticated surface of this tier. Every operator-app screen missing here is missing
+for the same reason: there is no resolver to call.
+
+⚠️ `companyUpdatePublished` is the one of the eight this app never calls, and the gap is a screen rather
+than a resolver: the companies form has no `publicName`, `slug` or `description` box, and the collection
+refuses `published: true` without the first two. Publishing a *shop* therefore starts by adding those
+three fields to the company card and to `schema/authenticated-resource.graphql`'s `GraphQLInputCompany`,
+which the service has carried since 20260804010000.
 
 ⚠️ `itemCategories` is the one read on this tier that answers the same list to everybody — the taxonomy
 is the operator's, and an owner only files items under it. Every other operation is scoped to the
@@ -211,6 +218,13 @@ guard against all render as a working screen.
   the same mutation that renames an item can move it to another of the owner's shops. Nothing on this
   screen offers that yet — the field is sent back unchanged — but a "move to" control is a select, not
   a new resolver.
+- ⚠️ **Publishing is a separate operation, and the only control on the page that writes on its own.**
+  `published` left `GraphQLInputItem` on 2026-08-14: `itemUpdate` `$set`s the whole object, so a flag
+  inside the card was written on every save, and a card left open since before an operator took the item
+  down republished it the next time the owner fixed a typo. `itemAdd` stamps `false`, the header's
+  Publish / Unpublish button calls `itemUpdatePublished`, and the label is read back from
+  `companyItems` rather than kept locally — so what the button says is what the collection holds.
+  A published item in an unpublished shop shows nobody anything: the two flags compose.
 - **No price anywhere on the item form.** `item` carries none, deliberately: there is no cart, no
   order, no delivery and no payment on this platform, and a price with nothing to charge it against
   would be the first half of a design nobody has made. Adding the field starts in `marketplace-db-setup`

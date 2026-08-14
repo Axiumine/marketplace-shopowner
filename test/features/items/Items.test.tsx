@@ -77,6 +77,8 @@ const taxonomy = (list: unknown[]) => ({ ItemCategories: { data: { itemCategorie
 const LOADED = { ...shops([shop]), ...catalogue([item]), ...taxonomy([categoryTop, categoryChild]) }
 
 const OK = { ItemUpdate: { data: { itemUpdate: true } } }
+/** The publish switch, which is a mutation of its own since `published` left `GraphQLInputItem`. */
+const OK_PUBLISH = { ItemUpdatePublished: { data: { itemUpdatePublished: true } } }
 /**
  * ⚠️ An object with an `_id`, not `true`. `itemAdd` answers `OnlyIdType`, as `companyAdd` does on this
  * tier — the call site tests the field rather than the object, so it stays honest if it ever goes
@@ -130,18 +132,42 @@ const mask = () => screen.queryByText('It will be withdrawn on save.')?.parentEl
 const adds = (stub: GraphQLStub) => stub.calls.filter((call) => call.operationName === 'ItemAdd')
 const writes = (stub: GraphQLStub) => stub.calls.filter((call) => call.operationName === 'ItemUpdate')
 const deletes = (stub: GraphQLStub) => stub.calls.filter((call) => call.operationName === 'ItemDel')
+const publishes = (stub: GraphQLStub) => stub.calls.filter((call) => call.operationName === 'ItemUpdatePublished')
+
+/**
+ * What the card's header states about the flag, in words.
+ *
+ * ⚠️ Not a row of "Item data" any more, and that is the assertion: the box holds what the page's Save
+ * sends, and `published` is not in it. The header is where the state is said and where it is changed.
+ */
+const publishedSays = (name?: string) => card(name).getByText(/^Published:/).textContent
+
+/**
+ * The header's publish switch, whose label is the action it offers rather than the state it is in.
+ *
+ * Anchored at the end and not at both ends: the button grows a spinner while the write is in flight, and
+ * the spinner's visually-hidden "Loading" joins the accessible name in front of the label. Case-insensitive
+ * for the same one word twice — "Unpublish" carries a lowercase `p`, and a `/Publish$/` matches neither
+ * label while looking as though it should match both.
+ */
+const publishButton = (name?: string) => card(name).getByRole('button', { name: /publish$/i })
 
 /** Every request sent for one operation — a refetch is counted here, not read off the screen. */
 const reads = (stub: GraphQLStub, name: string) => stub.calls.filter((call) => call.operationName === name)
 
-/** The stored item as both writes send it back: the parsed fields, plus the shop the list was drawn in. */
+/**
+ * The stored item as both writes send it back: the parsed fields, plus the shop the list was drawn in.
+ *
+ * ⚠️ No `published`. The fixture above is a published item and every save below sends this exact object,
+ * which is the point: the card cannot carry the flag any more, so a save can no longer republish
+ * anything.
+ */
 const SENT = {
 	idCompany: ID_COMPANY,
 	idCategory: ID_CHILD,
 	name: 'Blue enamel mug',
 	description: 'Half a litre, dishwasher safe.',
-	slug: 'blue-enamel-mug',
-	published: true
+	slug: 'blue-enamel-mug'
 }
 
 /**
@@ -409,7 +435,23 @@ describe('Items — the catalogue', () => {
 		// The label the picker offers, not the stored id: an owner has never seen an ObjectId and could not
 		// tell two apart.
 		expect(rowValue('Category')).toBe('Homeware / Mugs')
-		expect(rowValue('Published')).toBe('Yes')
+	})
+
+	/*
+	 * ⚠️ The flag is stated outside the form, and the box holds nothing about it. Every other row of "Item
+	 * data" is something the page's Save writes; `published` is not in `GraphQLInputItem` any more, so a
+	 * row there would promise a save that cannot happen.
+	 */
+	it('states the publish flag in the header, not among the fields', async () => {
+		stubGraphQL(LOADED)
+		await renderRoute(PAGE)
+		await chooseShop()
+
+		await screen.findByRole('heading', { name: item.name, level: 3 })
+
+		expect(publishedSays()).toBe('Published: Yes')
+		expect(box().queryByText('Published')).toBeNull()
+		expect(card().queryByLabelText('Published')).toBeNull()
 	})
 
 	// ⚠️ There is no price row and none is missing: `item` carries no `price`, because cart, order,
@@ -432,7 +474,7 @@ describe('Items — the catalogue', () => {
 		expect(await screen.findByRole('heading', { name: item.name, level: 3 })).toBeInTheDocument()
 		expect(screen.getByRole('heading', { name: itemTwo.name, level: 3 })).toBeInTheDocument()
 		// A draft is exactly what the owner opened this page to finish, so it is on the list and says so.
-		expect(rowValue('Published', itemTwo.name)).toBe('No')
+		expect(publishedSays(itemTwo.name)).toBe('Published: No')
 		expect(rowValue('Category', itemTwo.name)).toBe('Homeware')
 	})
 
@@ -551,20 +593,25 @@ describe('Items — editing', () => {
 		expect(writes(stub)[0]?.variables).toMatchObject({ item: { idCategory: ID_TOP } })
 	})
 
-	// `published` travels in the same `$set` as everything else, which is why it is a checkbox inside the
-	// card rather than a control of its own.
-	it('withdraws an item from the public site through its own checkbox', async () => {
+	/*
+	 * ⚠️ The regression the split is about, asserted from the side that used to cause it: an owner edits
+	 * one box of a card loaded while the item was published, an operator takes the item down in between,
+	 * and the save must not put it back. `SENT` names no `published` at all, so there is nothing in the
+	 * write for the server to `$set` it from.
+	 */
+	it('never sends the publish flag with an ordinary save', async () => {
 		const stub = stubGraphQL({ ...LOADED, ...OK })
 		await renderRoute(PAGE)
 		await chooseShop()
 
 		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await open('Published')
-		await userEvent.click(box().getByLabelText('Published'))
+		await open('Slug')
+		write('Slug', 'blue-enamel-mug-large')
 		await userEvent.click(save())
 
 		await screen.findByText('Changes saved.')
-		expect(writes(stub)[0]?.variables).toMatchObject({ item: { published: false } })
+		expect(writes(stub)[0]?.variables).toEqual({ _id: ID_ITEM, item: { ...SENT, slug: 'blue-enamel-mug-large' } })
+		expect(publishes(stub)).toHaveLength(0)
 	})
 
 	/*
@@ -730,6 +777,200 @@ describe('Items — editing', () => {
 
 		expect(await screen.findByRole('alert')).toHaveTextContent('Category is required')
 		expect(writes(stub)).toEqual([])
+	})
+})
+
+/**
+ * Publishing, which is its own mutation and the one control on this page that writes on the spot.
+ *
+ * ⚠️ It has to write on its own: `published` is not in `GraphQLInputItem` any more, so the page's Save
+ * cannot carry it. That is the whole split — `itemUpdate` saves the card, `itemUpdatePublished` decides
+ * whether anybody sees it, and an operator's takedown survives every save the owner makes afterwards.
+ *
+ * Nothing here holds a local copy of the flag: the mutation invalidates `GraphQLItem`, `companyItems` is
+ * refetched, and the label is drawn from the answer.
+ */
+describe('Items — publishing', () => {
+	it('takes a published item off the public site, on its own', async () => {
+		const stub = stubGraphQL({ ...LOADED, ...OK_PUBLISH })
+		await renderRoute(PAGE)
+		await chooseShop()
+
+		await screen.findByRole('heading', { name: item.name, level: 3 })
+
+		expect(publishButton()).toHaveTextContent('Unpublish')
+		// The quiet variant, because taking something down is not what the owner came here to do — the
+		// draft's button below is the loud one.
+		expect(publishButton()).toHaveClass('bg-secondary')
+
+		await userEvent.click(publishButton())
+
+		expect(publishes(stub)).toHaveLength(1)
+		expect(publishes(stub)[0]?.variables).toEqual({ _id: ID_ITEM, published: false })
+		// Not queued behind the page's Save, and not a change the page thinks it still owes: the write
+		// already happened, so leaving the page now loses nothing.
+		expect(writes(stub)).toHaveLength(0)
+		expect(save()).toBeDisabled()
+	})
+
+	// The draft is the other direction, and the button offers the action rather than describing the state.
+	it('publishes a draft', async () => {
+		const stub = stubGraphQL({
+			...shops([shop]),
+			...catalogue([item, itemTwo]),
+			...taxonomy([categoryTop, categoryChild]),
+			...OK_PUBLISH
+		})
+		await renderRoute(PAGE)
+		await chooseShop()
+
+		await screen.findByRole('heading', { name: itemTwo.name, level: 3 })
+
+		expect(publishButton(itemTwo.name)).toHaveTextContent('Publish')
+		// The primary variant: finishing a draft is what the owner opened this page for.
+		expect(publishButton(itemTwo.name)).toHaveClass('bg-third')
+
+		await userEvent.click(publishButton(itemTwo.name))
+
+		expect(publishes(stub)[0]?.variables).toEqual({ _id: ID_ITEM_TWO, published: true })
+	})
+
+	/*
+	 * ⚠️ The label is the *server's* answer, one refetch later — which is why `CompanyItems` is queued
+	 * twice here with a different flag each time. A card that flipped its own copy would go on saying
+	 * "published" after a write the collection refused.
+	 */
+	it('says what the collection holds once the write has been read back', async () => {
+		const stub = stubGraphQL({
+			...shops([shop]),
+			CompanyItems: [{ data: { companyItems: [item] } }, { data: { companyItems: [{ ...item, published: false }] } }],
+			...taxonomy([categoryTop, categoryChild]),
+			...OK_PUBLISH
+		})
+		await renderRoute(PAGE)
+		await chooseShop()
+
+		await screen.findByRole('heading', { name: item.name, level: 3 })
+
+		expect(publishedSays()).toBe('Published: Yes')
+
+		await userEvent.click(publishButton())
+
+		await waitFor(() => {
+			expect(publishedSays()).toBe('Published: No')
+		})
+		expect(reads(stub, 'CompanyItems')).toHaveLength(2)
+		expect(publishButton()).toHaveTextContent('Publish')
+	})
+
+	// A refusal is the item's own toast, beside the card it is about — the same place a refused save lands.
+	it('surfaces the server message when the publish is refused', async () => {
+		stubGraphQL({
+			...LOADED,
+			ItemUpdatePublished: { errors: [graphQLError('Forbidden', 'This item is not yours', 403)], status: 403 }
+		})
+		await renderRoute(PAGE)
+		await chooseShop()
+
+		await screen.findByRole('heading', { name: item.name, level: 3 })
+		await userEvent.click(publishButton())
+
+		expect(await screen.findByRole('alert')).toHaveTextContent('This item is not yours')
+		// Nothing was written, so the header still states what the collection holds.
+		expect(publishedSays()).toBe('Published: Yes')
+	})
+
+	/*
+	 * A `false` with no error beside it — the mutation is declared `Boolean!` and answering anything but
+	 * `true` is not a state the service produces, which is exactly why the call site tests the value
+	 * rather than the absence of an error. A truthiness check here would report a silent failure as a
+	 * success.
+	 */
+	it('reports a publish the server did not confirm', async () => {
+		stubGraphQL({ ...LOADED, ItemUpdatePublished: { data: { itemUpdatePublished: false } } })
+		await renderRoute(PAGE)
+		await chooseShop()
+
+		await screen.findByRole('heading', { name: item.name, level: 3 })
+		await userEvent.click(publishButton())
+
+		expect(await screen.findByRole('alert')).toHaveTextContent('Publishing failed.')
+	})
+
+	// The card's own toast, cleared by the press that worked — the page does not remount after this write,
+	// so a message left behind would outlive what it was about.
+	it('clears its toast once a later publish goes through', async () => {
+		stubGraphQL({
+			...LOADED,
+			ItemUpdatePublished: [{ data: { itemUpdatePublished: false } }, { data: { itemUpdatePublished: true } }]
+		})
+		await renderRoute(PAGE)
+		await chooseShop()
+
+		await screen.findByRole('heading', { name: item.name, level: 3 })
+		await userEvent.click(publishButton())
+
+		expect(await screen.findByRole('alert')).toHaveTextContent('Publishing failed.')
+
+		await userEvent.click(publishButton())
+
+		await waitFor(() => {
+			expect(screen.queryByRole('alert')).toBeNull()
+		})
+	})
+
+	/*
+	 * ⚠️ Disabled while the item is queued for withdrawal. It is the one pair of controls on this card that
+	 * could contradict each other: the publish writes now and the deletion writes on Save, so publishing an
+	 * item about to be withdrawn would land first and be undone seconds later.
+	 */
+	it('refuses to publish an item queued for deletion', async () => {
+		const stub = stubGraphQL({ ...LOADED, ...OK_PUBLISH, ...OK_DEL })
+		await renderRoute(PAGE)
+		await chooseShop()
+
+		await screen.findByRole('heading', { name: item.name, level: 3 })
+		await userEvent.click(card().getByRole('button', { name: 'Delete item' }))
+
+		expect(publishButton()).toBeDisabled()
+
+		// Cancelling the deletion hands it back: the queue is a decision the owner can undo.
+		await userEvent.click(card().getByRole('button', { name: 'Cancel item deletion' }))
+
+		expect(publishButton()).toBeEnabled()
+		expect(publishes(stub)).toHaveLength(0)
+	})
+
+	// The switch is shut while its own write is in flight, so a second press cannot queue a second one —
+	// two presses of a toggle would ask for opposite states off the same stale flag.
+	it('shuts the switch while the write is in flight', async () => {
+		stubGraphQL({ ...LOADED, ItemUpdatePublished: { pending: true } })
+		await renderRoute(PAGE)
+		await chooseShop()
+
+		await screen.findByRole('heading', { name: item.name, level: 3 })
+		await userEvent.click(publishButton())
+
+		await waitFor(() => {
+			expect(publishButton()).toBeDisabled()
+		})
+		expect(within(publishButton()).getByRole('status')).toBeInTheDocument()
+	})
+
+	/*
+	 * A new card has nothing to publish — `itemAdd` stamps `false` and the item does not exist until the
+	 * page's Save writes it — so the switch is not there at all, while the state is still stated.
+	 */
+	it('offers no switch on a card that has never been saved', async () => {
+		stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop, categoryChild]) })
+		await renderRoute(PAGE)
+		await chooseShop()
+
+		await screen.findByText('No item in this shop.')
+		await userEvent.click(plus())
+
+		expect(card(NEW).queryByRole('button', { name: /publish$/i })).toBeNull()
+		expect(publishedSays(NEW)).toBe('Published: No')
 	})
 })
 
@@ -955,9 +1196,8 @@ describe('Items — new item', () => {
 		expect(box(NEW).getByLabelText('Name')).toHaveValue('')
 		expect(box(NEW).getByLabelText('Description')).toHaveValue('')
 		expect(box(NEW).getByLabelText('Slug')).toHaveValue('')
-		// The placeholder, and a draft: neither default can publish something by accident.
+		// The placeholder: the owner has to choose rather than accept whichever category is first.
 		expect(box(NEW).getByLabelText('Category')).toHaveValue('')
-		expect(box(NEW).getByLabelText('Published')).not.toBeChecked()
 		// No pen anywhere on the card: a row that is already open has nothing to open.
 		expect(within(newCard()).queryByRole('button', { name: 'Change Name' })).toBeNull()
 	})
@@ -1095,9 +1335,9 @@ describe('Items — new item', () => {
 				idCategory: ID_TOP,
 				name: 'Garden trowel',
 				description: 'Stainless steel, ash handle.',
-				slug: 'garden-trowel',
-				// A new item is a draft until its owner says otherwise.
-				published: false
+				slug: 'garden-trowel'
+				// No `published`: `itemAdd` stamps `false` on the server, so a new item is a draft
+				// whatever the client sends — and the client can no longer send anything.
 			}
 		})
 		// The list refetches on `additionalTypenames` and the stored item takes the card's place. A

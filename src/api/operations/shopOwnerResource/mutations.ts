@@ -42,7 +42,7 @@ export const CompanyDelDocument = graphql(`
 `)
 
 /**
- * The three writes on an item — the catalogue half of this service's mutation surface.
+ * The four writes on an item — the catalogue half of this service's mutation surface.
  *
  * ⚠️ **`idCompany` travels inside `GraphQLInputItem` on all three writes that carry the item**, which is
  * what makes `ItemUpdate` a transfer as well as a save: changing that one field moves the item to
@@ -58,9 +58,16 @@ export const CompanyDelDocument = graphql(`
  * inside that shop for good. A second delete of the same item answers **403**, not `false` — the
  * ownership guard filters `deleted` and refuses before the write is reached.
  *
- * All three need `additionalTypenames: ['GraphQLItem']` at the call site, for the reason the company
- * writes need theirs: two answer a bare `Boolean` and the third an `OnlyIdType`, so nothing in any
- * response names the type whose cached list has just gone stale.
+ * ⚠️ **`ItemUpdate` does not carry `published`, and `ItemUpdatePublished` is the only thing that writes
+ * it.** The flag left `GraphQLInputItem` on 2026-08-14: `funItemUpdate` `$set`s the whole object, so a
+ * flag inside the input made every save of the card a write of the flag — and a card the owner had
+ * open since before an operator took the item down republished it on the next save, without anybody
+ * asking to. `ItemAdd` stamps `false`, so a new item is a draft until it is published on purpose.
+ *
+ * All four need `additionalTypenames: ['GraphQLItem']` at the call site, for the reason the company
+ * writes need theirs: three answer a bare `Boolean` and the fourth an `OnlyIdType`, so nothing in any
+ * response names the type whose cached list has just gone stale. `ItemUpdatePublished` needs it most of
+ * all — it is what puts the new flag on screen, since nothing here holds a local copy of it.
  */
 export const ItemAddDocument = graphql(`
 	mutation ItemAdd($item: GraphQLInputItem!) {
@@ -73,6 +80,12 @@ export const ItemAddDocument = graphql(`
 export const ItemUpdateDocument = graphql(`
 	mutation ItemUpdate($_id: ID!, $item: GraphQLInputItem!) {
 		itemUpdate(_id: $_id, item: $item)
+	}
+`)
+
+export const ItemUpdatePublishedDocument = graphql(`
+	mutation ItemUpdatePublished($_id: ID!, $published: Boolean!) {
+		itemUpdatePublished(_id: $_id, published: $published)
 	}
 `)
 

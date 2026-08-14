@@ -8,14 +8,19 @@ import { z } from 'zod'
 
 import { CTX_SHOP_OWNER_RESOURCE } from '@/api/endpoints'
 import { messageOf } from '@/api/errors'
-import { ItemAddDocument, ItemDelDocument, ItemUpdateDocument } from '@/api/operations/shopOwnerResource/mutations'
+import {
+	ItemAddDocument,
+	ItemDelDocument,
+	ItemUpdateDocument,
+	ItemUpdatePublishedDocument
+} from '@/api/operations/shopOwnerResource/mutations'
 import {
 	CompanyItemsDocument,
 	ItemCategoriesDocument,
 	ShopOwnerCompaniesDocument
 } from '@/api/operations/shopOwnerResource/queries'
 import { Alert } from '@/components/ui/Alert'
-import { CheckboxField } from '@/components/ui/CheckboxField'
+import { Button } from '@/components/ui/Button'
 import { EditableRow } from '@/components/ui/EditableRow'
 import { IconButton } from '@/components/ui/IconButton'
 import { IconPlus, IconTrash } from '@/components/ui/icons'
@@ -63,6 +68,11 @@ const CATEGORY_SEPARATOR = '/'
  * back from `itemCategories`, and the empty string is the placeholder option — which is also what a
  * stored item falls back to when its category is no longer in the list, so this message is what an owner
  * sees when a category was retired under them.
+ *
+ * ⚠️ **`published` is not here, and that is the shape of the mutation.** It left `GraphQLInputItem` on
+ * 2026-08-14: `itemUpdate` `$set`s the whole object, so a flag inside the form was written on every
+ * save, and a card left open since before an operator took the item down republished it the next time
+ * the owner fixed a typo. The button in the card's header is the only thing that writes it.
  */
 export const itemSchema = z.object({
 	name: required('Name', MAX_NAME),
@@ -73,8 +83,7 @@ export const itemSchema = z.object({
 		.min(MIN_SLUG, `The slug is at least ${MIN_SLUG} characters`)
 		.max(MAX_SLUG, `The slug cannot exceed ${MAX_SLUG} characters`)
 		.regex(SHAPE_SLUG, 'The slug is lowercase letters and digits, joined by single hyphens'),
-	idCategory: z.string().min(1, 'Category is required'),
-	published: z.boolean()
+	idCategory: z.string().min(1, 'Category is required')
 })
 
 type ItemValues = z.infer<typeof itemSchema>
@@ -145,15 +154,15 @@ const CTX_SAVE_ITEM: Partial<OperationContext> = Object.freeze({
 /**
  * A blank card, for an item that does not exist yet.
  *
- * `published: false` and not true: a new item is a draft until its owner says otherwise, which is the
- * only default that cannot publish something by accident.
+ * No `published` among them, and nothing missing: `itemAdd` stamps `false` on the server, so a new item
+ * is a draft whatever the card holds — which is the only default that cannot publish something by
+ * accident, and one the client can no longer get wrong.
  */
 const NEW_VALUES: ItemValues = {
 	name: '',
 	description: '',
 	slug: '',
-	idCategory: '',
-	published: false
+	idCategory: ''
 }
 
 const dataOf = (item: Item, options: readonly CategoryOption[]): ItemValues => ({
@@ -162,8 +171,7 @@ const dataOf = (item: Item, options: readonly CategoryOption[]): ItemValues => (
 	slug: item.slug,
 	// The placeholder when the stored category is not among the options, so a taxonomy change is a
 	// refused save the owner can fix rather than a silent re-filing under whichever option is first.
-	idCategory: options.some((option) => option._id === item.idCategory) ? item.idCategory : '',
-	published: item.published
+	idCategory: options.some((option) => option._id === item.idCategory) ? item.idCategory : ''
 })
 
 /**
@@ -184,9 +192,11 @@ export const valuesInitial = (item: Item | null, options: readonly CategoryOptio
  * card: everything on this page waits for the one Save button, and a trash icon that wrote immediately
  * would be the only control here that did not.
  *
- * There is no ban icon either, but for the opposite reason to a company's: `published` **is** the
- * open/closed state of an item, and it is an ordinary checkbox inside the card rather than a control of
- * its own, because it travels in the same `$set` as everything else.
+ * ⚠️ **The publish button is the exception, and writes on its own.** It has to: `published` is not in
+ * `GraphQLInputItem` any more, so the page's Save cannot carry it, and `itemUpdatePublished` is a
+ * mutation of its own on both tiers. It is also not the same kind of decision as fixing a description —
+ * an owner publishes an item once and edits it a dozen times — so queueing it behind the same Save
+ * would hide the one action here with a public consequence behind the one with none.
  */
 const FormItem = ({
 	item,
@@ -220,6 +230,7 @@ const FormItem = ({
 	const [, runAdd] = useMutation(ItemAddDocument)
 	const [, runUpdate] = useMutation(ItemUpdateDocument)
 	const [, runDel] = useMutation(ItemDelDocument)
+	const [publishing, runPublish] = useMutation(ItemUpdatePublishedDocument)
 
 	const {
 		register,
@@ -244,9 +255,30 @@ const FormItem = ({
 		idCategory: values.idCategory,
 		name: values.name,
 		description: values.description,
-		slug: values.slug,
-		published: values.published
+		slug: values.slug
 	})
+
+	/**
+	 * Publishes the item, or withdraws it — one call, made now, on the flag the card no longer carries.
+	 *
+	 * The stored item is passed in rather than read from the prop: TypeScript drops the `item !== null`
+	 * narrowing across a function boundary, and the button that calls this is rendered inside exactly
+	 * that check.
+	 *
+	 * Nothing here holds the new value. `CTX_SAVE_ITEM` invalidates `GraphQLItem`, `companyItems` is
+	 * refetched, and the label below is drawn from the answer — so what the button says is what the
+	 * server stored, never what this card hoped it would.
+	 */
+	const publish = async (stored: Item) => {
+		const outcome = await runPublish({ _id: stored._id, published: !stored.published }, CTX_SAVE_ITEM)
+
+		if (outcome.data?.itemUpdatePublished !== true) {
+			setError(outcome.error === undefined ? 'Publishing failed.' : messageOf(outcome.error))
+			return
+		}
+
+		setError(undefined)
+	}
 
 	const add = async (values: ItemValues): Promise<boolean> => {
 		const result = await runAdd({ item: fieldsToSave(values) }, CTX_SAVE_ITEM)
@@ -321,18 +353,40 @@ const FormItem = ({
 				<h3 className={`text-lg font-bold ${deleted ? 'text-tip line-through' : ''}`}>
 					{item === null ? 'New item' : item.name}
 				</h3>
-				<IconButton
-					name={isNew ? 'Cancel new item' : deleted ? 'Cancel item deletion' : 'Delete item'}
-					onClick={() => {
-						// A card with nothing behind it is thrown away rather than queued: there is no
-						// document to withdraw, and discarding it is also the only way out of the leave
-						// guard it arms.
-						if (isNew) discard(cardKey)
-						else setDeleted((current) => !current)
-					}}
-				>
-					<IconTrash />
-				</IconButton>
+				<div className="flex items-center gap-2">
+					{/* The state in words beside the button that changes it: on its own, a button reading
+					    "Unpublish" asks the owner to infer the current state from the action offered, and
+					    the two are read the wrong way round exactly when it matters. A new card says "No"
+					    because an item that does not exist yet is published nowhere. */}
+					<span className="text-sm text-tip">Published: {handleNullBoolYN(item?.published)}</span>
+					{item === null ? null : (
+						<Button
+							variant={item.published ? 'ghost' : 'primary'}
+							// Queued for withdrawal: publishing something about to be taken down is the one
+							// combination of these two controls that contradicts itself, and the write would
+							// land before the delete rather than instead of it.
+							disabled={deleted}
+							loading={publishing.fetching}
+							onClick={() => {
+								void publish(item)
+							}}
+						>
+							{item.published ? 'Unpublish' : 'Publish'}
+						</Button>
+					)}
+					<IconButton
+						name={isNew ? 'Cancel new item' : deleted ? 'Cancel item deletion' : 'Delete item'}
+						onClick={() => {
+							// A card with nothing behind it is thrown away rather than queued: there is no
+							// document to withdraw, and discarding it is also the only way out of the leave
+							// guard it arms.
+							if (isNew) discard(cardKey)
+							else setDeleted((current) => !current)
+						}}
+					>
+						<IconTrash />
+					</IconButton>
+				</div>
 			</div>
 
 			{error === undefined ? null : <Toast tone="error">{error}</Toast>}
@@ -377,9 +431,9 @@ const FormItem = ({
 							))}
 						</SelectField>
 					</EditableRow>
-					<EditableRow label="Published" value={handleNullBoolYN(item?.published)} openInitial={isNew}>
-						<CheckboxField label="Published" {...register('published')} />
-					</EditableRow>
+					{/* No Published row. It would be a row of "Item data" that the Save button does not send,
+					    which is the one thing every other row here promises. The flag lives in the header,
+					    beside the control that writes it. */}
 				</Infobox>
 
 				{/* The mask — the company card's own, which this matches deliberately. */}
