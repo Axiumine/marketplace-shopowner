@@ -269,9 +269,10 @@ One thing a shop sells, as its owner sees it.
 fragment and leaves the flag out, since an item it can return is published by definition. `deleted` is
 exposed nowhere — every read path on this tier filters it, so the only value it could carry is null.
 
-⚠️ There is no `price`, and its absence is a platform decision rather than an omission in this slice:
-cart, order, delivery and payment have no model anywhere yet, so a price would be a guess at a currency,
-a precision and a VAT treatment at once. See the header of the `item` validator.
+⚠️ There is no `price`, and its absence is a permanent platform decision rather than an omission in this
+slice: cart, order, delivery and payment are permanently out of scope (ADR-038, 2026-08-27), so a price
+would be a guess at a currency, a precision and a VAT treatment at once, with nothing that will ever
+resolve it. See the header of the `item` validator.
 """
 type GraphQLItem {
 	_id: ID!

@@ -225,10 +225,11 @@ guard against all render as a working screen.
   Publish / Unpublish button calls `itemUpdatePublished`, and the label is read back from
   `companyItems` rather than kept locally — so what the button says is what the collection holds.
   A published item in an unpublished shop shows nobody anything: the two flags compose.
-- **No price anywhere on the item form.** `item` carries none, deliberately: there is no cart, no
-  order, no delivery and no payment on this platform, and a price with nothing to charge it against
-  would be the first half of a design nobody has made. Adding the field starts in `marketplace-db-setup`
-  and the ADR index, not here.
+- **No price anywhere on the item form, permanently.** `item` carries none, deliberately: cart, order,
+  delivery and payment are **permanently out of scope** on this platform (ADR-038, 2026-08-27), and a
+  price with nothing to charge it against would be the first half of a design nobody is going to make.
+  The field is not added at all — doing so contradicts an accepted ADR, and reversing that takes a
+  superseding ADR from the platform owner, not a change here or in `marketplace-db-setup`.
 - **The category picker flattens the taxonomy into `Parent / Child` labels rather than an indented
   tree.** `itemCategories` sorts by `position` then `_id` across both levels at once, so the list
   arrives interleaved; one pass regroups it, and a subcategory whose parent is gone is kept at the end
