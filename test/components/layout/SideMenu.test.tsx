@@ -11,8 +11,8 @@ const noCompanies = { ShopOwnerCompanies: { data: { shopOwnerCompanies: [] } } }
 
 /*
  * ⚠️ The pure function is tested against prefixes no route in this app serves, and that is deliberate.
- * Every section here currently holds one prefix equal to its own `to`, so an exact `===` would pass all
- * five sidebar tests below — the list exists for the page that lives under a *different* prefix, which
+ * Every section here currently holds one prefix equal to its own `to`, so an exact `===` would pass every
+ * sidebar test below — the list exists for the page that lives under a *different* prefix, which
  * is the shape the operator app already has (`/p/shopOwners/…` under a `/shopOwners` section) and the
  * shape this app takes the first time a company gets a detail screen. Testing the function only through
  * the two routes that exist would let that generality be deleted without a single failure.
@@ -43,15 +43,16 @@ describe('isSectionActive', () => {
 
 describe('SideMenu', () => {
 	/*
-	 * ⚠️ Three entries, and the assertion is that there are exactly three. The operator app's sidebar
-	 * carries a Settings one, whose only mutation is `adminUpdatePwd` on the Admin tier. This tier has no
-	 * `shopOwnerUpdatePwd` and no self-service personal-data mutation at all, so a Settings entry copied
-	 * across would light up a route with nothing to submit.
+	 * ⚠️ Four entries, and the assertion is that there are exactly four. `Account` is not the Settings
+	 * entry the operator app carries: that one changes a password through `adminUpdatePwd`, an Admin-tier
+	 * mutation with no counterpart here, and this tier still has no `shopOwnerUpdatePwd` and no
+	 * self-service personal-data mutation at all. What it has is `shopOwnerDel` — one thing the owner can
+	 * submit about their own account, which is the whole of that section.
 	 *
 	 * Items is its own section rather than a tab inside Companies: a catalogue is per shop, but the page
 	 * is about the items and the shop is one select at the top of it.
 	 */
-	it('lists the three sections and no fourth', async () => {
+	it('lists the four sections and no fifth', async () => {
 		stubGraphQL({})
 		await renderRoute('/home')
 
@@ -59,7 +60,8 @@ describe('SideMenu', () => {
 		expect(menu.getByRole('link', { name: 'Dashboard' })).toHaveAttribute('href', '/home')
 		expect(menu.getByRole('link', { name: 'Companies' })).toHaveAttribute('href', '/companies')
 		expect(menu.getByRole('link', { name: 'Items' })).toHaveAttribute('href', '/items')
-		expect(menu.getAllByRole('link')).toHaveLength(3)
+		expect(menu.getByRole('link', { name: 'Account' })).toHaveAttribute('href', '/account')
+		expect(menu.getAllByRole('link')).toHaveLength(4)
 		expect(menu.queryByRole('link', { name: 'Settings' })).not.toBeInTheDocument()
 	})
 
@@ -71,6 +73,7 @@ describe('SideMenu', () => {
 		expect(menu.getByRole('link', { name: 'Dashboard' })).toHaveClass('font-bold')
 		expect(menu.getByRole('link', { name: 'Companies' })).not.toHaveClass('font-bold')
 		expect(menu.getByRole('link', { name: 'Items' })).not.toHaveClass('font-bold')
+		expect(menu.getByRole('link', { name: 'Account' })).not.toHaveClass('font-bold')
 	})
 
 	// The other way round, so neither test can pass on a sidebar that hardcodes one highlight. Scoped to
@@ -93,6 +96,16 @@ describe('SideMenu', () => {
 		const menu = within(screen.getByRole('navigation', { name: 'Main menu' }))
 		expect(menu.getByRole('link', { name: 'Items' })).toHaveClass('font-bold')
 		expect(menu.getByRole('link', { name: 'Companies' })).not.toHaveClass('font-bold')
+	})
+
+	// The fourth section, on the one page of this app that is about the owner rather than about a shop.
+	it('highlights the account section on its own route', async () => {
+		stubGraphQL({})
+		await renderRoute('/account')
+
+		const menu = within(screen.getByRole('navigation', { name: 'Main menu' }))
+		expect(menu.getByRole('link', { name: 'Account' })).toHaveClass('font-bold')
+		expect(menu.getByRole('link', { name: 'Items' })).not.toHaveClass('font-bold')
 	})
 
 	it('shows who is signed in', async () => {

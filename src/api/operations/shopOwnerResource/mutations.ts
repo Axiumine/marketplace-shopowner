@@ -94,3 +94,44 @@ export const ItemDelDocument = graphql(`
 		itemDel(_id: $_id)
 	}
 `)
+
+/**
+ * The bulk half of `ItemUpdatePublished`, for the select-all control on the items page.
+ *
+ * ⚠️ **Bounded at 500 ids a call, and the bound is the server's**: a longer list is a 400, not a
+ * truncated write. `chunk` in `Items.tsx` is what keeps a bigger selection legal, and it makes the
+ * gesture several writes rather than one — a run that fails leaves the runs before it applied, which is
+ * why the button reports how far it got rather than a bare failure.
+ *
+ * ⚠️ **Ownership is all-or-nothing**: one id the session does not own answers 403 and writes none of
+ * the list. That is a guarantee worth having rather than a limitation — a partial application could not
+ * be reported honestly, and refusing to say which id was foreign is what keeps this from answering
+ * "does this item exist" for ids the owner guessed.
+ *
+ * `additionalTypenames: ['GraphQLItem']` like the other four: the answer is a bare `Boolean` and every
+ * card on the page is now showing a stale flag.
+ */
+export const ItemsUpdatePublishedDocument = graphql(`
+	mutation ItemsUpdatePublished($_ids: [ID!]!, $published: Boolean!) {
+		itemsUpdatePublished(_ids: $_ids, published: $published)
+	}
+`)
+
+/**
+ * The owner closing their own account — the one write here that ends the session that made it.
+ *
+ * ⚠️ **No variables, and the absence is the security property.** Every owner authenticates against the
+ * same collection and the platform has no role field, so an `_id` accepted from the browser would turn
+ * this into "close any owner's account". The resolver reads the account from the Redis session and
+ * declares no argument at all; do not add one here "for symmetry" with the Admin tier's namesake, which
+ * takes an id precisely because an operator is closing somebody else's.
+ *
+ * What follows the `true` is not a refetch: every session of the account ends server-side, the caller's
+ * included, so the next request on this token is refused. The call site signs out rather than
+ * invalidating a cache — there is nothing left to read.
+ */
+export const ShopOwnerDelDocument = graphql(`
+	mutation ShopOwnerDel {
+		shopOwnerDel
+	}
+`)

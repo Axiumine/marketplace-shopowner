@@ -39,6 +39,14 @@ describe('route guard', () => {
 		expect(router.state.location.search).toEqual({ redirect: '/items' })
 	})
 
+	it('guards the account page as well', async () => {
+		stubGraphQL({ ShopOwnerCompanies: { pending: true } })
+		const { router } = await renderRoute('/account', { session: null })
+
+		expect(router.state.location.pathname).toBe('/loading')
+		expect(router.state.location.search).toEqual({ redirect: '/account' })
+	})
+
 	it('lets a signed-in owner through', async () => {
 		stubGraphQL(noCompanies)
 		const { router } = await renderRoute('/companies')
@@ -93,7 +101,7 @@ describe('the bootstrap search param', () => {
 })
 
 /**
- * The five routes, each rendering the page it names.
+ * The six routes, each rendering the page it names.
  *
  * ⚠️ There is no `$_id` segment anywhere, and that absence is the tenant boundary rather than an
  * omission: `shopOwnerCompanies` and the three company writes take no owner id, so no URL in this app
@@ -130,6 +138,15 @@ describe('routes', () => {
 		await renderRoute('/items')
 
 		expect(screen.getByRole('heading', { name: 'Items', level: 1 })).toBeInTheDocument()
+	})
+
+	// `/account` is parameterless for a reason of its own rather than by habit: `shopOwnerDel` takes no
+	// argument at all, so there is nothing about it a URL could carry.
+	it('serves the account page', async () => {
+		stubGraphQL({})
+		await renderRoute('/account')
+
+		expect(screen.getByRole('heading', { name: 'Account', level: 1 })).toBeInTheDocument()
 	})
 
 	// The page sends the query with no variables at all — not with an empty object it built, and not

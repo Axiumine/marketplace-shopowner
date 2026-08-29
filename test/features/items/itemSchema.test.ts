@@ -17,10 +17,23 @@ let itemSchema: Modulo['itemSchema']
 let orderedCategories: Modulo['orderedCategories']
 let labelOfCategory: Modulo['labelOfCategory']
 let valuesInitial: Modulo['valuesInitial']
+let chunk: Modulo['chunk']
+let doneBefore: Modulo['doneBefore']
+let bulkFailure: Modulo['bulkFailure']
+let maxItemsPerCall: Modulo['MAX_ITEMS_PER_CALL']
 
 beforeEach(async () => {
 	vi.resetModules()
-	;({ itemSchema, orderedCategories, labelOfCategory, valuesInitial } = await import('@/features/items/Items'))
+	;({
+		itemSchema,
+		orderedCategories,
+		labelOfCategory,
+		valuesInitial,
+		chunk,
+		doneBefore,
+		bulkFailure,
+		MAX_ITEMS_PER_CALL: maxItemsPerCall
+	} = await import('@/features/items/Items'))
 })
 
 const ID_CATEGORY = '65f0000000000000000000c1'
@@ -296,5 +309,88 @@ describe('labelOfCategory', () => {
 	it('falls back to the placeholder for a category that is no longer offered', () => {
 		expect(labelOfCategory(OPTIONS, 'c-9')).toBe('---')
 		expect(labelOfCategory([], 'c-1')).toBe('---')
+	})
+})
+
+/**
+ * The three pure pieces the select-all bar is built from, asserted here rather than through the bar.
+ *
+ * ⚠️ **They are here precisely because the bar cannot reach them.** Every one of them is only
+ * interesting on a selection larger than `MAX_ITEMS_PER_CALL`, and a rendered catalogue of five hundred
+ * and one cards is not a test anybody would run — so the arithmetic is written as functions and covered
+ * with three-element lists, and what the bar's own tests then have to prove is only that it calls them.
+ */
+describe('MAX_ITEMS_PER_CALL', () => {
+	/*
+	 * ⚠️ The server's bound, mirrored — not this app's idea of a sensible batch. `itemsUpdatePublished`
+	 * answers 400 to a longer list, so this number is a fact about
+	 * `marketplace-dev-authenticated-resource` and moves there first.
+	 */
+	it('is the five hundred the resolver refuses to go past', () => {
+		expect(maxItemsPerCall).toBe(500)
+	})
+})
+
+describe('chunk', () => {
+	it('leaves a list that fits in one run', () => {
+		expect(chunk(['a', 'b'], 3)).toEqual([['a', 'b']])
+	})
+
+	it('splits a longer list into runs of the given size', () => {
+		expect(chunk(['a', 'b', 'c', 'd', 'e'], 2)).toEqual([['a', 'b'], ['c', 'd'], ['e']])
+	})
+
+	// An exact multiple, which is where an off-by-one adds a trailing empty run — and an empty run is a
+	// call with `_ids: []`, which the resolver answers 400 to.
+	it('adds no empty run when the size divides the list', () => {
+		expect(chunk(['a', 'b', 'c', 'd'], 2)).toEqual([
+			['a', 'b'],
+			['c', 'd']
+		])
+	})
+
+	it('has nothing to send for an empty selection', () => {
+		expect(chunk([], 2)).toEqual([])
+	})
+})
+
+describe('doneBefore', () => {
+	const RUNS = [['a', 'b'], ['c', 'd'], ['e']]
+
+	// The first run failing is the case where nothing was written, and it is the one the owner must not be
+	// told a count about.
+	it('counts nothing before the first run', () => {
+		expect(doneBefore(RUNS, 0)).toBe(0)
+	})
+
+	it('counts every id the earlier runs carried', () => {
+		expect(doneBefore(RUNS, 1)).toBe(2)
+		expect(doneBefore(RUNS, 2)).toBe(4)
+	})
+
+	// Summed rather than `index * MAX_ITEMS_PER_CALL`, so a short last run is counted for what it holds.
+	it('counts a short run for its own length', () => {
+		expect(doneBefore(RUNS, 3)).toBe(5)
+	})
+})
+
+describe('bulkFailure', () => {
+	const REASON = 'This item is not yours'
+
+	// Nothing landed: the reason on its own. A count of zero here would read as a partial write.
+	it('reports the reason alone when the first run was refused', () => {
+		expect(bulkFailure(0, 30, REASON)).toBe(REASON)
+	})
+
+	/*
+	 * ⚠️ **A run that fails does not undo the runs before it.** Each group of ids is its own transaction,
+	 * so a selection that stops half way has already changed everything up to that point — reporting a
+	 * bare failure over that would leave the owner believing the shop is as it was, which is the one thing
+	 * it is not.
+	 */
+	it('says how much landed before it stopped, and what to do about it', () => {
+		expect(bulkFailure(1000, 1200, REASON)).toBe(
+			`${REASON} 1000 of 1200 items were changed before it stopped — press again to finish.`
+		)
 	})
 })

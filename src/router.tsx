@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 import { getSession } from '@/auth/session'
 import { AppShell } from '@/components/layout/AppShell'
+import { AccountPage } from '@/pages/AccountPage'
 import { CompaniesPage } from '@/pages/CompaniesPage'
 import { HomePage } from '@/pages/HomePage'
 import { ItemsPage } from '@/pages/ItemsPage'
@@ -15,7 +16,7 @@ import { LoginPage } from '@/pages/LoginPage'
  *
  * File-based routing would emit a `routeTree.gen.ts` that is checked in, linted and type-checked. A
  * generated file cannot be tested, so it would have to be excluded from any coverage gate, and every
- * exclusion is a hole someone can later hide real code in. Four routes do not need a generator.
+ * exclusion is a hole someone can later hide real code in. Five routes do not need a generator.
  *
  * It is a *factory* rather than a module-level constant, and that is a testing requirement rather than
  * a preference. Built at module scope, every path string, every `component:` reference and every search
@@ -96,6 +97,13 @@ const createAppRouteTree = () => {
 	 */
 	const itemsRoute = createRoute({ getParentRoute: () => appRoute, path: '/items', component: ItemsPage })
 
+	/**
+	 * The owner's own account. Parameterless like the other two, and here the reason is not a habit:
+	 * `shopOwnerDel` takes no argument at all, so there is no id this route could carry that the mutation
+	 * would read. See the note on `CloseAccount`.
+	 */
+	const accountRoute = createRoute({ getParentRoute: () => appRoute, path: '/account', component: AccountPage })
+
 	/*
 	 * A function declaration, not an arrow constant, so it can be named in the route definition above
 	 * while reading its own route's hooks below. It is the only place the URL is turned into props; the
@@ -106,7 +114,11 @@ const createAppRouteTree = () => {
 		return <LoadingPage redirect={target} />
 	}
 
-	return rootRoute.addChildren([loginRoute, loadingRoute, appRoute.addChildren([homeRoute, companiesRoute, itemsRoute])])
+	return rootRoute.addChildren([
+		loginRoute,
+		loadingRoute,
+		appRoute.addChildren([homeRoute, companiesRoute, itemsRoute, accountRoute])
+	])
 }
 
 /**

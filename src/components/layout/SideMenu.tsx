@@ -5,7 +5,7 @@ import { useLogout } from '@/auth/useLogout'
 import { Button } from '@/components/ui/Button'
 
 /**
- * The three sections of the shop-owner app.
+ * The four sections of the shop-owner app.
  *
  * The `prefixes` list is kept even though every entry currently holds exactly one path equal to `to`.
  * It exists so a section whose pages live under a different prefix — the operator app puts its detail
@@ -13,17 +13,19 @@ import { Button } from '@/components/ui/Button'
  * page is an edit to this one table rather than a highlight rule scattered across the pages. Anything
  * that makes each page announce its own highlight goes stale the first time a page forgets.
  *
- * There is no Settings entry. The operator app's settings screen is a password change, and the only
- * mutation behind it is `adminUpdatePwd` on the Admin tier — `marketplace-dev-authenticated-resource`
- * has no `shopOwnerUpdatePwd` and no self-service personal-data mutation of any kind, so a Settings
- * page here would have nothing to submit. Add the entry when the resolver exists, not before.
+ * `Account` is not the Settings entry this file used to say did not exist, and the reason it once gave
+ * still holds: `marketplace-dev-authenticated-resource` has no `shopOwnerUpdatePwd` and no self-service
+ * personal-data mutation, so a settings page here would have nothing to submit. What it does have is
+ * `shopOwnerDel`, one mutation the owner can send about their own account — which is the whole of that
+ * section and the reason it earns a tab.
  */
 const SECTIONS = [
 	{ to: '/home', label: 'Dashboard', prefixes: ['/home'] },
 	{ to: '/companies', label: 'Companies', prefixes: ['/companies'] },
 	// Its own section rather than a tab inside Companies: a catalogue is per shop, but the page is about
 	// the items and the shop is one select at the top of it.
-	{ to: '/items', label: 'Items', prefixes: ['/items'] }
+	{ to: '/items', label: 'Items', prefixes: ['/items'] },
+	{ to: '/account', label: 'Account', prefixes: ['/account'] }
 ] as const
 
 export const isSectionActive = (pathname: string, prefixes: readonly string[]): boolean =>
