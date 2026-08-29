@@ -17,3 +17,21 @@ exports[`CheckboxField > renders 1`] = `
   </label>
 </div>
 `;
+
+exports[`CheckboxField > renders with the label hidden 1`] = `
+<div
+  class="flex items-center gap-2"
+>
+  <input
+    class="h-4 w-4 rounded-box border border-tip accent-third"
+    id="field-select"
+    type="checkbox"
+  />
+  <label
+    class="sr-only"
+    for="field-select"
+  >
+    Select Blue enamel mug
+  </label>
+</div>
+`;

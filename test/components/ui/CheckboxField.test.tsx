@@ -51,8 +51,36 @@ describe('CheckboxField', () => {
 		expect(screen.getByRole('checkbox', { name: 'Disabled' })).toHaveAttribute('id', 'field-disabled')
 	})
 
+	/*
+	 * ⚠️ `hideLabel` takes the label off the screen and leaves it in the accessibility tree — `sr-only`,
+	 * never `hidden`. The assertion is therefore that the box is still *named*: a per-row selection box
+	 * with no label at all is announced as an anonymous checkbox, and a catalogue of them is a column of
+	 * identical anonymous checkboxes.
+	 */
+	it('keeps the name of a label it does not show', () => {
+		render(<CheckboxField label="Select Blue enamel mug" hideLabel />)
+
+		expect(screen.getByRole('checkbox', { name: 'Select Blue enamel mug' })).toBeInTheDocument()
+		expect(screen.getByText('Select Blue enamel mug')).toHaveClass('sr-only')
+	})
+
+	// The default, stated: every other checkbox in the app shows its label, and the flag has to be asked
+	// for rather than inherited from whichever field was rendered last.
+	it('shows the label unless asked not to', () => {
+		render(<CheckboxField label="Disabled" />)
+
+		expect(screen.getByText('Disabled')).toHaveClass('text-sm font-semibold')
+		expect(screen.getByText('Disabled')).not.toHaveClass('sr-only')
+	})
+
 	it('renders', () => {
 		const { container } = render(<CheckboxField label="Disabled" id="field-disabled" />)
+
+		expect(container.firstChild).toMatchSnapshot()
+	})
+
+	it('renders with the label hidden', () => {
+		const { container } = render(<CheckboxField label="Select Blue enamel mug" hideLabel id="field-select" />)
 
 		expect(container.firstChild).toMatchSnapshot()
 	})

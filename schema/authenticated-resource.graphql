@@ -169,12 +169,42 @@ type MutationsApi {
 	itemUpdatePublished(_id: ID!, published: Boolean!): Boolean!
 
 	"""
+	The same flag on several items at once, for the owner's select-all.
+
+	One ownership check for the whole list, all-or-nothing: a list holding one item the session does not
+	own answers 403 and writes none of it, so a partial result can never be reported as a whole one.
+
+	⚠️ **At most 500 ids per call**, and an empty list is a 400 rather than a `true` — a client that lost
+	its selection is not an owner asking for nothing. A bigger selection is sent in runs of 500, which
+	makes it several writes: a failure part-way leaves the earlier runs applied.
+
+	Duplicates are dropped server-side before the guard counts them.
+	"""
+	itemsUpdatePublished(_ids: [ID!]!, published: Boolean!): Boolean!
+
+	"""
 	Withdraws an item: stamps `deleted` and leaves the document in place, like `companyDel`.
 
 	The ownership guard filters `deleted` too, so a second call on the same item answers 403 rather than
 	repeating the stamp. The slug stays occupied inside that shop afterwards.
 	"""
 	itemDel(_id: ID!): Boolean!
+
+	"""
+	Closes the signed-in owner's own account. **Takes no id** — the account is the session's, and an id
+	from the wire would name somebody else's.
+
+	Stamps `deleted` and nothing else. `disabled` is untouched in either direction, so closing neither
+	lifts a standing suspension nor hands one back to an operator, and no `deletedBy` is written: its
+	absence is what says the holder closed it themselves.
+
+	Every company and every item goes dark in the same transaction, and every session ends once the write
+	lands — the caller's included, so the next request on this token is refused.
+
+	Undoable for thirty days: registering again at the same address inside the window restores this same
+	document, `_id` and all, with every company and item still attached and still dark.
+	"""
+	shopOwnerDel: Boolean!
 }
 
 """

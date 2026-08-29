@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
 import { VALIDATION_HEADER } from '@/components/ui/ToastValidation'
+import { BULK_REFUSED } from '@/features/items/Items'
 
 import type { GraphQLStub } from '../../helpers/graphql'
 import { graphQLError, stubGraphQL } from '../../helpers/graphql'
@@ -979,6 +980,217 @@ describe('Items — publishing', () => {
  * waits for the one Save button, and a trash icon that wrote immediately would be the only control here
  * that did not.
  */
+/**
+ * The select-all bar: one write over every item the owner ticked.
+ *
+ * ⚠️ Its arithmetic is **not** tested here. `chunk`, `doneBefore` and `bulkFailure` only do anything on a
+ * selection past `MAX_ITEMS_PER_CALL`, and rendering five hundred and one cards to reach them would be a
+ * minute of jsdom per assertion — they are exported and covered in `itemSchema.test.ts`, and what is
+ * left for this file is the wiring: which ids travel, which flag, and what the owner is told afterwards.
+ */
+describe('Items — bulk publishing', () => {
+	const bar = () => screen.getByRole('checkbox', { name: 'Select all' })
+
+	const tick = async (name: string) => {
+		await userEvent.click(screen.getByRole('checkbox', { name: `Select ${name}` }))
+	}
+
+	const publishSelected = () => screen.getByRole('button', { name: /Publish selected$/ })
+	const unpublishSelected = () => screen.getByRole('button', { name: /Unpublish selected$/ })
+
+	const bulks = (stub: GraphQLStub) => stub.calls.filter((call) => call.operationName === 'ItemsUpdatePublished')
+
+	const BOTH = { ...shops([shop]), ...catalogue([item, itemTwo]), ...taxonomy([categoryTop, categoryChild]) }
+	const OK_BULK = { ItemsUpdatePublished: { data: { itemsUpdatePublished: true } } }
+
+	const loaded = async (replies: Record<string, unknown> = {}) => {
+		const stub = stubGraphQL({ ...BOTH, ...replies })
+		await renderRoute(PAGE)
+		await chooseShop()
+		await screen.findByRole('heading', { name: itemTwo.name, level: 3 })
+		return stub
+	}
+
+	// Nothing to select, nothing to offer: an empty shop shows the "No item" line and no bar over it.
+	it('offers no bar on a shop with no item', async () => {
+		stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop, categoryChild]) })
+		await renderRoute(PAGE)
+		await chooseShop()
+
+		expect(await screen.findByText('No item in this shop.')).toBeInTheDocument()
+		expect(screen.queryByRole('checkbox', { name: 'Select all' })).not.toBeInTheDocument()
+	})
+
+	it('counts the selection against the catalogue', async () => {
+		await loaded()
+
+		expect(screen.getByText('0 of 2 selected')).toBeInTheDocument()
+		await tick(item.name)
+		expect(screen.getByText('1 of 2 selected')).toBeInTheDocument()
+	})
+
+	it('ticks every item at once', async () => {
+		await loaded()
+
+		await userEvent.click(bar())
+
+		expect(screen.getByRole('checkbox', { name: `Select ${item.name}` })).toBeChecked()
+		expect(screen.getByRole('checkbox', { name: `Select ${itemTwo.name}` })).toBeChecked()
+		expect(screen.getByText('2 of 2 selected')).toBeInTheDocument()
+	})
+
+	// The same box the other way round, so the test cannot pass on a control that only ever ticks.
+	it('unticks every item when it is already whole', async () => {
+		await loaded()
+
+		await userEvent.click(bar())
+		await userEvent.click(bar())
+
+		expect(screen.getByRole('checkbox', { name: `Select ${item.name}` })).not.toBeChecked()
+		expect(screen.getByText('0 of 2 selected')).toBeInTheDocument()
+	})
+
+	// The select-all box reads the selection rather than remembering its own presses: ticking the last
+	// card by hand fills it, and untickng one empties it again.
+	it('fills and empties itself as the cards are ticked by hand', async () => {
+		await loaded()
+
+		await tick(item.name)
+		expect(bar()).not.toBeChecked()
+
+		await tick(itemTwo.name)
+		expect(bar()).toBeChecked()
+
+		await tick(itemTwo.name)
+		expect(bar()).not.toBeChecked()
+	})
+
+	it('does nothing until something is ticked', async () => {
+		await loaded()
+
+		expect(publishSelected()).toBeDisabled()
+		expect(unpublishSelected()).toBeDisabled()
+	})
+
+	/*
+	 * ⚠️ One call carrying the ticked ids and nothing else — not one call per card. The bulk mutation
+	 * exists because a shop with a real catalogue is otherwise several hundred round trips, each with its
+	 * own ownership check.
+	 */
+	it('publishes exactly what was ticked, in one write', async () => {
+		const stub = await loaded(OK_BULK)
+
+		await tick(itemTwo.name)
+		await userEvent.click(publishSelected())
+
+		await waitFor(() => {
+			expect(bulks(stub)).toHaveLength(1)
+		})
+		expect(bulks(stub)[0]?.variables).toEqual({ _ids: [ID_ITEM_TWO], published: true })
+		// The per-card publish switch is a different control and must not have fired as well.
+		expect(publishes(stub)).toHaveLength(0)
+	})
+
+	it('takes the whole catalogue off the public site in one write', async () => {
+		const stub = await loaded(OK_BULK)
+
+		await userEvent.click(bar())
+		await userEvent.click(unpublishSelected())
+
+		await waitFor(() => {
+			expect(bulks(stub)).toHaveLength(1)
+		})
+		expect(bulks(stub)[0]?.variables).toEqual({ _ids: [ID_ITEM, ID_ITEM_TWO], published: false })
+	})
+
+	// Nothing in the bar holds the new value: `CTX_SAVE_ITEM` invalidates `GraphQLItem`, the list is read
+	// again, and every card's "Published" line is redrawn from what the server actually stored.
+	it('reads the catalogue back after a bulk write', async () => {
+		const stub = await loaded(OK_BULK)
+
+		await userEvent.click(bar())
+		await userEvent.click(unpublishSelected())
+
+		await waitFor(() => {
+			expect(reads(stub, 'CompanyItems')).toHaveLength(2)
+		})
+	})
+
+	// A clean run clears the selection: what it was about has happened, and a bar still saying "2 of 2
+	// selected" invites the same write a second time.
+	it('drops the selection once the write goes through', async () => {
+		await loaded(OK_BULK)
+
+		await userEvent.click(bar())
+		await userEvent.click(publishSelected())
+
+		await waitFor(() => {
+			expect(screen.getByText('0 of 2 selected')).toBeInTheDocument()
+		})
+		expect(publishSelected()).toBeDisabled()
+	})
+
+	/*
+	 * ⚠️ The selection is **kept** after a refusal, on purpose. Each run is its own transaction, so a
+	 * failure can leave part of the selection written — keeping the ticks is what lets the owner press
+	 * again and finish the job over the same ids.
+	 */
+	it('surfaces the server message and keeps the selection', async () => {
+		await loaded({
+			ItemsUpdatePublished: { errors: [graphQLError('Forbidden', 'One of these items is not yours', 403)], status: 403 }
+		})
+
+		await userEvent.click(bar())
+		await userEvent.click(publishSelected())
+
+		expect(await screen.findByRole('alert')).toHaveTextContent('One of these items is not yours')
+		expect(screen.getByText('2 of 2 selected')).toBeInTheDocument()
+	})
+
+	/*
+	 * A `false` with no error beside it. The mutation is declared `Boolean!`, so anything but `true` is
+	 * not a state the service produces — and a truthiness check would report it as a shop that went dark
+	 * when it did not.
+	 */
+	it('reports a bulk write the server did not confirm', async () => {
+		await loaded({ ItemsUpdatePublished: { data: { itemsUpdatePublished: false } } })
+
+		await tick(item.name)
+		await userEvent.click(unpublishSelected())
+
+		expect(await screen.findByRole('alert')).toHaveTextContent(BULK_REFUSED)
+		expect(screen.getByText('1 of 2 selected')).toBeInTheDocument()
+	})
+
+	it('shuts both buttons while the write is in flight', async () => {
+		await loaded({ ItemsUpdatePublished: { pending: true } })
+
+		await tick(item.name)
+		await userEvent.click(publishSelected())
+
+		await waitFor(() => {
+			expect(publishSelected()).toBeDisabled()
+		})
+		expect(unpublishSelected()).toBeDisabled()
+	})
+
+	/*
+	 * ⚠️ A card that has never been saved carries no tick, and it needs no guard inside `FormItem` to say
+	 * so: the box is rendered by the list beside the card rather than by the card, and the list draws one
+	 * per *stored* item. A new card has no `_id` to put in a variable set.
+	 */
+	it('gives a new card no tick of its own', async () => {
+		await loaded()
+
+		await userEvent.click(plus())
+
+		expect(await screen.findByRole('heading', { name: NEW, level: 3 })).toBeInTheDocument()
+		// Two stored items, two boxes — plus the bar's own, which is not one of the catalogue's.
+		expect(screen.getAllByRole('checkbox', { name: /^Select / })).toHaveLength(3)
+		expect(screen.getByText('0 of 2 selected')).toBeInTheDocument()
+	})
+})
+
 describe('Items — deletion', () => {
 	const trash = (name?: string) => card(name).getByRole('button', { name: 'Delete item' })
 

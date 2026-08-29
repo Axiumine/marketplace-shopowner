@@ -11,6 +11,7 @@ import { messageOf } from '@/api/errors'
 import {
 	ItemAddDocument,
 	ItemDelDocument,
+	ItemsUpdatePublishedDocument,
 	ItemUpdateDocument,
 	ItemUpdatePublishedDocument
 } from '@/api/operations/shopOwnerResource/mutations'
@@ -21,6 +22,7 @@ import {
 } from '@/api/operations/shopOwnerResource/queries'
 import { Alert } from '@/components/ui/Alert'
 import { Button } from '@/components/ui/Button'
+import { CheckboxField } from '@/components/ui/CheckboxField'
 import { EditableRow } from '@/components/ui/EditableRow'
 import { IconButton } from '@/components/ui/IconButton'
 import { IconPlus, IconTrash } from '@/components/ui/icons'
@@ -150,6 +152,60 @@ const CTX_SAVE_ITEM: Partial<OperationContext> = Object.freeze({
 	...CTX_SHOP_OWNER_RESOURCE,
 	additionalTypenames: ['GraphQLItem']
 })
+
+/**
+ * How many ids one `itemsUpdatePublished` call may carry.
+ *
+ * ⚠️ **The server's bound, mirrored — not this app's own idea of a sensible batch.** `itemsUpdatePublished`
+ * answers 400 to a longer list, so a selection past this size is not slow here, it is refused there. Raise
+ * it and the select-all breaks on exactly the large catalogue it exists for; the number moves in
+ * `marketplace-dev-authenticated-resource/src/graphQLApi/schema/mutations/itemsUpdatePublished.mts` first.
+ */
+export const MAX_ITEMS_PER_CALL = 500
+
+/**
+ * The list in runs of at most `size`, in order, with no empty run at the end.
+ *
+ * A selection bigger than one call is several calls, and they are made one after another rather than at
+ * once: each is a write of its own, and a shop taken down half-way is a state the owner has to be told
+ * about honestly rather than a promise the client quietly retried.
+ */
+export const chunk = <T,>(list: readonly T[], size: number): T[][] => {
+	const runs: T[][] = []
+
+	for (let start = 0; start < list.length; start += size) runs.push(list.slice(start, start + size))
+
+	return runs
+}
+
+/**
+ * What a failed bulk write says, which depends on whether anything landed before it.
+ *
+ * ⚠️ **A run that fails does not undo the runs before it.** The ids travel in groups of
+ * `MAX_ITEMS_PER_CALL` and each group is its own transaction, so a selection of 1200 that fails on the
+ * third call has already changed 1000 items. Reporting a bare "it failed" over that would leave the owner
+ * believing the shop is as it was, which is the one thing it is not — hence the count, and hence a
+ * selection that is *kept* rather than cleared, so pressing the button again re-applies the same flag
+ * over the same ids and finishes the job.
+ */
+export const bulkFailure = (done: number, total: number, reason: string): string =>
+	done === 0 ? reason : `${reason} ${done} of ${total} items were changed before it stopped — press again to finish.`
+
+/**
+ * How many ids the runs before `index` carried — the count `bulkFailure` reports as already written.
+ *
+ * A function over the runs rather than a counter added up inside the loop, and that is a testability
+ * decision with teeth: an accumulator is only ever non-zero on a selection past `MAX_ITEMS_PER_CALL`, so
+ * every mutant of it would need a catalogue of five hundred and one rendered cards to be caught. Here the
+ * same arithmetic is a pure function three assertions cover.
+ *
+ * Summed rather than `index * MAX_ITEMS_PER_CALL`, so it stays right for the last run, which is short.
+ */
+export const doneBefore = (runs: readonly (readonly string[])[], index: number): number =>
+	runs.slice(0, index).reduce((total, run) => total + run.length, 0)
+
+/** The refusal, when the server answers `false` with no error of its own to quote. */
+export const BULK_REFUSED = 'The write was refused.'
 
 /**
  * A blank card, for an item that does not exist yet.
@@ -449,6 +505,108 @@ const FormItem = ({
 	)
 }
 
+/**
+ * Select-all, and the two buttons that write the flag over everything ticked.
+ *
+ * ⚠️ **This is how an owner takes their whole shop down**, which is why it exists at all: the card's own
+ * Publish button is one round trip per item, and a hundred of them means a shop that is half withdrawn
+ * for as long as the clicking lasts. One gesture, one intent.
+ *
+ * The selection lives on the page rather than here — the checkboxes are down in the list, and a bar that
+ * owned the set would be telling the cards what they are while reading it from nowhere. What *is* here is
+ * the write: the mutation, the runs it is split into, and the one error line they share.
+ *
+ * ⚠️ **A card queued for deletion can still be ticked, and this writes the flag over it anyway.** The
+ * queue is card-local state that no write has happened for yet; the flag is a write that happens now.
+ * Publishing an item that is about to be withdrawn is harmless — Save withdraws it a moment later — and
+ * the alternative, reaching into every card's state from up here, would tie the two controls together
+ * for a case nobody meets.
+ */
+const BulkPublishBar = ({
+	ids,
+	selected,
+	onSelected
+}: {
+	/** Every stored item on screen, in the order the list draws them. */
+	ids: readonly string[]
+	selected: readonly string[]
+	onSelected: (next: readonly string[]) => void
+}) => {
+	const [error, setError] = useState<string | undefined>(undefined)
+	const [bulk, runBulk] = useMutation(ItemsUpdatePublishedDocument)
+
+	const allSelected = selected.length === ids.length
+
+	/**
+	 * Writes the flag over the selection, in runs of `MAX_ITEMS_PER_CALL`, stopping at the first refusal.
+	 *
+	 * Nothing here holds the new value: `CTX_SAVE_ITEM` invalidates `GraphQLItem`, the list is refetched,
+	 * and every card's "Published" label is redrawn from what the server actually stored.
+	 *
+	 * The selection is cleared only on the way out of a clean run. Kept after a failure, on purpose —
+	 * see `bulkFailure` for why the half-applied case is the one that needs it.
+	 */
+	const apply = async (published: boolean) => {
+		const runs = chunk(selected, MAX_ITEMS_PER_CALL)
+
+		for (const [index, run] of runs.entries()) {
+			const outcome = await runBulk({ _ids: run, published }, CTX_SAVE_ITEM)
+
+			if (outcome.data?.itemsUpdatePublished !== true) {
+				const reason = outcome.error === undefined ? BULK_REFUSED : messageOf(outcome.error)
+
+				setError(bulkFailure(doneBefore(runs, index), selected.length, reason))
+				return
+			}
+		}
+
+		setError(undefined)
+		onSelected([])
+	}
+
+	return (
+		<>
+			<div className="mb-4 flex flex-wrap items-center gap-3 rounded-box border border-tip bg-white p-3">
+				<CheckboxField
+					label="Select all"
+					checked={allSelected}
+					onChange={() => {
+						onSelected(allSelected ? [] : ids)
+					}}
+				/>
+				{/* The count in words, because the two buttons act on a set the owner assembled by scrolling:
+				    what is ticked off-screen is exactly what a bulk write is easy to be surprised by. */}
+				<span className="text-sm text-tip">
+					{selected.length} of {ids.length} selected
+				</span>
+				<div className="ml-auto flex gap-2">
+					<Button
+						disabled={selected.length === 0}
+						loading={bulk.fetching}
+						onClick={() => {
+							void apply(true)
+						}}
+					>
+						Publish selected
+					</Button>
+					<Button
+						variant="ghost"
+						disabled={selected.length === 0}
+						loading={bulk.fetching}
+						onClick={() => {
+							void apply(false)
+						}}
+					>
+						Unpublish selected
+					</Button>
+				</div>
+			</div>
+
+			{error === undefined ? null : <Toast tone="error">{error}</Toast>}
+		</>
+	)
+}
+
 /** The stored items of the chosen shop, plus whatever new cards the owner has open. */
 const ListItems = ({
 	items,
@@ -456,7 +614,9 @@ const ListItems = ({
 	options,
 	registerSection,
 	newKeys,
-	discard
+	discard,
+	selected,
+	onToggle
 }: {
 	items: readonly Item[]
 	idCompany: string
@@ -464,6 +624,9 @@ const ListItems = ({
 	registerSection: RegisterSection
 	newKeys: string[]
 	discard: (key: string) => void
+	selected: readonly string[]
+	/** Ticks or unticks one stored item. */
+	onToggle: (_id: string) => void
 }) => {
 	// "None" is about the catalogue, but it cannot be on screen under an open new card: the card is the
 	// answer to it.
@@ -471,16 +634,33 @@ const ListItems = ({
 
 	return (
 		<div className="flex flex-col gap-6">
+			{/* The tick sits beside the card rather than inside its header, and that is a boundary rather
+			    than a layout choice: the card is a form with a dirty state and a save of its own, while
+			    the box is the page's — a new card has no id to select and gets none, which falls out of
+			    this shape instead of needing a guard inside `FormItem`. */}
 			{items.map((item) => (
-				<FormItem
-					key={item._id}
-					cardKey={item._id}
-					item={item}
-					idCompany={idCompany}
-					options={options}
-					registerSection={registerSection}
-					discard={discard}
-				/>
+				<div key={item._id} className="flex items-start gap-3">
+					<div className="pt-1">
+						<CheckboxField
+							label={`Select ${item.name}`}
+							hideLabel
+							checked={selected.includes(item._id)}
+							onChange={() => {
+								onToggle(item._id)
+							}}
+						/>
+					</div>
+					<div className="grow">
+						<FormItem
+							cardKey={item._id}
+							item={item}
+							idCompany={idCompany}
+							options={options}
+							registerSection={registerSection}
+							discard={discard}
+						/>
+					</div>
+				</div>
 			))}
 			{/* New cards last, under the items that exist: the list is the record, and what is being added
 			    to it belongs at the bottom rather than pushing the record down the page. */}
@@ -573,6 +753,17 @@ export const CompanyPicker = ({
 export const Items = ({ idCompany, registerSection }: { idCompany: string; registerSection: RegisterSection }) => {
 	const [newKeys, setNewKeys] = useState<string[]>([])
 
+	/*
+	 * Which items the bulk buttons act on. Ids rather than the items themselves, so a refetch that
+	 * replaces every object leaves the selection standing.
+	 *
+	 * Held here rather than in the bar or the cards because it is the one piece of state both halves of
+	 * this screen read. It does not survive a shop change or a save: `ItemsPage` keys this subtree on
+	 * `idCompany` and on the save counter, so both remount it — which is the right answer to a selection
+	 * assembled over a list that no longer exists.
+	 */
+	const [selected, setSelected] = useState<readonly string[]>([])
+
 	const [itemsResult] = useQuery({
 		query: CompanyItemsDocument,
 		variables: { idCompany },
@@ -615,16 +806,27 @@ export const Items = ({ idCompany, registerSection }: { idCompany: string; regis
 			) : options.length === 0 ? (
 				<Alert tone="info">No category exists yet. An operator has to fill in the taxonomy before an item can be filed.</Alert>
 			) : (
-				<ListItems
-					items={items}
-					idCompany={idCompany}
-					options={options}
-					registerSection={registerSection}
-					newKeys={newKeys}
-					discard={(key) => {
-						setNewKeys((current) => current.filter((open) => open !== key))
-					}}
-				/>
+				<>
+					{/* Nothing to select, and nothing the two buttons could be pressed against: an empty shop
+					    gets the list's own "No item in this shop." and no bar above it. */}
+					{items.length === 0 ? null : (
+						<BulkPublishBar ids={items.map((item) => item._id)} selected={selected} onSelected={setSelected} />
+					)}
+					<ListItems
+						items={items}
+						idCompany={idCompany}
+						options={options}
+						registerSection={registerSection}
+						newKeys={newKeys}
+						discard={(key) => {
+							setNewKeys((current) => current.filter((open) => open !== key))
+						}}
+						selected={selected}
+						onToggle={(_id) => {
+							setSelected((current) => (current.includes(_id) ? current.filter((id) => id !== _id) : [...current, _id]))
+						}}
+					/>
+				</>
 			)}
 		</>
 	)

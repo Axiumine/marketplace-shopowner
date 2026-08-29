@@ -125,100 +125,106 @@ exports[`Items — the catalogue > renders 1`] = `
     </button>
   </div>
   <div
+    class="mb-4 flex flex-wrap items-center gap-3 rounded-box border border-tip bg-white p-3"
+  >
+    <div
+      class="flex items-center gap-2"
+    >
+      <input
+        class="h-4 w-4 rounded-box border border-tip accent-third"
+        id=":id-1:"
+        type="checkbox"
+      />
+      <label
+        class="text-sm font-semibold"
+        for=":id-1:"
+      >
+        Select all
+      </label>
+    </div>
+    <span
+      class="text-sm text-tip"
+    >
+      0
+       of 
+      1
+       selected
+    </span>
+    <div
+      class="ml-auto flex gap-2"
+    >
+      <button
+        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-third text-palette-white hover:bg-tomato px-4"
+        disabled=""
+        type="button"
+      >
+        Publish selected
+      </button>
+      <button
+        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-secondary text-palette-bg hover:bg-primary px-4"
+        disabled=""
+        type="button"
+      >
+        Unpublish selected
+      </button>
+    </div>
+  </div>
+  <div
     class="flex flex-col gap-6"
   >
-    <section>
+    <div
+      class="flex items-start gap-3"
+    >
       <div
-        class="mb-1 flex items-center justify-between gap-2"
+        class="pt-1"
       >
-        <h3
-          class="text-lg font-bold "
-        >
-          Blue enamel mug
-        </h3>
         <div
           class="flex items-center gap-2"
         >
-          <span
-            class="text-sm text-tip"
+          <input
+            class="h-4 w-4 rounded-box border border-tip accent-third"
+            id=":id-2:"
+            type="checkbox"
+          />
+          <label
+            class="sr-only"
+            for=":id-2:"
           >
-            Published: 
-            Yes
-          </span>
-          <button
-            class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-secondary text-palette-bg hover:bg-primary px-4"
-            type="button"
-          >
-            Unpublish
-          </button>
-          <button
-            aria-label="Delete item"
-            class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
-            title="Delete item"
-            type="button"
-          >
-            <svg
-              aria-hidden="true"
-              class="h-4 w-4"
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1.75"
-              viewBox="0 0 24 24"
-            >
-              <path
-                d="M4 7h16"
-              />
-              <path
-                d="M9 7V4h6v3"
-              />
-              <path
-                d="m6 7 1 13h10l1-13"
-              />
-              <path
-                d="M10 11v6"
-              />
-              <path
-                d="M14 11v6"
-              />
-            </svg>
-          </button>
+            Select Blue enamel mug
+          </label>
         </div>
       </div>
       <div
-        class="relative"
+        class="grow"
       >
-        <section
-          aria-labelledby=":id-1:"
-          class="h-full overflow-hidden rounded-box border-4 border-third bg-white p-[10px] shadow "
-        >
+        <section>
           <div
-            class="mb-2 flex items-center justify-between gap-2"
+            class="mb-1 flex items-center justify-between gap-2"
           >
             <h3
-              class="font-bold"
-              id=":id-1:"
-            >
-              Item data
-            </h3>
-          </div>
-          <div
-            class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
-          >
-            <span
-              class="text-tip"
-            >
-              Name
-            </span>
-            <span
-              class="flex items-center gap-1 text-right"
+              class="text-lg font-bold "
             >
               Blue enamel mug
+            </h3>
+            <div
+              class="flex items-center gap-2"
+            >
+              <span
+                class="text-sm text-tip"
+              >
+                Published: 
+                Yes
+              </span>
               <button
-                aria-label="Change Name"
+                class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 bg-secondary text-palette-bg hover:bg-primary px-4"
+                type="button"
+              >
+                Unpublish
+              </button>
+              <button
+                aria-label="Delete item"
                 class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
-                title="Change Name"
+                title="Delete item"
                 type="button"
               >
                 <svg
@@ -232,132 +238,198 @@ exports[`Items — the catalogue > renders 1`] = `
                   viewBox="0 0 24 24"
                 >
                   <path
-                    d="M12 20h9"
+                    d="M4 7h16"
                   />
                   <path
-                    d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+                    d="M9 7V4h6v3"
+                  />
+                  <path
+                    d="m6 7 1 13h10l1-13"
+                  />
+                  <path
+                    d="M10 11v6"
+                  />
+                  <path
+                    d="M14 11v6"
                   />
                 </svg>
               </button>
-            </span>
+            </div>
           </div>
           <div
-            class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
+            class="relative"
           >
-            <span
-              class="text-tip"
+            <section
+              aria-labelledby=":id-3:"
+              class="h-full overflow-hidden rounded-box border-4 border-third bg-white p-[10px] shadow "
             >
-              Description
-            </span>
-            <span
-              class="flex items-center gap-1 text-right"
-            >
-              Half a litre, dishwasher safe.
-              <button
-                aria-label="Change Description"
-                class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
-                title="Change Description"
-                type="button"
+              <div
+                class="mb-2 flex items-center justify-between gap-2"
               >
-                <svg
-                  aria-hidden="true"
-                  class="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="1.75"
-                  viewBox="0 0 24 24"
+                <h3
+                  class="font-bold"
+                  id=":id-3:"
                 >
-                  <path
-                    d="M12 20h9"
-                  />
-                  <path
-                    d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
-                  />
-                </svg>
-              </button>
-            </span>
-          </div>
-          <div
-            class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
-          >
-            <span
-              class="text-tip"
-            >
-              Slug
-            </span>
-            <span
-              class="flex items-center gap-1 text-right"
-            >
-              blue-enamel-mug
-              <button
-                aria-label="Change Slug"
-                class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
-                title="Change Slug"
-                type="button"
+                  Item data
+                </h3>
+              </div>
+              <div
+                class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
               >
-                <svg
-                  aria-hidden="true"
-                  class="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="1.75"
-                  viewBox="0 0 24 24"
+                <span
+                  class="text-tip"
                 >
-                  <path
-                    d="M12 20h9"
-                  />
-                  <path
-                    d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
-                  />
-                </svg>
-              </button>
-            </span>
-          </div>
-          <div
-            class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
-          >
-            <span
-              class="text-tip"
-            >
-              Category
-            </span>
-            <span
-              class="flex items-center gap-1 text-right"
-            >
-              Homeware / Mugs
-              <button
-                aria-label="Change Category"
-                class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
-                title="Change Category"
-                type="button"
+                  Name
+                </span>
+                <span
+                  class="flex items-center gap-1 text-right"
+                >
+                  Blue enamel mug
+                  <button
+                    aria-label="Change Name"
+                    class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+                    title="Change Name"
+                    type="button"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.75"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M12 20h9"
+                      />
+                      <path
+                        d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+                      />
+                    </svg>
+                  </button>
+                </span>
+              </div>
+              <div
+                class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
               >
-                <svg
-                  aria-hidden="true"
-                  class="h-4 w-4"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="1.75"
-                  viewBox="0 0 24 24"
+                <span
+                  class="text-tip"
                 >
-                  <path
-                    d="M12 20h9"
-                  />
-                  <path
-                    d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
-                  />
-                </svg>
-              </button>
-            </span>
+                  Description
+                </span>
+                <span
+                  class="flex items-center gap-1 text-right"
+                >
+                  Half a litre, dishwasher safe.
+                  <button
+                    aria-label="Change Description"
+                    class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+                    title="Change Description"
+                    type="button"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.75"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M12 20h9"
+                      />
+                      <path
+                        d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+                      />
+                    </svg>
+                  </button>
+                </span>
+              </div>
+              <div
+                class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
+              >
+                <span
+                  class="text-tip"
+                >
+                  Slug
+                </span>
+                <span
+                  class="flex items-center gap-1 text-right"
+                >
+                  blue-enamel-mug
+                  <button
+                    aria-label="Change Slug"
+                    class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+                    title="Change Slug"
+                    type="button"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.75"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M12 20h9"
+                      />
+                      <path
+                        d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+                      />
+                    </svg>
+                  </button>
+                </span>
+              </div>
+              <div
+                class="flex items-center justify-between gap-4 border-b border-palette-bg1 py-1 text-sm last:border-b-0"
+              >
+                <span
+                  class="text-tip"
+                >
+                  Category
+                </span>
+                <span
+                  class="flex items-center gap-1 text-right"
+                >
+                  Homeware / Mugs
+                  <button
+                    aria-label="Change Category"
+                    class="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+                    title="Change Category"
+                    type="button"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="h-4 w-4"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.75"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        d="M12 20h9"
+                      />
+                      <path
+                        d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
+                      />
+                    </svg>
+                  </button>
+                </span>
+              </div>
+            </section>
           </div>
         </section>
       </div>
-    </section>
+    </div>
   </div>
   <div
     class="mt-8 flex items-center justify-end gap-4"
