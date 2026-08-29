@@ -40,7 +40,7 @@ the baseline to compare against.
 
 Both hooks *block* on a missing prerequisite — the `qodana` CLI, the docker daemon, the
 `jetbrains/qodana-js` tag `qodana.yaml` names, `QODANA_TOKEN` — and print the fixing command rather than
-skipping. **The token is per project**: this repo has its own on qodana.cloud, separate from the operator
+skipping. **The token is per project**: this repo has its own on qodana.cloud, separate from the admin
 app's and from the nine backend ones. Another repo's token would file these reports under that repo's
 project.
 

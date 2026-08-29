@@ -3,7 +3,7 @@ import { graphql } from '@gql/shopOwnerResource'
 /**
  * The three writes on a company — the whole mutation surface of the ShopOwner resource service.
  *
- * ⚠️ All three differ from the operator tier's mutations of the same name, so a document copied across
+ * ⚠️ All three differ from the admin tier's mutations of the same name, so a document copied across
  * from marketplace-admin compiles against the wrong schema and is refused at the server:
  *
  *   - `companyAdd` takes **no** `idShopOwner`. The owner is the session's, and `GraphQLInputCompany`
@@ -50,7 +50,7 @@ export const CompanyDelDocument = graphql(`
  * is now, where it is going, and whether the category exists — so a save that only meant to fix a typo
  * still has to send the `idCompany` the item already had, never a blank.
  *
- * `ItemAdd` answers `OnlyIdType`, like `CompanyAdd` and unlike the operator tier's namesakes. A `slug`
+ * `ItemAdd` answers `OnlyIdType`, like `CompanyAdd` and unlike the admin tier's namesakes. A `slug`
  * already taken **inside the same company** comes back as a 409 through `tryCatchRethrow`; the same slug
  * in a different shop is legal, since the public route carries the shop segment ahead of the item's.
  *
@@ -61,7 +61,7 @@ export const CompanyDelDocument = graphql(`
  * ⚠️ **`ItemUpdate` does not carry `published`, and `ItemUpdatePublished` is the only thing that writes
  * it.** The flag left `GraphQLInputItem` on 2026-08-14: `funItemUpdate` `$set`s the whole object, so a
  * flag inside the input made every save of the card a write of the flag — and a card the owner had
- * open since before an operator took the item down republished it on the next save, without anybody
+ * open since before an admin took the item down republished it on the next save, without anybody
  * asking to. `ItemAdd` stamps `false`, so a new item is a draft until it is published on purpose.
  *
  * All four need `additionalTypenames: ['GraphQLItem']` at the call site, for the reason the company
@@ -124,7 +124,7 @@ export const ItemsUpdatePublishedDocument = graphql(`
  * same collection and the platform has no role field, so an `_id` accepted from the browser would turn
  * this into "close any owner's account". The resolver reads the account from the Redis session and
  * declares no argument at all; do not add one here "for symmetry" with the Admin tier's namesake, which
- * takes an id precisely because an operator is closing somebody else's.
+ * takes an id precisely because an admin is closing somebody else's.
  *
  * What follows the `true` is not a refetch: every session of the account ends server-side, the caller's
  * included, so the next request on this token is refused. The call site signs out rather than

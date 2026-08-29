@@ -6,7 +6,7 @@ import { WigButton } from '@/features/dashboard/WigButton'
  *
  * There is no counter, chart or period breakdown on it, and that is a backend fact rather than a
  * design choice: `marketplace-dev-authenticated-resource` exposes a single query, `shopOwnerCompanies`,
- * with no aggregate anywhere. The operator app's tiles read `shopOwnersStats` and `shopOwnersPerPeriod`,
+ * with no aggregate anywhere. The admin app's tiles read `shopOwnersStats` and `shopOwnersPerPeriod`,
  * which have no ShopOwner-tier counterpart — inventing one client-side would mean counting an array
  * this page would have to fetch in full to say a number about.
  */

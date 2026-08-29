@@ -143,7 +143,7 @@ describe('itemSchema — the slug', () => {
 
 /**
  * ⚠️ The category is a plain non-empty check rather than an id shape, and the empty string is a state an
- * owner reaches without typing: it is what a stored item falls back to when the operator retires the
+ * owner reaches without typing: it is what a stored item falls back to when the admin retires the
  * category it was filed under, so this message is what a taxonomy change looks like from inside the card.
  */
 describe('itemSchema — the category', () => {
@@ -286,7 +286,7 @@ describe('valuesInitial', () => {
 		})
 	})
 
-	// The operator retired the category this item was filed under. Falling back to the placeholder makes
+	// The admin retired the category this item was filed under. Falling back to the placeholder makes
 	// the next save a refusal the owner can fix, where keeping the dead id would send it straight back.
 	it('falls back to the placeholder when the stored category is no longer offered', () => {
 		expect(valuesInitial({ ...STORED, idCategory: 'c-9' }, OPTIONS).idCategory).toBe('')

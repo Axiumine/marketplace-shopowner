@@ -11,7 +11,7 @@ describe('searchAddresses', () => {
 	 * The query string is the whole contract with Nominatim, asserted whole rather than sampled.
 	 *
 	 * `countrycodes=us` is not a nicety: every field around this one is a domestic address — five-digit
-	 * postal code, two-letter province — so a same-named street abroad is noise the operator reads past. `limit`
+	 * postal code, two-letter province — so a same-named street abroad is noise the admin reads past. `limit`
 	 * keeps one answer small, which is what the usage policy asks of a client that fires on every pause
 	 * in typing.
 	 */
@@ -85,7 +85,7 @@ describe('searchAddresses', () => {
 		expect(found?.province).toBe('')
 	})
 
-	// Nominatim omits `address` entirely for some matches. Every field is then empty and the operator
+	// Nominatim omits `address` entirely for some matches. Every field is then empty and the admin
 	// fills them — which is a usable form, unlike a crash.
 	it('survives a result with no address block at all', async () => {
 		installOsm({ results: [resultOsm({ address: undefined })] })

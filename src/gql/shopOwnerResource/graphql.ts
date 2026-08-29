@@ -44,7 +44,7 @@ export type GraphQlInputCompanyPosition = {
  *
  * ⚠️ **`published` is deliberately absent.** It was a `Boolean!` here until 2026-08-14, which made every
  * save of the card a write of the flag; `itemUpdatePublished` is the only writer now. Putting it back
- * would republish, on the next ordinary save, whatever an operator had just taken down.
+ * would republish, on the next ordinary save, whatever an admin had just taken down.
  *
  * Every field is non-null, matching the collection's `required` list, and `itemUpdate` `$set`s the whole
  * object — so an optional field here would be a field that can never be cleared.

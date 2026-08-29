@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/Button'
  * The four sections of the shop-owner app.
  *
  * The `prefixes` list is kept even though every entry currently holds exactly one path equal to `to`.
- * It exists so a section whose pages live under a different prefix — the operator app puts its detail
+ * It exists so a section whose pages live under a different prefix — the admin app puts its detail
  * and add screens under `/p/shopOwners/…` — can still light up its own tab, and so that adding such a
  * page is an edit to this one table rather than a highlight rule scattered across the pages. Anything
  * that makes each page announce its own highlight goes stale the first time a page forgets.

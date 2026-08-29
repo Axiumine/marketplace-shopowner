@@ -6,7 +6,7 @@ import { SaveChanges, useDiscardWarning, useSaving } from '@/features/saving'
  * The owner's companies.
  *
  * There is no id anywhere on this page — not in the path, not in a prop, not in the query variables.
- * The operator app reaches the same section through `/p/shopOwners/id/$_id`, because an operator has to
+ * The admin app reaches the same section through `/p/shopOwners/id/$_id`, because an admin has to
  * say *whose* companies they are looking at; here the answer is fixed by the Redis session the access
  * token names, so the route is a bare `/companies` and cannot be pointed at anyone else.
  *

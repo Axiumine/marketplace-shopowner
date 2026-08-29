@@ -13,7 +13,7 @@ const noCompanies = { ShopOwnerCompanies: { data: { shopOwnerCompanies: [] } } }
  * ⚠️ The pure function is tested against prefixes no route in this app serves, and that is deliberate.
  * Every section here currently holds one prefix equal to its own `to`, so an exact `===` would pass every
  * sidebar test below — the list exists for the page that lives under a *different* prefix, which
- * is the shape the operator app already has (`/p/shopOwners/…` under a `/shopOwners` section) and the
+ * is the shape the admin app already has (`/p/shopOwners/…` under a `/shopOwners` section) and the
  * shape this app takes the first time a company gets a detail screen. Testing the function only through
  * the two routes that exist would let that generality be deleted without a single failure.
  */
@@ -44,7 +44,7 @@ describe('isSectionActive', () => {
 describe('SideMenu', () => {
 	/*
 	 * ⚠️ Four entries, and the assertion is that there are exactly four. `Account` is not the Settings
-	 * entry the operator app carries: that one changes a password through `adminUpdatePwd`, an Admin-tier
+	 * entry the admin app carries: that one changes a password through `adminUpdatePwd`, an Admin-tier
 	 * mutation with no counterpart here, and this tier still has no `shopOwnerUpdatePwd` and no
 	 * self-service personal-data mutation at all. What it has is `shopOwnerDel` — one thing the owner can
 	 * submit about their own account, which is the whole of that section.
@@ -116,7 +116,7 @@ describe('SideMenu', () => {
 	})
 
 	/*
-	 * ⚠️ The durable empty state, and the one with no counterpart in the operator app: a session restored
+	 * ⚠️ The durable empty state, and the one with no counterpart in the admin app: a session restored
 	 * from the refresh cookie carries `email: null`, because the login form is the only place this app
 	 * ever learns the address and a reload rebuilds the module. It is a real session — the sidebar is
 	 * standing, the owner is signed in — with nobody to name.

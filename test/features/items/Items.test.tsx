@@ -388,7 +388,7 @@ describe('Items — the catalogue', () => {
 		// By text rather than by role: `Spinner` is a `role="status"` too, so the first status on the page
 		// while the taxonomy is still in flight is the spinner and not this.
 		expect(
-			await screen.findByText('No category exists yet. An operator has to fill in the taxonomy before an item can be filed.')
+			await screen.findByText('No category exists yet. An admin has to fill in the taxonomy before an item can be filed.')
 		).toBeInTheDocument()
 		expect(plus()).toBeDisabled()
 		expect(screen.queryByText('No item in this shop.')).not.toBeInTheDocument()
@@ -406,7 +406,7 @@ describe('Items — the catalogue', () => {
 		await chooseShop()
 
 		expect(
-			await screen.findByText('No category exists yet. An operator has to fill in the taxonomy before an item can be filed.')
+			await screen.findByText('No category exists yet. An admin has to fill in the taxonomy before an item can be filed.')
 		).toBeInTheDocument()
 		expect(plus()).toBeDisabled()
 	})
@@ -596,7 +596,7 @@ describe('Items — editing', () => {
 
 	/*
 	 * ⚠️ The regression the split is about, asserted from the side that used to cause it: an owner edits
-	 * one box of a card loaded while the item was published, an operator takes the item down in between,
+	 * one box of a card loaded while the item was published, an admin takes the item down in between,
 	 * and the save must not put it back. `SENT` names no `published` at all, so there is nothing in the
 	 * write for the server to `$set` it from.
 	 */
@@ -786,7 +786,7 @@ describe('Items — editing', () => {
  *
  * ⚠️ It has to write on its own: `published` is not in `GraphQLInputItem` any more, so the page's Save
  * cannot carry it. That is the whole split — `itemUpdate` saves the card, `itemUpdatePublished` decides
- * whether anybody sees it, and an operator's takedown survives every save the owner makes afterwards.
+ * whether anybody sees it, and an admin's takedown survives every save the owner makes afterwards.
  *
  * Nothing here holds a local copy of the flag: the mutation invalidates `GraphQLItem`, `companyItems` is
  * refetched, and the label is drawn from the answer.

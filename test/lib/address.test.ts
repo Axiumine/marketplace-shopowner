@@ -46,7 +46,7 @@ describe('coordinateTesto', () => {
 		expect(coordinatesText([-71.06, 42.3601])).toEqual({ longitude: '-71.06', latitude: '42.3601' })
 	})
 
-	// Empty boxes, not the word "undefined" for the operator to delete: a pair of the wrong length is the
+	// Empty boxes, not the word "undefined" for the admin to delete: a pair of the wrong length is the
 	// one broken shape a `[Float!]!` can carry.
 	it('leaves both boxes empty for a pair that never arrived', () => {
 		expect(coordinatesText([])).toEqual({ longitude: '', latitude: '' })
@@ -113,7 +113,7 @@ describe('addressError', () => {
 	 *
 	 * A wrong field makes the composed line stop matching too, so the composite rule fires alongside it
 	 * every single time — and it is the one that says nothing useful. "Select the address from the list"
-	 * over an address that *was* selected, and whose postal code is what the geocoder left out, sends the operator
+	 * over an address that *was* selected, and whose postal code is what the geocoder left out, sends the admin
 	 * back to the list to pick the same address again.
 	 */
 	it('prefers the broken field over the composite rule that broke with it', () => {

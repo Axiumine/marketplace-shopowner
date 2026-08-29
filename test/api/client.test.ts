@@ -121,7 +121,7 @@ describe('createGraphQLClient', () => {
 
 	// The page-reload story: the access token lives in memory, a reload wipes it, and the first
 	// authenticated operation after the reload re-mints it from the cookie instead of bouncing the
-	// operator to the login page.
+	// admin to the login page.
 	it('refreshes before sending when there is no token yet', async () => {
 		const stub = stubGraphQL({ Refresh: refreshed('tok-2'), ShopOwnerCompanies: { data: COMPANIES } })
 		clearAccessToken()

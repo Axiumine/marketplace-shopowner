@@ -68,10 +68,10 @@ exports[`AccountPage > renders 1`] = `
         <strong>
           unpublished
         </strong>
-         — you put them back on the marketplace yourself, when you are ready — and the account goes back into the approval queue, so an operator approves it once more before you can sign in.
+         — you put them back on the marketplace yourself, when you are ready — and the account goes back into the approval queue, so an admin approves it once more before you can sign in.
       </p>
       <p>
-        A suspension is not lifted by closing your account. If an operator has suspended you, the suspension comes back with the account, and only an operator can take it off.
+        A suspension is not lifted by closing your account. If an admin has suspended you, the suspension comes back with the account, and only an admin can take it off.
       </p>
       <p>
         After thirty days your personal details are overwritten and the account cannot be brought back at all. Nothing here is a way to have your data kept — it is the opposite.

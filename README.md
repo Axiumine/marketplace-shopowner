@@ -9,7 +9,7 @@ behind the access token, so there is nothing here that could be pointed at anoth
 item resolvers take an `idCompany`, which is the one thing this app names — and the server checks the
 session owns it before answering, so naming somebody else's shop is a 403 rather than a leak.
 
-Mirrored from `marketplace-admin`, the operator app for the `Admin` tier — same stack, same
+Mirrored from `marketplace-admin`, the admin app for the `Admin` tier — same stack, same
 conventions. The customer (`User`) frontend is a third app that does not exist yet.
 
 ## What this app is not, yet
@@ -18,7 +18,7 @@ The mirror is thinner than the original because the backend behind it is thinner
 `marketplace-dev-authenticated-resource` exposes **three queries and eight mutations** in total —
 `shopOwnerCompanies`, `companyItems`, `itemCategories`, `companyAdd`, `companyUpdate`,
 `companyUpdatePublished`, `companyDel`, `itemAdd`, `itemUpdate`, `itemUpdatePublished`, `itemDel` — and
-that is the whole authenticated surface of this tier. Every operator-app screen missing here is missing
+that is the whole authenticated surface of this tier. Every admin-app screen missing here is missing
 for the same reason: there is no resolver to call.
 
 ⚠️ `companyUpdatePublished` is the one of the eight this app never calls, and the gap is a screen rather
@@ -28,21 +28,21 @@ three fields to the company card and to `schema/authenticated-resource.graphql`'
 which the service has carried since 20260804010000.
 
 ⚠️ `itemCategories` is the one read on this tier that answers the same list to everybody — the taxonomy
-is the operator's, and an owner only files items under it. Every other operation is scoped to the
+is the admin's, and an owner only files items under it. Every other operation is scoped to the
 session, `companyItems` by `throwIfShopOwnerDontOwnCompany` rather than by an absent argument.
 
-| Operator app screen | Backed by | Here |
+| Admin app screen | Backed by | Here |
 |---|---|---|
 | profile after login | `infoAdminAfterLogin` | **none** — the sidebar shows the address typed at sign-in, and nothing after a reload |
 | change own password | `adminUpdatePwd` | **none** — no `shopOwnerUpdatePwd` exists |
-| edit own personal data | `shopOwnerUpdate` (an operator acting on someone) | **none** — an owner cannot edit their own record |
+| edit own personal data | `shopOwnerUpdate` (an admin acting on someone) | **none** — an owner cannot edit their own record |
 | dashboard stats and chart | `shopOwnersStats`, `shopOwnersPerPeriod` | **none** — no aggregate on this tier |
 | paginated table | `shopOwnersActiveTbl` | **none** — the companies list is short and unpaged |
 
 Building any of them starts in `BEs/dev/marketplace-dev-authenticated-resource`, not here. They were
 pruned rather than stubbed: a screen that renders and cannot save is worse than one that is absent.
 
-Password recovery is the one capability this tier has and the operator tier does not — `resetPwd` and
+Password recovery is the one capability this tier has and the admin tier does not — `resetPwd` and
 `updatePwd` on `marketplace-dev-public-resource` are bound to the `ShopOwner` model — and it is still
 not wired up. It needs a fifth endpoint (port 4027), its own slice, its own codegen project, a
 `CTX_PUBLIC_RESOURCE`, a proxy entry and two screens. See the note in `src/pages/LoginPage.tsx`.
@@ -97,7 +97,7 @@ yarn test:mutation  # Stryker, gated at a score of 100
 ```
 
 **497 tests over 38 files, 100% coverage, 100% mutation score** — the same bar as every other repo on
-the platform, so no commit here needs `--no-verify`. The suite was seeded from the operator app's and
+the platform, so no commit here needs `--no-verify`. The suite was seeded from the admin app's and
 adapted screen by screen; [`COVERAGE.md`](./COVERAGE.md) has the gate layers and the recipe for a surviving mutant.
 
 `.githooks/pre-push` runs lint → typecheck → coverage → mutation → Qodana, all blocking, and
@@ -146,7 +146,7 @@ schema slices; it describes nothing that exists.
 - Requests are **POST, always** (`preferGetMethod: false`). Every service builds its `ApolloServer`
   with `csrfPrevention: true`, which blocks a GET carrying none of the preflight-forcing headers, and
   urql sends none of them.
-- Each tier has its own Redis session namespace, so an operator's access token is not a shop owner's
+- Each tier has its own Redis session namespace, so an admin's access token is not a shop owner's
   and does not resolve on these services.
 
 ## Routes
@@ -160,8 +160,8 @@ schema slices; it describes nothing that exists.
 | `/items` | one shop's catalogue — pick the shop, then add, edit, delete |
 
 Five routes, and no path or search param anywhere except `/loading`'s `?redirect=`. That is the tenant
-boundary showing up in the URL space: the operator app needs `/p/shopOwners/id/$_id` because an
-operator has to say *whose* companies they are looking at, and here there is nobody else to name.
+boundary showing up in the URL space: the admin app needs `/p/shopOwners/id/$_id` because an
+admin has to say *whose* companies they are looking at, and here there is nobody else to name.
 
 ⚠️ `/items` is the one route that had a choice. `companyItems` takes an `idCompany`, so
 `/items/$idCompany` would have worked — the shop is page state instead, which keeps *every* id out of
@@ -220,7 +220,7 @@ guard against all render as a working screen.
   a new resolver.
 - ⚠️ **Publishing is a separate operation, and the only control on the page that writes on its own.**
   `published` left `GraphQLInputItem` on 2026-08-14: `itemUpdate` `$set`s the whole object, so a flag
-  inside the card was written on every save, and a card left open since before an operator took the item
+  inside the card was written on every save, and a card left open since before an admin took the item
   down republished it the next time the owner fixed a typo. `itemAdd` stamps `false`, the header's
   Publish / Unpublish button calls `itemUpdatePublished`, and the label is read back from
   `companyItems` rather than kept locally — so what the button says is what the collection holds.

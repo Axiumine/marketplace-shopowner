@@ -123,7 +123,7 @@ exports[`LoginPage > renders the login card 1`] = `
       <p
         class="mt-6 text-xs text-tip"
       >
-        Password forgotten? Self-service recovery is not available from this screen yet: ask the platform operator to send you a reset link.
+        Password forgotten? Self-service recovery is not available from this screen yet: ask the platform admin to send you a reset link.
       </p>
     </div>
   </div>

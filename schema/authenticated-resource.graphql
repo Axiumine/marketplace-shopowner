@@ -20,7 +20,7 @@
 #
 # ⚠️ **This is the whole authenticated surface of the ShopOwner tier — three queries and eight mutations.**
 # It is not a subset kept small for this app's benefit; the service has nothing else. Anything the
-# operator app does that is missing here (a profile after login, a password change, stats, a period
+# admin app does that is missing here (a profile after login, a password change, stats, a period
 # breakdown, a paginated table) has no ShopOwner-tier resolver at all, and adding a screen for it means
 # writing one in `marketplace-dev-authenticated-resource` first.
 #
@@ -160,7 +160,7 @@ type MutationsApi {
 
 	One guard, where `itemUpdate` runs three: nothing moves, so the only question is whether the item
 	named belongs to the session. The Admin tier has carried a mutation of this name since it gained
-	moderation, and an operator's takedown is undone by this call alone — never by the owner saving the
+	moderation, and an admin's takedown is undone by this call alone — never by the owner saving the
 	card, which is what the split is for.
 
 	A published item in an unpublished shop shows nobody anything: the two flags compose, and this one
@@ -195,7 +195,7 @@ type MutationsApi {
 	from the wire would name somebody else's.
 
 	Stamps `deleted` and nothing else. `disabled` is untouched in either direction, so closing neither
-	lifts a standing suspension nor hands one back to an operator, and no `deletedBy` is written: its
+	lifts a standing suspension nor hands one back to an admin, and no `deletedBy` is written: its
 	absence is what says the holder closed it themselves.
 
 	Every company and every item goes dark in the same transaction, and every session ends once the write
@@ -340,7 +340,7 @@ type GraphQLItemCategory {
 	name: String!
 	slug: String!
 	"""
-	A sort ordinal set by the operator — ⚠️ not the GeoJSON `position` of `GraphQLCompanyPosition`.
+	A sort ordinal set by the admin — ⚠️ not the GeoJSON `position` of `GraphQLCompanyPosition`.
 	"""
 	position: Int!
 }
@@ -356,7 +356,7 @@ sends is an id the client can guess.
 
 ⚠️ **`published` is deliberately absent.** It was a `Boolean!` here until 2026-08-14, which made every
 save of the card a write of the flag; `itemUpdatePublished` is the only writer now. Putting it back
-would republish, on the next ordinary save, whatever an operator had just taken down.
+would republish, on the next ordinary save, whatever an admin had just taken down.
 
 Every field is non-null, matching the collection's `required` list, and `itemUpdate` `$set`s the whole
 object — so an optional field here would be a field that can never be cleared.

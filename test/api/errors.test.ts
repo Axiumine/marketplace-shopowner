@@ -144,7 +144,7 @@ describe('isSessionGone', () => {
 		expect(isSessionGone(backendError('Invalid data', { status: 400 }))).toBe(false)
 	})
 
-	// A network failure must not log the operator out: the session is probably still fine and the wifi
+	// A network failure must not log the admin out: the session is probably still fine and the wifi
 	// is not.
 	it('is false when no status could be read', () => {
 		expect(isSessionGone(new CombinedError({ networkError: new Error('offline') }))).toBe(false)

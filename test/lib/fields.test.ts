@@ -4,7 +4,7 @@ import { ADDRESS_MESSAGE, coordinate, EMPTY_ADDRESS, optional, optionalEmail, re
 
 /*
  * Some of these rules are exercised through the forms that use them — that is where a message reaches an
- * operator, and where a wrong bound is a wrong bound. The rest are asserted here, because no form can
+ * admin, and where a wrong bound is a wrong bound. The rest are asserted here, because no form can
  * reach them: a coordinate has no input of its own, and `optional` / `optionalEmail` currently have no
  * call site at all — the company card inlined its certified-email rule as a bare `regex` when the company
  * moved into a collection of its own, and left these two behind as the module's only unused exports.
@@ -13,7 +13,7 @@ import { ADDRESS_MESSAGE, coordinate, EMPTY_ADDRESS, optional, optionalEmail, re
  * rule the shop-owner tier will need the moment it grows an optional contact field is cheaper to keep
  * asserted than to re-derive — the shared shape is the point of the file. What is *not* acceptable is
  * leaving them unasserted: an untested export is a rule that can be silently wrong for whoever adopts it
- * next, and the message text is the whole of what an operator ever sees.
+ * next, and the message text is the whole of what an admin ever sees.
  */
 describe('coordinate', () => {
 	const longitude = coordinate('Longitude', 180)
@@ -23,7 +23,7 @@ describe('coordinate', () => {
 	})
 
 	// The trim is the rule, not a tidy-up: `Number('   ')` is `0`, so a box holding nothing but spaces
-	// would otherwise validate as the prime meridian and be written as a position the operator never
+	// would otherwise validate as the prime meridian and be written as a position the admin never
 	// picked.
 	it('refuses a box holding only spaces', () => {
 		const outcome = longitude.safeParse('   ')
@@ -40,7 +40,7 @@ describe('coordinate', () => {
 describe('required', () => {
 	const legalName = required('Legal name', 10)
 
-	// The trim is what makes "empty" mean what an operator means by it: a box holding three spaces looks
+	// The trim is what makes "empty" mean what an admin means by it: a box holding three spaces looks
 	// blank and would otherwise pass a bare `min(1)`, storing whitespace as a legal name.
 	it('trims, and answers the label when what is left is nothing', () => {
 		expect(legalName.parse('  Rivers   ')).toBe('Rivers')
@@ -92,7 +92,7 @@ describe('optionalEmail', () => {
 	})
 
 	// The cap is checked before the shape, so an over-length address is reported as too long rather than
-	// as malformed — two different mistakes, and the first is the one the operator made.
+	// as malformed — two different mistakes, and the first is the one the admin made.
 	it('caps before it checks the shape', () => {
 		const long = `${'v'.repeat(250)}@rivers.test`
 
@@ -116,7 +116,7 @@ describe('SHAPE_EMAIL', () => {
 })
 
 /*
- * Spelled out rather than compared against itself. It is the one sentence that tells an operator why an
+ * Spelled out rather than compared against itself. It is the one sentence that tells an admin why an
  * address they typed by hand was refused, and asserting the constant against the constant would pass
  * whatever it happened to hold.
  */

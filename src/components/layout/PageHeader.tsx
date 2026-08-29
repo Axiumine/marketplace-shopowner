@@ -13,7 +13,7 @@ export interface Crumb {
 /**
  * Title and breadcrumbs — the strip every page opens with.
  *
- * ⚠️ No `actions` slot, unlike the operator app's, where four pages hang a section menu off it. The two
+ * ⚠️ No `actions` slot, unlike the admin app's, where four pages hang a section menu off it. The two
  * pages here have nothing to put in one: the companies page's only control is "New company", and it
  * belongs beside the list it adds to rather than beside the page title. A slot no page fills is a branch
  * no test can reach except by rendering the component nothing renders — add it back the day a page needs

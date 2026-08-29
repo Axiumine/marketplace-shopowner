@@ -6,7 +6,7 @@ import { CloseAccount } from '@/features/account/CloseAccount'
  *
  * ⚠️ **This is not a settings screen and must not grow into one by guesswork.**
  * `marketplace-dev-authenticated-resource` has no `shopOwnerUpdatePwd` and no self-service personal-data
- * mutation of any kind — the operator app's settings page changes a password through `adminUpdatePwd`,
+ * mutation of any kind — the admin app's settings page changes a password through `adminUpdatePwd`,
  * which is the Admin tier's and has no counterpart here. A password field on this page would have
  * nowhere to submit. `shopOwnerDel` is the single exception, and it is why the page exists at all.
  *

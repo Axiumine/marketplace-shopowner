@@ -13,7 +13,7 @@ import { env } from '@/env'
  * context changes, and it compares by key: a `{ url }` literal built inside a component body is a new
  * object on every render, which turns a static query into an infinite refetch loop.
  *
- * ⚠️ Three of the four are the ShopOwner tier's services and not the operator app's — see the warning
+ * ⚠️ Three of the four are the ShopOwner tier's services and not the admin app's — see the warning
  * in src/env.ts. `/logout` is the one both apps share, legitimately: `authorizationLogoutHandler`
  * resolves the bearer token straight out of Redis and never opens a collection, so it is tier-agnostic
  * by construction.

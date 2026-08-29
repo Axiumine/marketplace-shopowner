@@ -127,7 +127,7 @@ describe('TextareaField', () => {
 		expect(screen.getByText('0 characters remaining')).toBeInTheDocument()
 	})
 
-	// The number changes while the operator types and nothing else on screen reports it, so it has to be
+	// The number changes while the admin types and nothing else on screen reports it, so it has to be
 	// announced rather than merely rendered.
 	it('announces the count as it changes', () => {
 		render(<TextareaField label="Notes" remaining={12} />)

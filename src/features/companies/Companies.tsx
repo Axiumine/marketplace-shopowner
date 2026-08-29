@@ -301,7 +301,7 @@ const FormCompany = ({
 		// No owner id in the variables, and there is nowhere to get one from: `companyAdd` on this tier takes
 		// the company alone and stamps the owner from `ctx.state.user._id`, the Redis session behind the
 		// access token. The Admin tier's mutation of the same name takes that id as its first argument, which
-		// is the whole difference between an operator filing a company for someone and an owner filing their
+		// is the whole difference between an admin filing a company for someone and an owner filing their
 		// own — and the reason a client-supplied id must never appear here.
 		const result = await runAdd({ company: fieldsToSave(values) }, CTX_SAVE_COMPANY)
 

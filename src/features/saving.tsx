@@ -204,7 +204,7 @@ export const useSavableSection = (id: string, register: RegisterSection, changed
 /**
  * The page's one Save button.
  *
- * Disabled until something is dirty. The operator app's copy of this note blamed `shopOwnerUpdate`,
+ * Disabled until something is dirty. The admin app's copy of this note blamed `shopOwnerUpdate`,
  * which answers 500 when its write matched a document and modified none — that mutation does not exist
  * on this tier and the reasoning does not carry over: `funCompanyUpdate` checks `matchedCount`, not
  * `modifiedCount`, so re-saving an untouched card is a plain 200 here. The guard stays because a save

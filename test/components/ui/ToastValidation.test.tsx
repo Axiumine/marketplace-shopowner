@@ -8,7 +8,7 @@ import { ToastValidation, VALIDATION_HEADER } from '@/components/ui/ToastValidat
 const errors = (tree: Record<string, unknown>): FieldErrors => tree as unknown as FieldErrors
 
 describe('ToastValidation', () => {
-	// Nothing at all, not an empty toast: the operator has nothing to correct, and a box in the corner
+	// Nothing at all, not an empty toast: the admin has nothing to correct, and a box in the corner
 	// saying so is one more thing to dismiss.
 	it('is nothing when there is nothing to correct', () => {
 		render(<ToastValidation errors={errors({})} />)

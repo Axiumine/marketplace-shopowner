@@ -25,7 +25,7 @@ export default defineConfig({
 	test: {
 		globals: true,
 		environment: 'jsdom',
-		// Every date on the operator screens is formatted through `Intl`, which reads the ambient zone.
+		// Every date on the admin screens is formatted through `Intl`, which reads the ambient zone.
 		// Without a fixed one the same assertion passes on a machine an hour ahead of UTC and fails in
 		// UTC — and the failure is an hour, which reads as a bug in the formatter rather than as a
 		// machine difference.

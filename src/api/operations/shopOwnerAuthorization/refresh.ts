@@ -11,7 +11,7 @@ import { graphql } from '@gql/shopOwnerAuthorization'
  * `willAuthError` fires before the first authenticated operation, and this is what runs.
  *
  * It goes to `/authenticated-authorization` (port 4029), the ShopOwner tier's token service. The
- * operator app's `/admin-authenticated-authorization` (4025) is a different service reading a
+ * admin app's `/admin-authenticated-authorization` (4025) is a different service reading a
  * different Redis namespace; the two mutations are identical in shape and would each happily refuse
  * the other's cookie.
  */

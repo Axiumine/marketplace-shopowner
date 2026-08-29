@@ -3,13 +3,13 @@
 **The suite exists and both numbers are met: 497 tests over 38 files, 100% on all four coverage
 metrics, 100% mutation score.** No `--no-verify` is needed here any more, and none should be used.
 
-It was seeded from the operator app's suite rather than written blind — `cp -r ../marketplace-admin/test/.`
+It was seeded from the admin app's suite rather than written blind — `cp -r ../marketplace-admin/test/.`
 and then adapted file by file — which is why the conventions below read as `marketplace-admin`'s: they
 are. What did *not* survive the copy is worth knowing before the next test is written, because each
 divergence is a tier difference and not an oversight: `Companies.test.tsx` lost its `ShopOwnerById`
 fixture and its `/p/shopOwners/id/$_id` route (the owner is the session's, so the page has nothing to be
 told), `SideMenu.test.tsx` was rewritten around two sections instead of three, and `CompaniesPage.test.tsx`
-had no counterpart at all — the operator app reaches `useDiscardWarning` through a different page.
+had no counterpart at all — the admin app reaches `useDiscardWarning` through a different page.
 
 Two numbers, both 100, both blocking — plus a scan that re-checks the first one and much else:
 
@@ -63,7 +63,7 @@ Read `reports/mutation/mutation.html`. In order of what it usually is:
 1. **A weak assertion.** Assert the rendered text, not the presence of a node. Assert the variables of
    the request, not that a request happened.
 2. **A branch that cannot be reached.** Delete it rather than testing it. Two were removed that way in
-   the operator app: a second `?? []` on a list the empty check had already unwrapped, and a
+   the admin app: a second `?? []` on a list the empty check had already unwrapped, and a
    `{session?.email ?? ''}` whose fallback rendered a bordered empty strip in a state that is real —
    `useLogout` clears the session before it navigates. ⚠️ The second one does **not** transfer: here
    `session.email` is legitimately `null` after every reload, because no ShopOwner-tier query answers
@@ -105,7 +105,7 @@ docker daemon, the `jetbrains/qodana-js` image the `image:` key in `qodana.yaml`
 the tag from there, so bumping it in one place cannot leave them scanning with an older linter), and
 the token.
 
-## Three traps the operator app's suite already hit
+## Three traps the admin app's suite already hit
 
 The configs here already carry all three fixes. Do not undo them because nothing in this repo appears
 to need them yet — the first test that renders a date or a form will.

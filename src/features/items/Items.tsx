@@ -73,7 +73,7 @@ const CATEGORY_SEPARATOR = '/'
  *
  * ⚠️ **`published` is not here, and that is the shape of the mutation.** It left `GraphQLInputItem` on
  * 2026-08-14: `itemUpdate` `$set`s the whole object, so a flag inside the form was written on every
- * save, and a card left open since before an operator took the item down republished it the next time
+ * save, and a card left open since before an admin took the item down republished it the next time
  * the owner fixed a typo. The button in the card's header is the only thing that writes it.
  */
 export const itemSchema = z.object({
@@ -789,7 +789,7 @@ export const Items = ({ idCompany, registerSection }: { idCompany: string; regis
 				<IconButton
 					name="Add item"
 					// Nothing to file it under. `itemAdd` refuses a category that does not exist, so a card
-					// opened here could never be saved — and the taxonomy is the operator's to fill in.
+					// opened here could never be saved — and the taxonomy is the admin's to fill in.
 					disabled={options.length === 0}
 					onClick={() => {
 						setNewKeys((current) => [...current, crypto.randomUUID()])
@@ -804,7 +804,7 @@ export const Items = ({ idCompany, registerSection }: { idCompany: string; regis
 			) : failure !== undefined ? (
 				<Alert tone="error">{messageOf(failure)}</Alert>
 			) : options.length === 0 ? (
-				<Alert tone="info">No category exists yet. An operator has to fill in the taxonomy before an item can be filed.</Alert>
+				<Alert tone="info">No category exists yet. An admin has to fill in the taxonomy before an item can be filed.</Alert>
 			) : (
 				<>
 					{/* Nothing to select, and nothing the two buttons could be pressed against: an empty shop

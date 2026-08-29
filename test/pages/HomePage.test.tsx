@@ -19,7 +19,7 @@ describe('HomePage', () => {
 	})
 
 	/*
-	 * ⚠️ One tile, and the assertion is that there is exactly one. The operator app's dashboard carries
+	 * ⚠️ One tile, and the assertion is that there is exactly one. The admin app's dashboard carries
 	 * counters and a period chart fed by `shopOwnersStats` / `shopOwnersPerPeriod`, and this tier has no
 	 * counterpart to either — a tile copied across would either query an endpoint that does not implement
 	 * it or count an array the page would have to fetch in full to say a number about.

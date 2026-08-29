@@ -3,7 +3,7 @@ import { LoginForm } from '@/features/login/LoginForm'
 /**
  * The unauthenticated landing page.
  *
- * ⚠️ The note in the card is the **opposite** of the operator app's, and copying that one across would
+ * ⚠️ The note in the card is the **opposite** of the admin app's, and copying that one across would
  * have been a lie. The platform's recovery pair — `resetPwd` and `updatePwd` on public-resource — is
  * bound to the `ShopOwner` model (`createResetPwdFlow({ model: ShopOwner, … })` in
  * `marketplace-dev-public-resource/src/lib/access/resetPwdFlow.mts`), so it answers for exactly the
@@ -22,7 +22,7 @@ export const LoginPage = () => (
 			<h1 className="mb-4 text-2xl font-bold">Marketplace — shop owner area</h1>
 			<LoginForm />
 			<p className="mt-6 text-xs text-tip">
-				Password forgotten? Self-service recovery is not available from this screen yet: ask the platform operator to send you a
+				Password forgotten? Self-service recovery is not available from this screen yet: ask the platform admin to send you a
 				reset link.
 			</p>
 		</div>
