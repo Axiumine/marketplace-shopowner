@@ -9,6 +9,7 @@ import { CLOSE_REFUSED, CONFIRM_LABEL } from '@/features/account/CloseAccount'
 
 import type { GraphQLStub } from '../../helpers/graphql'
 import { graphQLError, stubGraphQL } from '../../helpers/graphql'
+import { stubLocationAssign } from '../../helpers/location'
 import { page } from '../../helpers/page'
 import { renderRoute } from '../../helpers/render'
 
@@ -160,20 +161,22 @@ describe('CloseAccount — closing', () => {
 
 	/*
 	 * The whole point of the button, end to end: the account is closed, the browser is emptied and the
-	 * owner is back at the login page.
+	 * owner is sent back to the login page by a full page load — the same exit `useLogout` takes, and for
+	 * the same reason: nothing of this session may survive into the next one.
 	 *
 	 * The `logout` behind it is answered with a 401 — the realistic reply, since the backend has just
 	 * ended every session this account had. Nothing about the teardown may depend on it succeeding.
 	 */
-	it('signs the owner out and returns to the login page', async () => {
+	it('signs the owner out and leaves the page', async () => {
 		const stub = stubGraphQL({ ...OK, ...GONE_LOGOUT })
-		const { router } = await renderRoute(PAGE)
+		const assign = stubLocationAssign()
+		await renderRoute(PAGE)
 
 		await confirm()
 		await userEvent.click(closeButton())
 
 		await waitFor(() => {
-			expect(router.state.location.pathname).toBe('/')
+			expect(assign).toHaveBeenCalledExactlyOnceWith('/')
 		})
 		expect(stub.calls.map((call) => call.operationName)).toEqual(['ShopOwnerDel', 'Logout'])
 		expect(getAccessToken()).toBeNull()
@@ -184,13 +187,14 @@ describe('CloseAccount — closing', () => {
 	// around either answer.
 	it('signs the owner out when the logout succeeds too', async () => {
 		stubGraphQL({ ...OK, ...OK_LOGOUT })
-		const { router } = await renderRoute(PAGE)
+		const assign = stubLocationAssign()
+		await renderRoute(PAGE)
 
 		await confirm()
 		await userEvent.click(closeButton())
 
 		await waitFor(() => {
-			expect(router.state.location.pathname).toBe('/')
+			expect(assign).toHaveBeenCalledExactlyOnceWith('/')
 		})
 		expect(getSession()).toBeNull()
 	})
