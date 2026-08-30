@@ -7,7 +7,7 @@ import { graphql } from '@gql/publicAuthorization'
  * different collection behind it and a different Redis session namespace. The two share one endpoint,
  * which is why the schema slice for this app carries only this one.
  *
- * ⚠️ `onboardingStep` and `onboardingDone` are selected here and **not** in the operator app, and that
+ * ⚠️ `onboardingStep` and `onboardingDone` are selected here and **not** in the admin app, and that
  * asymmetry is the whole point of the two fields: they are ShopOwner concepts, `loginAdmin` hard-codes
  * them because the `admin` collection has no such fields, and this is the tier they mean something on.
  * `login` derives `onboardingStep` from `makeOnboardingData(user.login)` at sign-in.

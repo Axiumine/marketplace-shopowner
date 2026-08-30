@@ -147,7 +147,7 @@ describe('EditableRow', () => {
 		expect(screen.queryByRole('button', { name: 'Delete monday' })).not.toBeInTheDocument()
 	})
 
-	// The whole point of keeping it reachable: a row is usually opened *before* the operator decides it
+	// The whole point of keeping it reachable: a row is usually opened *before* the admin decides it
 	// should not exist at all.
 	it('keeps the bin once the row is open', async () => {
 		let deleted = false
@@ -172,7 +172,7 @@ describe('EditableRow', () => {
 	})
 
 	// A row that was just added has no stored value: closed, it would read as an empty label beside an
-	// empty value, and the operator would have to find the pen of a row that looks like a rendering bug.
+	// empty value, and the admin would have to find the pen of a row that looks like a rendering bug.
 	it('can start open', () => {
 		render(
 			<EditableRow label="" value="" openInitial>

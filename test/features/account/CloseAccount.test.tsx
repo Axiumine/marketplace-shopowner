@@ -80,12 +80,12 @@ describe('CloseAccount — what it says', () => {
 	 * not a way out of a suspension. An owner who believed otherwise would take the one action that costs
 	 * them thirty days of catalogue and buys them nothing.
 	 */
-	it('says a suspension survives the close and only an operator lifts it', async () => {
+	it('says a suspension survives the close and only an admin lifts it', async () => {
 		stubGraphQL({})
 		await renderRoute(PAGE)
 
 		expect(page().getByText(/A suspension is not lifted by closing your account/)).toBeInTheDocument()
-		expect(page().getByText(/only an operator can take it off/)).toBeInTheDocument()
+		expect(page().getByText(/only an admin can take it off/)).toBeInTheDocument()
 	})
 
 	it('says the window ends in an overwrite that cannot be undone', async () => {

@@ -134,7 +134,7 @@ describe('AddressField', () => {
 			await vi.advanceTimersByTimeAsync(SEARCH_DEBOUNCE_MS - 1)
 		})
 		expect(osm.calls).toHaveLength(0)
-		// And says nothing while it waits: the spinner means a request is out, not that the operator paused
+		// And says nothing while it waits: the spinner means a request is out, not that the admin paused
 		// between two words. One that appears on the first keystroke is on screen for the whole address.
 		expect(screen.queryByRole('status')).not.toBeInTheDocument()
 
@@ -210,12 +210,12 @@ describe('AddressField', () => {
 	})
 
 	/*
-	 * The request the operator has already typed past is abandoned, and abandoning it is what keeps the
+	 * The request the admin has already typed past is abandoned, and abandoning it is what keeps the
 	 * answers in order.
 	 *
 	 * Nominatim answers a vague address slowly and a precise one quickly, so the slow answer to `Main
 	 * Street` can land well after the quick one to `4 Oak Avenue Salem` — and a client that lets both through
-	 * shows the older matches last, over the newer ones, with the map on a city the operator has
+	 * shows the older matches last, over the newer ones, with the map on a city the admin has
 	 * finished correcting.
 	 */
 	it('lets the newer answer win over an older one still in flight', async () => {
@@ -264,7 +264,7 @@ describe('AddressField', () => {
 	 * And leaves nothing behind either, which is the half the test above cannot see. What the catch would
 	 * write is keyed by the query it belonged to, and a query too short to geocode shows no state at all —
 	 * so a failure recorded for the abandoned request stays hidden exactly until that query comes back. An
-	 * operator who deletes a word and types it again is asking the same question, and would be told the
+	 * admin who deletes a word and types it again is asking the same question, and would be told the
 	 * geocoder is down while the fresh request for it is still in flight.
 	 */
 	it('does not report it later either, when the abandoned query is typed again', async () => {
@@ -320,7 +320,7 @@ describe('AddressField', () => {
 	/*
 	 * Picking writes the chosen address into the box, which is a change like any other and would come
 	 * back round as a search for the address that was just chosen — reopening the list under it and
-	 * spending a second request to be told what the operator already accepted.
+	 * spending a second request to be told what the admin already accepted.
 	 */
 	it('does not geocode the address it just filled in', async () => {
 		const osm = installOsm({ results: [BOSTON] })

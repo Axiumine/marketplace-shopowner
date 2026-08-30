@@ -35,11 +35,11 @@ describe('LoginPage', () => {
 	})
 
 	/*
-	 * ⚠️ The note is the **opposite** of the operator app's, and the difference is asserted rather than
+	 * ⚠️ The note is the **opposite** of the admin app's, and the difference is asserted rather than
 	 * left to the wording. `resetPwd` / `updatePwd` on public-resource are bound to the `ShopOwner` model,
 	 * so recovery answers for exactly the accounts that sign in here — it is missing from this app because
 	 * the screens are not built, not because the backend refuses it. A note claiming the backend cannot do
-	 * it would send an owner to the operator forever.
+	 * it would send an owner to the admin forever.
 	 */
 	it('says recovery is not built yet rather than claiming it is unavailable', async () => {
 		stubGraphQL({})

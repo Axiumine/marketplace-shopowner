@@ -12,7 +12,7 @@ import { useSyncExternalStore } from 'react'
  * and `/loading` re-derives the session from the refresh cookie — the same round-trip the access token
  * already needs.
  *
- * ⚠️ `email` is nullable, and the operator app's equivalent is not. That is a backend gap, not a
+ * ⚠️ `email` is nullable, and the admin app's equivalent is not. That is a backend gap, not a
  * design choice: the ShopOwner resource service exposes exactly one query, `shopOwnerCompanies`, and
  * has no `infoShopOwnerAfterLogin` to answer "who am I" with. The address is therefore known only on
  * the sign-in that supplied it, and is `null` for the rest of the session after any reload — at which

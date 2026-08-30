@@ -76,7 +76,7 @@ describe('messagesToFix', () => {
 	/*
 	 * ⚠️ The address is one line however many of its seven fields are wrong, and it is `addressError`
 	 * that decides which one — six of the seven have no input of their own, so a list naming them would
-	 * send the operator looking for boxes that are not on screen.
+	 * send the admin looking for boxes that are not on screen.
 	 *
 	 * Two of them are wrong here on purpose: the postal code is the one reported, and the province's own message
 	 * has to be absent rather than merely second.
@@ -92,7 +92,7 @@ describe('messagesToFix', () => {
 
 	// The composite rule fires together with whichever field broke it, and it is reported last for the
 	// reason written on `addressError`: "select the address from the list" under an address that was
-	// selected, and whose postal code is the problem, sends the operator back to the list for nothing.
+	// selected, and whose postal code is the problem, sends the admin back to the list for nothing.
 	it('reports the broken field rather than the composite rule that broke with it', () => {
 		const tree = {
 			postalCode: { message: 'The postal code must be 5 digits' },
@@ -102,7 +102,7 @@ describe('messagesToFix', () => {
 		expect(messagesToFix(errors(tree))).toEqual(['The postal code must be 5 digits'])
 	})
 
-	// The address line comes first, and the fields the operator can actually see follow it.
+	// The address line comes first, and the fields the admin can actually see follow it.
 	it('puts the address ahead of the rest', () => {
 		const tree = {
 			firstName: { message: 'First name is required' },

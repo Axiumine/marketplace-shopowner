@@ -71,18 +71,18 @@ export const CloseAccount = () => {
 					You have <strong>thirty days</strong> to change your mind. Register again at this same email address inside that window
 					and confirm the message we send you: the account comes back as it was, with the same shops, the same items and the same
 					details. They come back <strong>unpublished</strong> — you put them back on the marketplace yourself, when you are
-					ready — and the account goes back into the approval queue, so an operator approves it once more before you can sign in.
+					ready — and the account goes back into the approval queue, so an admin approves it once more before you can sign in.
 				</p>
 
 				{/*
 				 * Said here because it is the one consequence an owner may believe they are buying: closing and
-				 * re-registering is not a way out of a suspension. ADR-044 gives the operator tier the only hand
+				 * re-registering is not a way out of a suspension. ADR-044 gives the admin tier the only hand
 				 * that lifts one, and ADR-046 leaves `disabled`, `disabledBy` and `disabledReason` untouched
 				 * through the whole restore, precisely so this route cannot be used as one.
 				 */}
 				<p>
-					A suspension is not lifted by closing your account. If an operator has suspended you, the suspension comes back with
-					the account, and only an operator can take it off.
+					A suspension is not lifted by closing your account. If an admin has suspended you, the suspension comes back with the
+					account, and only an admin can take it off.
 				</p>
 
 				<p>

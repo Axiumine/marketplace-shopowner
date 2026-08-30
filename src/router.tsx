@@ -85,7 +85,7 @@ const createAppRouteTree = () => {
 	/**
 	 * The first domain route. No `$_id` segment and no search params: `shopOwnerCompanies` takes no
 	 * arguments and the three writes take no owner id, so there is nothing about this page a URL could
-	 * usefully carry. The operator app's equivalent is `/p/shopOwners/id/$_id`, and the missing parameter
+	 * usefully carry. The admin app's equivalent is `/p/shopOwners/id/$_id`, and the missing parameter
 	 * is the tenant boundary, not an omission.
 	 */
 	const companiesRoute = createRoute({ getParentRoute: () => appRoute, path: '/companies', component: CompaniesPage })

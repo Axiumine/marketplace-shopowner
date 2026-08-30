@@ -32,7 +32,7 @@ describe('AccountPage', () => {
 	/*
 	 * ⚠️ One card, and the assertion is that there is exactly one. This is not a settings screen: the
 	 * ShopOwner tier has no `shopOwnerUpdatePwd` and no self-service personal-data mutation, so a password
-	 * box or a details form copied over from the operator app would have nowhere to submit.
+	 * box or a details form copied over from the admin app would have nowhere to submit.
 	 */
 	it('carries the close-account card and nothing else', async () => {
 		stubGraphQL({})

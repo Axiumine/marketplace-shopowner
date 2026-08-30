@@ -10,8 +10,8 @@ describe('TextField', () => {
 		render(<TextField label="Email" />)
 
 		const input = screen.getByLabelText('Email')
-		await userEvent.type(input, 'operator@marketplace.test')
-		expect(input).toHaveValue('operator@marketplace.test')
+		await userEvent.type(input, 'admin@marketplace.test')
+		expect(input).toHaveValue('admin@marketplace.test')
 	})
 
 	it('generates an id when none is given, so two fields on one page do not collide', () => {

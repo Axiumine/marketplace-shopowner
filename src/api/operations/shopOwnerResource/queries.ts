@@ -4,7 +4,7 @@ import { graphql } from '@gql/shopOwnerResource'
  * The signed-in owner's live companies. The first of the three queries the ShopOwner resource service
  * exposes — the other two are the catalogue's, below.
  *
- * ⚠️ It takes no arguments, and the operator tier's query of the same name takes `idShopOwner`. The
+ * ⚠️ It takes no arguments, and the admin tier's query of the same name takes `idShopOwner`. The
  * owner comes from the Redis session server-side (`ctx.state.user._id`), which is what makes this app
  * incapable of naming another owner's data even if someone edits the request: there is no variable to
  * edit. Do not "fix" the missing argument by copying the admin document.

@@ -105,7 +105,7 @@ describe('the bootstrap search param', () => {
  *
  * ⚠️ There is no `$_id` segment anywhere, and that absence is the tenant boundary rather than an
  * omission: `shopOwnerCompanies` and the three company writes take no owner id, so no URL in this app
- * can name whose data is on screen. The operator app's equivalent page is `/p/shopOwners/id/$_id`.
+ * can name whose data is on screen. The admin app's equivalent page is `/p/shopOwners/id/$_id`.
  *
  * ⚠️ `/items` is the one that had a choice — `companyItems` takes an `idCompany`, so `/items/$idCompany`
  * would have worked. The shop is page state instead, which keeps *every* id out of this app's URL space

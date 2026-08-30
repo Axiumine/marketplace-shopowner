@@ -37,7 +37,7 @@ export const safeRedirect = (target: string | undefined): string => {
  * cookie it cannot read amounts to checking that one is *present*, which a stale or revoked session
  * passes. A real authenticated query is the only answer that means anything.
  *
- * The probe is `shopOwnerCompanies`, and the operator app's equivalent screen probes with
+ * The probe is `shopOwnerCompanies`, and the admin app's equivalent screen probes with
  * `infoAdminAfterLogin`. Not a preference: the ShopOwner resource service exposes exactly one query,
  * so this is the only authenticated request there is to make. It pays for itself twice over — the
  * result lands in the urql document cache under the same key the companies page asks for, so the

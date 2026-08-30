@@ -15,7 +15,7 @@
  * purpose; its secret half is `TURNSTILE_SECRET` on the backend service and never leaves it.
  *
  * ⚠️ The three authenticated paths here are the ShopOwner tier's — the ones **without** `admin` in the
- * name. They are different services from the operator app's, on different ports, backed by a different
+ * name. They are different services from the admin app's, on different ports, backed by a different
  * Redis session namespace and a different collection. Pointing this app at an `admin-…` path would not
  * merely fail somewhere obvious: `authenticated-resource` and `admin-authenticated-resource` expose
  * three operations of the same name (`companyAdd`, `companyDel`, `companyUpdate`) with different

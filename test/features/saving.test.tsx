@@ -113,7 +113,7 @@ const PageId = ({ id, mounted }: { id: string; mounted: boolean }) => {
 const save = () => screen.getByRole('button', { name: 'Save' })
 
 describe('useSaving', () => {
-	// ⚠️ The reason here is *not* the operator app's. `funCompanyUpdate` checks `matchedCount`, so a save
+	// ⚠️ The reason here is *not* the admin app's. `funCompanyUpdate` checks `matchedCount`, so a save
 	// that changes nothing answers 200 on this tier — the gate is about not writing, and not showing
 	// "Changes saved." over a page nobody edited, rather than about dodging a 500.
 	it('keeps the button disabled while nothing has been touched', () => {

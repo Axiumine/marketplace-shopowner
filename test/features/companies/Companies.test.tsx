@@ -23,7 +23,7 @@ import { page } from '../../helpers/page'
 import { renderRoute } from '../../helpers/render'
 
 /**
- * ⚠️ No id in the URL, and none anywhere else in this file. The operator app renders this same section
+ * ⚠️ No id in the URL, and none anywhere else in this file. The admin app renders this same section
  * at `/p/shopOwners/id/$_id`, below the shop owner it names; here the owner is the session's, so the
  * page has nothing to be told and the route has no segment to carry it.
  */

@@ -8,7 +8,7 @@ import { SaveChanges, useDiscardWarning, useSaving } from '@/features/saving'
  * The catalogue of one of the owner's shops.
  *
  * ⚠️ **The chosen shop is state, not a URL segment**, and that is a deliberate difference from the
- * operator app's habit of putting every id in the path. `companyItems` takes an `idCompany`, so a
+ * admin app's habit of putting every id in the path. `companyItems` takes an `idCompany`, so a
  * `/items/$idCompany` route would be technically possible — and it would put an id a stranger can paste
  * into the one place this app has always kept free of them. The resolver refuses a shop the session does
  * not hold either way; what the URL decides is whether a wrong id is something an owner can be handed in

@@ -13,7 +13,7 @@ import {
 } from '@/auth/session'
 
 /**
- * ⚠️ An email and nothing else. The operator app's identity carries an `_id` because
+ * ⚠️ An email and nothing else. The admin app's identity carries an `_id` because
  * `infoAdminAfterLogin` answers with one; the ShopOwner resource service has no "who am I" query at
  * all, so the only thing this app ever learns about the owner is the address they typed into the
  * sign-in form.
@@ -106,8 +106,8 @@ describe('useSession', () => {
 })
 
 /**
- * The address the sign-in form hands to `/loading`, which has no counterpart in the operator app —
- * there the bootstrap screen asks `infoAdminAfterLogin` who the operator is, and nothing has to be
+ * The address the sign-in form hands to `/loading`, which has no counterpart in the admin app —
+ * there the bootstrap screen asks `infoAdminAfterLogin` who the admin is, and nothing has to be
  * carried across the navigation.
  */
 describe('the pending email', () => {

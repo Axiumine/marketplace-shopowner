@@ -1,6 +1,6 @@
 # marketplace-shopowner
 
-Shop-owner SPA, `ShopOwner` tier. Vite + React + TypeScript. Dev port **3044** (operator app is 3043).
+Shop-owner SPA, `ShopOwner` tier. Vite + React + TypeScript. Dev port **3044** (admin app is 3043).
 
 **Read parent first** — [`../CLAUDE.md`](https://github.com/Axiumine/fullstack-marketplace-blueprint/blob/main/CLAUDE.md)
 One of fifteen sub-repos; almost nothing here is changeable on its own.
@@ -20,7 +20,7 @@ is thinner.
 it from `ctx.state.user._id`, the Redis session behind the access token. **Never add an owner id to a
 variable set here**, not even "for symmetry with the Admin tier": that asks the backend to accept from a
 browser the one thing the session already proves. The Admin tier's mutations of the same name *do* take
-that id — which is the whole difference between an operator filing a company for someone and an owner
+that id — which is the whole difference between an admin filing a company for someone and an owner
 filing their own.
 
 ⚠️ **English only** — identifiers, UI text, form labels, comments, routes. No exception; these are the
@@ -73,7 +73,7 @@ service repo — `BEs/dev/marketplace-dev-*/src/graphQLApi/` — and make the sl
 the contract. A slice can declare an operation no service implements, or give an argument a different name
 from the resolver's; both compile, both pass codegen, and both fail only at run time.
 
-Three divergences from the operator app's slices were verified against source and recorded in the files
+Three divergences from the admin app's slices were verified against source and recorded in the files
 themselves — **do not "fix" them back**:
 
 - **`companyAdd` answers `OnlyIdType`**, not `Boolean`. The call site tests
@@ -84,7 +84,7 @@ themselves — **do not "fix" them back**:
   `validateAddress`. No server-side stamp exists on this side — `grep -rn "'Point'"` in
   `marketplace-dev-authenticated-resource/src` returns nothing — so the client must send it.
 - **`companyUpdate` does not 500 on a no-op save.** `funCompanyUpdate` checks `matchedCount`, not
-  `modifiedCount`. The operator app's note blaming `shopOwnerUpdate` describes a mutation this tier does
+  `modifiedCount`. The admin app's note blaming `shopOwnerUpdate` describes a mutation this tier does
   not have.
 
 `src/gql/` is generated. Never edit it; run `yarn codegen`.
@@ -170,7 +170,7 @@ other repo. `git commit --no-verify` is not needed here and must not be used; a 
 test, never by lowering a threshold or deleting the gate. [`COVERAGE.md`](./COVERAGE.md) has the layers and what to do with
 a Stryker survivor.
 
-Seeded from the operator app's suite and adapted file by file, so its conventions are the ones below. Where
+Seeded from the admin app's suite and adapted file by file, so its conventions are the ones below. Where
 it diverges, the divergence is a tier difference: no `ShopOwnerById` fixture and no id in any URL, a
 two-section sidebar, a `CompaniesPage.test.tsx` with no counterpart there.
 
