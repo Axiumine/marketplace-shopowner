@@ -3,7 +3,7 @@ import type { CombinedError } from '@urql/core'
 /**
  * The platform's error transport.
  *
- * The backend uses `extensions.code` for exactly one failure — the lost refresh race of E14-S04, read by
+ * The backend uses `extensions.code` for exactly one failure — the lost refresh race, read by
  * `isRefreshRaceRetry` below. Everything else is raised through koa-utils'
  * `throwGraphQLError(status, title, desc)`, which builds
  *
@@ -69,8 +69,8 @@ export const isAuthExpired = (error: CombinedError | undefined): boolean => stat
 export const isSessionGone = (error: CombinedError | undefined): boolean => SESSION_GONE.includes(statusOf(error))
 
 /**
- * The refresh the backend answered with "another request of yours just rotated this token, send it again"
- * (E14-S04) — the loser of a multi-tab race, which is ordinary use rather than a dead session.
+ * The refresh the backend answered with "another request of yours just rotated this token, send it
+ * again" — the loser of a multi-tab race, which is ordinary use rather than a dead session.
  *
  * ⚠️ **This string is `throwRefreshRaceRetry`'s `REFRESH_RACE_RETRY_CODE` in `marketplace-common`, and
  * nothing checks that the two agree.** A rename on either side turns every lost race back into a logout,
