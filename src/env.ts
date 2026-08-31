@@ -10,9 +10,9 @@
  * report" and "do not render the widget", which is what a developer machine wants.
  *
  * ⚠️ Only public values may be added here. Every `VITE_`-prefixed variable is substituted into the
- * client bundle at build time, so it is published rather than merely read — not `INTROSPECTION_CODE`,
- * and not a Turnstile *secret* key. The site key below is the half Cloudflare puts in the page on
- * purpose; its secret half is `TURNSTILE_SECRET` on the backend service and never leaves it.
+ * client bundle at build time, so it is published rather than merely read — not a backend credential of
+ * any kind, and not a Turnstile *secret* key. The site key below is the half Cloudflare puts in the page
+ * on purpose; its secret half is `TURNSTILE_SECRET` on the backend service and never leaves it.
  *
  * ⚠️ The three authenticated paths here are the ShopOwner tier's — the ones **without** `admin` in the
  * name. They are different services from the admin app's, on different ports, backed by a different
