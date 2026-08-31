@@ -41,7 +41,7 @@ type LoginValues = z.infer<typeof loginSchema>
  * "development only" default address and password ship to production in plain text.
  *
  * `rememberMe` is a real checkbox: it picks the server-side session cap the login stamps into the refresh
- * session — one day unchecked, thirty checked (E14-S05, E14-S07) — which every later refresh is measured
+ * session — one day unchecked, thirty checked — which every later refresh is measured
  * against. The cookie's own lifetime does not change with it, so pinning the box here would silently decide
  * how long an owner stays signed in without changing a single thing the browser can see.
  *

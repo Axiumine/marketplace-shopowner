@@ -15,7 +15,7 @@ CRITICAL, production tree only), then `yarn lint:check`, then `tsc --noEmit`, th
 an offline heuristic that queries no advisory feed and reports zero everywhere, and the class that does
 query one is bundled with the image but is in no profile. Trivy reads `yarn.lock` natively, suppresses
 devDependencies, and blocks on HIGH or CRITICAL with the CVE id and the fixed version. Bypass for a Docker
-or network outage, never for a finding: `SKIP_TRIVY=1 git push`. E18-S11.
+or network outage, never for a finding: `SKIP_TRIVY=1 git push`.
 
 `.githooks/pre-commit` repeats lint, typecheck, coverage and Qodana on top of the secret guard. Semgrep,
 trivy and mutation are push-only — all three need Docker, and push is the layer that sees the merge commit. Both hooks pass `SKIP_TESTS=1` to the scan so it reuses the `coverage/lcov.info` the step

@@ -26,7 +26,7 @@
 #
 # ⚠️ Until 2026-08-13 this file declared the company half alone and said so in this header — "one query
 # and three mutations" — while the service had carried the item half for months. The catalogue screens
-# were the gap E05-S07 records, and a slice that stops at what the app happens to call is how a gap stops
+# were the gap, and a slice that stops at what the app happens to call is how a gap stops
 # being visible. What is here is the service's whole surface, called or not.
 #
 # ⚠️ On 2026-08-14 `published` left `GraphQLInputItem` and the two `*UpdatePublished` mutations arrived
