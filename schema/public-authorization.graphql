@@ -14,9 +14,9 @@
 # this app never calls it, and codegen only needs to type what the documents under
 # src/api/operations/publicAuthorization/ actually ask for.
 #
-# To re-verify after a backend change, diff against those files. There is no introspection endpoint to
-# pull from — the services only expose introspection to callers holding `x-introspectioncode`, which is
-# a secret and must never reach a browser client or a committed script.
+# To re-verify after a backend change, diff against those files. There is nothing to pull the schema
+# from in production: the services answer no introspection query there at all, so this file is
+# maintained by hand rather than generated.
 
 schema {
 	query: QueriesPublic
