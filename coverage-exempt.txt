@@ -1,0 +1,40 @@
+# Every tracked source file that `coverage.include` gates but the coverage report does not contain,
+# with the reason it can never be there. `scripts/coverage-audit.mjs` runs after vitest inside
+# `yarn test:cov` and fails when this list and reality disagree in EITHER direction: a file missing
+# from the report and unnamed here is a file the 100% threshold said nothing about (RISK_REGISTER
+# R07), and a name here that is now covered is a stale line holding the hole open for the next file
+# to carry that path.
+#
+# Exact paths only, never globs. A directory glob exempts whatever lands in that directory next, in
+# silence, with the run still green — which is the failure this file exists to close. One line per
+# file is the cost, and it is the point: an untestable source file becomes a visible decision.
+
+# graphql-codegen output, rewritten wholesale by every `yarn codegen`. Editing one is pointless and
+# testing one tests the generator. Listed file by file rather than as a directory: a hand-written
+# module dropped into src/gql/ must go red, and under the old `src/gql/**` exclude it would not have.
+src/gql/logout/gql.ts
+src/gql/logout/graphql.ts
+src/gql/logout/index.ts
+src/gql/publicAuthorization/gql.ts
+src/gql/publicAuthorization/graphql.ts
+src/gql/publicAuthorization/index.ts
+src/gql/shopOwnerAuthorization/gql.ts
+src/gql/shopOwnerAuthorization/graphql.ts
+src/gql/shopOwnerAuthorization/index.ts
+src/gql/shopOwnerResource/gql.ts
+src/gql/shopOwnerResource/graphql.ts
+src/gql/shopOwnerResource/index.ts
+
+
+# `createRoot(...).render(...)`. Runs only against a real document, and the one thing it could get
+# wrong (mounting the wrong tree) is what every other test already covers.
+src/main.tsx
+
+
+# A single `Sentry.init` call guarded by a DSN check. Asserting it was called asserts that the SDK
+# exists.
+src/instrument.ts
+
+
+# An ambient declaration file. It emits no JavaScript, so there is nothing for v8 to instrument.
+src/vite-env.d.ts
