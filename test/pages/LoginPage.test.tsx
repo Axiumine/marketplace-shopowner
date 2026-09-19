@@ -209,6 +209,39 @@ describe('LoginPage', () => {
 		expect(router.state.location.pathname).toBe('/')
 	})
 
+	/*
+	 * ⚠️ A response with `errors` and no `data` is the one shape `result.data?.login.accessToken`
+	 * exists for: the toast above already renders off `loginState.error`, which urql sets independently
+	 * of this line, so a rendered error alone would pass even if the optional chain here were dropped.
+	 * The submit handler would then read `.login` off `undefined` and throw inside its own async
+	 * callback, past the point the test's synchronous assertions already read — an unhandled rejection
+	 * that fails nothing on its own. It is caught here instead, so dropping the `?.` fails this test.
+	 */
+	it('does not crash the submit handler on a response with errors and no data', async () => {
+		const rejections: unknown[] = []
+		const onUnhandledRejection = (reason: unknown) => rejections.push(reason)
+		process.on('unhandledRejection', onUnhandledRejection)
+
+		try {
+			stubGraphQL({
+				Login: {
+					errors: [graphQLError('Invalid credentials', 'Wrong email or password', 400)],
+					status: 400
+				}
+			})
+			await renderRoute('/', signedOut)
+
+			await fillIn('owner@marketplace.test', 'password123')
+			await submit()
+
+			expect(await screen.findByRole('alert')).toHaveTextContent('Wrong email or password')
+		} finally {
+			process.off('unhandledRejection', onUnhandledRejection)
+		}
+
+		expect(rejections).toHaveLength(0)
+	})
+
 	// The one case the schema cannot express: `accessToken` is non-null, so an empty string is the
 	// service answering without minting a session. Treating it as success stores `''`, and the owner
 	// lands on a dashboard whose every query then fails with no explanation of why.
