@@ -30,5 +30,14 @@
 			"@gql/*": ["./src/gql/*"]
 		}
 	},
-	"include": ["src", "test", "codegen.ts", "vite.config.ts", "vitest.config.ts", "vitest.polyfill.ts", "vitest.setup.ts"]
+	"include": [
+		"src",
+		"test",
+		"codegen.ts",
+		"vite.config.ts",
+		"vitest.config.ts",
+		"vitest.polyfill.ts",
+		"vitest.setup.ts",
+		"vitest.testNames.ts"
+	]
 }
