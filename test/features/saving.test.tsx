@@ -189,6 +189,44 @@ describe('useSaving', () => {
 	})
 
 	/*
+	 * ⚠️ The registry must actually forget the id, not merely leave it out of the dirty set — the two are
+	 * asserted separately on purpose. `changed` above proves the *button* forgets an unmounted section;
+	 * this proves `saveAll` does too, by driving the hook directly and awaiting what it resolves to. A
+	 * registry that kept the entry (set to `null` instead of deleted) would still show a disabled button
+	 * here, since `changed` is a different piece of state — but the next `saveAll` would iterate onto that
+	 * stale `null` and throw reading `.save()` off it, rejecting the promise this test awaits directly.
+	 */
+	it('does not ask a section again after it unregisters', async () => {
+		const order: string[] = []
+		const { result } = renderHook(() => useSaving())
+
+		act(() => {
+			result.current.register('a', {
+				changed: true,
+				save: async () => {
+					order.push('a')
+					return true
+				}
+			})
+		})
+		act(() => {
+			result.current.register('b', {
+				changed: true,
+				save: async () => {
+					order.push('b')
+					return true
+				}
+			})
+		})
+		act(() => {
+			result.current.register('b', null)
+		})
+
+		await expect(result.current.saveAll()).resolves.toBe(true)
+		expect(order).toEqual(['a'])
+	})
+
+	/*
 	 * A section unregisters the id it is registered under *now*.
 	 *
 	 * The cleanup deliberately sits in an effect of its own, keyed on the id, so that a section whose id
