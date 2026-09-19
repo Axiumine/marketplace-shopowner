@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest'
 import { ENDPOINT } from '@/api/endpoints'
 import { getAccessToken } from '@/api/tokenStore'
 import { getSession } from '@/auth/session'
-import { CLOSE_REFUSED, CONFIRM_LABEL } from '@/features/account/CloseAccount'
+import { CONFIRM_LABEL } from '@/features/account/CloseAccount'
 
 import type { GraphQLStub } from '../../helpers/graphql'
 import { graphQLError, stubGraphQL } from '../../helpers/graphql'
@@ -229,9 +229,22 @@ describe('CloseAccount — closing', () => {
 		await confirm()
 		await userEvent.click(closeButton())
 
-		expect(await screen.findByRole('alert')).toHaveTextContent(CLOSE_REFUSED)
+		// The literal copy, not the exported constant: importing `CLOSE_REFUSED` here would make this
+		// assertion compare the constant to itself, which passes for whatever the constant happens to
+		// hold — including an empty string.
+		expect(await screen.findByRole('alert')).toHaveTextContent('The account was not closed.')
 		expect(router.state.location.pathname).toBe(PAGE)
 		expect(getSession()).not.toBeNull()
+	})
+
+	// Before anything has been refused, there is nothing to show — the toast is driven entirely by
+	// `refused`, and a mutant that renders it unconditionally would put an empty, dismissable error
+	// banner in front of an owner who has not even pressed the button yet.
+	it('shows no refusal toast before anything has been refused', async () => {
+		stubGraphQL({})
+		await renderRoute(PAGE)
+
+		expect(screen.queryByRole('alert')).not.toBeInTheDocument()
 	})
 
 	// A second press while the first is still in flight would send a second `shopOwnerDel`. The button is

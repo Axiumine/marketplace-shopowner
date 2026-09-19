@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
 import { VALIDATION_HEADER } from '@/components/ui/ToastValidation'
-import { BULK_REFUSED } from '@/features/items/Items'
 
 import type { GraphQLStub } from '../../helpers/graphql'
 import { graphQLError, stubGraphQL } from '../../helpers/graphql'
@@ -1065,6 +1064,25 @@ describe('Items — bulk publishing', () => {
 		expect(bar()).not.toBeChecked()
 	})
 
+	/*
+	 * ⚠️ Untoggling one card must remove only that card's id, not the whole selection and not the wrong
+	 * one — `bar()` alone cannot tell these apart: with two items selected, emptying the selection
+	 * entirely and removing just the one un-ticked card both leave the "select all" box unchecked. Each
+	 * card's own checkbox is what tells a toggle that clears everything, or one that keeps the wrong id
+	 * and drops the right one, apart from the toggle that removes exactly the id that was pressed.
+	 */
+	it('un-ticking one card leaves every other ticked card ticked', async () => {
+		await loaded()
+
+		await tick(item.name)
+		await tick(itemTwo.name)
+
+		await tick(itemTwo.name)
+
+		expect(screen.getByRole('checkbox', { name: `Select ${item.name}` })).toBeChecked()
+		expect(screen.getByRole('checkbox', { name: `Select ${itemTwo.name}` })).not.toBeChecked()
+	})
+
 	it('does nothing until something is ticked', async () => {
 		await loaded()
 
@@ -1158,7 +1176,10 @@ describe('Items — bulk publishing', () => {
 		await tick(item.name)
 		await userEvent.click(unpublishSelected())
 
-		expect(await screen.findByRole('alert')).toHaveTextContent(BULK_REFUSED)
+		// The literal copy, not the exported constant: importing `BULK_REFUSED` here would make this
+		// assertion compare the constant to itself, which passes for whatever the constant happens to
+		// hold — including an empty string.
+		expect(await screen.findByRole('alert')).toHaveTextContent('The write was refused.')
 		expect(screen.getByText('1 of 2 selected')).toBeInTheDocument()
 	})
 
