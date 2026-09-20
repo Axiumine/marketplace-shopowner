@@ -30,6 +30,8 @@ names the database and the resolvers use, so a rename is never local to this rep
 `pre-push` calls it and at no other time, not to check a change, not on one file. Never invoke `stryker`
 directly either. To reproduce a survivor, apply the mutant by hand in the source and run `yarn test`
 instead. Why: [`REPO.md`](./REPO.md).
+⚠️ Since ADR-055 the script has a second caller, `.github/workflows/gates.yml`, which runs it on
+every pull request — two callers, both automated, and a hand is neither.
 
 ⚠️ **`/admin-authenticated-resource` does not 404 for this tier's requests.** It implements
 `shopOwnerCompanies`, `companyAdd`, `companyUpdate` and `companyDel` under the same names with
