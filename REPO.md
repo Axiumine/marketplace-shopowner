@@ -6,9 +6,10 @@ themselves, [`COVERAGE.md`](./COVERAGE.md) the thresholds.
 
 ## The hooks
 
-`.githooks/pre-push` is a blocking seven-step gate: `yarn semgrep:ci` (Semgrep SAST, rules vendored under
+`.githooks/pre-push` is a blocking eight-step gate: `yarn semgrep:ci` (Semgrep SAST, rules vendored under
 `semgrep/`, pinned image, `--network none`), then trivy (dependency advisories over `yarn.lock`, HIGH and
-CRITICAL, production tree only), then `yarn lint:check`, then `tsc --noEmit`, then
+CRITICAL, production tree only), then the OpenSSF Scorecard floor (`.scorecard-floor`, supply-chain
+posture read from the GitHub API, ADR-054), then `yarn lint:check`, then `tsc --noEmit`, then
 `yarn test:cov` (100 on all four metrics), then `yarn test:mutation` (100), then `./qodana.sh`.
 
 ⚠️ **Trivy is what checks dependencies; Qodana's own inspection does not.** `VulnerableLibrariesLocal` is
@@ -46,7 +47,7 @@ project.
 
 ## Node selection
 
-Ahead of its seven gates the pre-push hook selects node itself. It reads `engines.node` from `package.json`
+Ahead of its eight gates the pre-push hook selects node itself. It reads `engines.node` from `package.json`
 — never a hard-coded version — and sources nvm to switch if the current node does not satisfy it.
 
 This is necessary because every gate shells out to yarn and yarn's `engines` check is a hard failure: on
