@@ -41,7 +41,7 @@
 		"@tanstack/react-table": "^8.21.3",
 		"@urql/core": "^6.0.3",
 		"@urql/exchange-auth": "^3.0.0",
-		"graphql": "^16.14.2",
+		"graphql": "^17.0.2",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8",
 		"react-hook-form": "^7.84.0",
