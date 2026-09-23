@@ -12,6 +12,17 @@ import { clearAccessToken, getAccessToken, setAccessToken } from '@/api/tokenSto
  */
 const REFRESH_RACE_RETRIES = 2
 
+/**
+ * The refresh circuit breaker's cooldown after the n-th consecutive *transport* failure — no HTTP or
+ * GraphQL response at all, not a request the server answered and refused.
+ *
+ * `min(30_000, 1_000 * 2 ** (n - 1))`: 1s, 2s, 4s, … doubling, capped at 30s. During a sustained outage
+ * this is what stops every single operation from firing its own refresh attempt back-to-back — without
+ * it, a dead network turns into a tight loop of doomed requests instead of a session that quietly waits.
+ */
+const breakerCooldownMs = (consecutiveTransportFailures: number): number =>
+	Math.min(30_000, 1_000 * 2 ** (consecutiveTransportFailures - 1))
+
 export interface CreateGraphQLClientOptions {
 	/**
 	 * Called when the refresh mutation cannot mint a new access token. The session is over: the caller
@@ -19,6 +30,11 @@ export interface CreateGraphQLClientOptions {
 	 * API layer stays independent of TanStack Router, and so a test can observe it directly.
 	 */
 	onSessionLost: () => void
+	/**
+	 * The clock the refresh circuit breaker reads its cooldown window against. Defaults to `Date.now`;
+	 * a test injects its own so the window is deterministic instead of racing the real clock.
+	 */
+	now?: () => number
 }
 
 /**
@@ -34,8 +50,30 @@ export interface CreateGraphQLClientOptions {
  * `fetchOptions.credentials: 'include'` is what carries the refresh cookie. It works because the app
  * and the services share one origin; see the comment in vite.config.ts.
  */
-export const createGraphQLClient = ({ onSessionLost }: CreateGraphQLClientOptions): Client =>
-	new Client({
+export const createGraphQLClient = ({ onSessionLost, now = Date.now }: CreateGraphQLClientOptions): Client => {
+	/**
+	 * The refresh circuit breaker's state.
+	 *
+	 * Scoped to this client's closure rather than module scope. This app builds exactly one client for
+	 * its whole lifetime, but marketplace-user builds a fresh urql client per SSR request (ADR-019) —
+	 * a module-global counter there would let one visitor's outage silence refreshes for every other
+	 * request the server handles. Keeping the state here means the same shape is safe in both apps.
+	 */
+	let consecutiveTransportFailures = 0
+	let cooldownUntil = 0
+
+	const resetBreaker = (): void => {
+		consecutiveTransportFailures = 0
+		cooldownUntil = 0
+	}
+
+	// The network coming back is the clearest signal there is, and it can arrive well before the
+	// current cooldown window would have elapsed on its own. No `window` outside a browser (SSR, a
+	// non-browser build) — the breaker still works there, it just waits out its window instead of
+	// hearing about a reconnect early.
+	if (typeof window !== 'undefined') window.addEventListener('online', resetBreaker)
+
+	return new Client({
 		url: ENDPOINT.shopOwnerResource,
 		fetchOptions: { credentials: 'include' },
 		/**
@@ -88,20 +126,31 @@ export const createGraphQLClient = ({ onSessionLost }: CreateGraphQLClientOption
 				 * rotates it; the other presents a token the backend consumed milliseconds ago, and inside
 				 * the grace window it answers `REFRESH_RACE_RETRY` instead of revoking the family. By then
 				 * the winner's `Set-Cookie` is in the jar both tabs share, so the retry sends the current
-				 * token and succeeds — which is why there is no backoff here: the thing being waited for has
-				 * already happened, and a timer would only delay the owner's first screen.
+				 * token and succeeds — which is why the race-retry loop below has no backoff of its own: the
+				 * thing being waited for has already happened, and a timer would only delay the owner's first
+				 * screen. The breaker below is a different failure entirely — no response at all, not a
+				 * losing race — and that one does get a backoff, because the thing it is waiting for has not
+				 * happened yet and asking again immediately cannot make it happen sooner.
 				 *
 				 * Bounded at `REFRESH_RACE_RETRIES` because the loop is otherwise unbounded on a backend
 				 * that keeps answering the same code. Two is a race lost twice in a row; a third is not a
 				 * race any more, and a logout is the honest answer.
 				 */
 				async refreshAuth() {
+					// The circuit breaker. A sustained outage means every operation hitting a stale token
+					// fires its own refresh attempt, one after another with nothing between them; this skips
+					// the network entirely until the cooldown a previous transport failure opened has
+					// elapsed. The session is kept exactly as a transport failure below keeps it — this just
+					// avoids spending a round trip to find out again what the last one already answered.
+					if (now() < cooldownUntil) return
+
 					for (let attempt = 0; attempt <= REFRESH_RACE_RETRIES; attempt++) {
 						const result = await utils.mutate(RefreshDocument, {}, CTX_SHOP_OWNER_AUTHORIZATION)
 						const refresh = result.data?.refresh
 
 						if (refresh !== undefined && refresh.status && refresh.accessToken !== '') {
 							setAccessToken(refresh.accessToken)
+							resetBreaker()
 							return
 						}
 
@@ -114,7 +163,16 @@ export const createGraphQLClient = ({ onSessionLost }: CreateGraphQLClientOption
 						// `result.error !== undefined` first: a *clean* response that simply reports failure
 						// (`status: false`, no data, an empty token) has no error at all, and `statusOf(undefined)`
 						// is `undefined` too — that case is not a transport failure and must keep falling through.
-						if (result.error !== undefined && statusOf(result.error) === undefined) return
+						//
+						// Trips the breaker rather than returning bare: on its own this branch already keeps
+						// the session, but with nothing to slow the *next* operation down it would fire another
+						// refresh attempt straight away, and the one after that — every operation touching the
+						// network during the outage, back to back.
+						if (result.error !== undefined && statusOf(result.error) === undefined) {
+							consecutiveTransportFailures += 1
+							cooldownUntil = now() + breakerCooldownMs(consecutiveTransportFailures)
+							return
+						}
 
 						// Every other failure is terminal: a second attempt would present the same cookie to a
 						// backend that has already refused it.
@@ -150,3 +208,4 @@ export const createGraphQLClient = ({ onSessionLost }: CreateGraphQLClientOption
 			fetchExchange
 		]
 	})
+}

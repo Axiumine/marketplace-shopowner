@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { createGraphQLClient } from '@/api/client'
+import { createGraphQLClient, type CreateGraphQLClientOptions } from '@/api/client'
 import { CTX_PUBLIC_AUTHORIZATION, CTX_SHOP_OWNER_RESOURCE, ENDPOINT } from '@/api/endpoints'
 import { LoginDocument } from '@/api/operations/publicAuthorization/login'
 import { ShopOwnerCompaniesDocument } from '@/api/operations/shopOwnerResource/queries'
@@ -52,9 +52,9 @@ const raceLost = {
 	status: 409
 }
 
-const setup = () => {
+const setup = (overrides: Partial<CreateGraphQLClientOptions> = {}) => {
 	const onSessionLost = vi.fn()
-	return { client: createGraphQLClient({ onSessionLost }), onSessionLost }
+	return { client: createGraphQLClient({ onSessionLost, ...overrides }), onSessionLost }
 }
 
 const info = (client: ReturnType<typeof setup>['client']) =>
@@ -383,5 +383,150 @@ describe('createGraphQLClient', () => {
 		expect(result.error?.networkError).toBeDefined()
 		expect(onSessionLost).not.toHaveBeenCalled()
 		expect(getAccessToken()).toBe('tok-1')
+	})
+
+	describe('refresh circuit breaker', () => {
+		const refreshCalls = (stub: ReturnType<typeof stubGraphQL>) =>
+			stub.calls.filter((call) => call.operationName === 'Refresh').length
+
+		// The whole point of the breaker: during a sustained outage every operation hitting the stale
+		// token would otherwise refresh immediately, one after another with nothing between them. Each
+		// consecutive transport failure opens a longer cooldown — 1s, 2s, 4s, … — capped at 30s, and no
+		// `Refresh` is sent at all while one is open.
+		it('opens a doubling cooldown after each consecutive refresh transport failure, capped at 30s', async () => {
+			const stub = stubGraphQL({
+				ShopOwnerCompanies: { errors: [graphQLError('Invalid token', undefined, 498)], status: 498 },
+				Refresh: { networkError: 'offline' }
+			})
+			setAccessToken('tok-1')
+
+			let clock = 0
+			const { client, onSessionLost } = setup({ now: () => clock })
+
+			// 1st failure (n=1): hits the network, opens a 1s window.
+			await info(client)
+			expect(refreshCalls(stub)).toBe(1)
+
+			// Still inside the 1s window: no network call for the refresh at all.
+			clock = 999
+			await info(client)
+			expect(refreshCalls(stub)).toBe(1)
+
+			// The window has elapsed: hits the network again. 2nd consecutive failure (n=2) opens a 2s window.
+			clock = 1_000
+			await info(client)
+			expect(refreshCalls(stub)).toBe(2)
+
+			clock = 2_999
+			await info(client)
+			expect(refreshCalls(stub)).toBe(2)
+
+			// 3rd consecutive failure (n=3) opens a 4s window.
+			clock = 3_000
+			await info(client)
+			expect(refreshCalls(stub)).toBe(3)
+
+			clock = 6_999
+			await info(client)
+			expect(refreshCalls(stub)).toBe(3)
+
+			// 4th failure (n=4, 8s), 5th (n=5, 16s), 6th (n=6, min(30_000, 32_000) = 30s, the cap).
+			clock = 7_000
+			await info(client)
+			expect(refreshCalls(stub)).toBe(4)
+
+			clock = 15_000
+			await info(client)
+			expect(refreshCalls(stub)).toBe(5)
+
+			clock = 31_000
+			await info(client)
+			expect(refreshCalls(stub)).toBe(6)
+
+			// Right up against the 30s cap: still inside it, then just past it.
+			clock = 60_999
+			await info(client)
+			expect(refreshCalls(stub)).toBe(6)
+
+			clock = 61_000
+			await info(client)
+			expect(refreshCalls(stub)).toBe(7)
+
+			// None of this is a lost session — every failure here is transport-level, so the token this
+			// app already has is never touched.
+			expect(onSessionLost).not.toHaveBeenCalled()
+			expect(getAccessToken()).toBe('tok-1')
+		})
+
+		it('resets the counter and window on a successful refresh', async () => {
+			const stub = stubGraphQL({
+				ShopOwnerCompanies: { errors: [graphQLError('Invalid token', undefined, 498)], status: 498 },
+				Refresh: [{ networkError: 'offline' }, refreshed('tok-2'), { networkError: 'offline' }]
+			})
+			setAccessToken('tok-1')
+
+			let clock = 0
+			const { client, onSessionLost } = setup({ now: () => clock })
+
+			await info(client) // Refresh #1: transport failure, opens a 1s window (n=1).
+
+			clock = 1_000 // window elapsed
+			await info(client) // Refresh #2: succeeds — resets the breaker.
+			expect(getAccessToken()).toBe('tok-2')
+
+			clock = 1_001
+			await info(client) // Refresh #3: transport failure again, right after the reset.
+
+			// A fresh n=1 window opened at 1_001 elapses at 2_001. Had the counter kept counting from
+			// before the reset instead (n=3), the window would still be open until 5_001.
+			clock = 2_000
+			await info(client)
+			expect(refreshCalls(stub)).toBe(3)
+
+			clock = 2_001
+			await info(client)
+			expect(refreshCalls(stub)).toBe(4)
+
+			expect(onSessionLost).not.toHaveBeenCalled()
+		})
+
+		it('resets the window when the browser reports coming back online, even before it would have elapsed', async () => {
+			const stub = stubGraphQL({
+				ShopOwnerCompanies: { errors: [graphQLError('Invalid token', undefined, 498)], status: 498 },
+				Refresh: { networkError: 'offline' }
+			})
+			setAccessToken('tok-1')
+
+			let clock = 0
+			const { client } = setup({ now: () => clock })
+
+			await info(client) // Refresh #1: opens a 1s window, due to elapse at 1_000.
+			expect(refreshCalls(stub)).toBe(1)
+
+			clock = 500 // well inside the window
+			window.dispatchEvent(new Event('online'))
+
+			await info(client)
+			expect(refreshCalls(stub)).toBe(2)
+		})
+
+		// ADR-019: marketplace-user builds a fresh urql client per SSR request, where there is no
+		// `window` at all. The breaker has to build (and keep working) without one rather than throwing,
+		// and it simply never hears an early reconnect there.
+		it('builds without touching window when there is none (SSR / non-browser build)', async () => {
+			vi.stubGlobal('window', undefined)
+
+			const stub = stubGraphQL({
+				ShopOwnerCompanies: [{ errors: [graphQLError('Invalid token', undefined, 498)], status: 498 }, { data: COMPANIES }],
+				Refresh: refreshed('tok-2')
+			})
+			setAccessToken('tok-1')
+
+			const { client } = setup()
+			const result = await info(client)
+
+			expect(refreshCalls(stub)).toBe(1)
+			expect(result.data).toEqual(COMPANIES)
+		})
 	})
 })
