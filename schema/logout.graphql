@@ -15,7 +15,11 @@ schema {
 }
 
 type QueriesApi {
-	helloLogout: String!
+	helloLogout: Hello2Type!
+}
+
+type Hello2Type {
+	txt: String!
 }
 
 type MutationsApi {

@@ -17,7 +17,11 @@ schema {
 }
 
 type QueriesApi {
-	helloRefresh: String!
+	helloRefresh: Hello2Type!
+}
+
+type Hello2Type {
+	txt: String!
 }
 
 type MutationsApi {
