@@ -2,7 +2,7 @@ import { cacheExchange, Client, fetchExchange, mapExchange } from '@urql/core'
 import { authExchange } from '@urql/exchange-auth'
 
 import { CTX_SHOP_OWNER_AUTHORIZATION, ENDPOINT, requiresAuth } from '@/api/endpoints'
-import { isAuthExpired, isRefreshRaceRetry, isSessionGone } from '@/api/errors'
+import { isAuthExpired, isRefreshRaceRetry, isSessionGone, statusOf } from '@/api/errors'
 import { RefreshDocument } from '@/api/operations/shopOwnerAuthorization/refresh'
 import { clearAccessToken, getAccessToken, setAccessToken } from '@/api/tokenStore'
 
@@ -104,6 +104,17 @@ export const createGraphQLClient = ({ onSessionLost }: CreateGraphQLClientOption
 							setAccessToken(refresh.accessToken)
 							return
 						}
+
+						// A transport failure never reached the server at all — offline, DNS, a connection dropped
+						// mid-reload — so the refresh cookie was never spent and the owner is almost certainly
+						// still signed in. The same policy `mapExchange` applies to ordinary queries below: a
+						// dropped connection is not a dead session, and ending it here would be a logout over a
+						// wifi blip. Leave the session alone rather than falling through to the terminal path.
+						//
+						// `result.error !== undefined` first: a *clean* response that simply reports failure
+						// (`status: false`, no data, an empty token) has no error at all, and `statusOf(undefined)`
+						// is `undefined` too — that case is not a transport failure and must keep falling through.
+						if (result.error !== undefined && statusOf(result.error) === undefined) return
 
 						// Every other failure is terminal: a second attempt would present the same cookie to a
 						// backend that has already refused it.

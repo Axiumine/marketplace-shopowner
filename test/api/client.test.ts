@@ -238,6 +238,36 @@ describe('createGraphQLClient', () => {
 		expect(getAccessToken()).toBeNull()
 	})
 
+	/*
+	 * ⚠️ The refresh mutation's own transport failure, not the domain query's. `mapExchange` already keeps
+	 * the session on a dropped connection for an ordinary query (see "keeps the session on a transport
+	 * failure" below) — this is the same policy applied to the one path that used to skip it: the refresh
+	 * cookie was never spent, since the request never reached the server, and logging the owner out over a
+	 * wifi blip would lose whatever they were doing.
+	 */
+	it('keeps the session when the refresh mutation itself is a transport failure', async () => {
+		const stub = stubGraphQL({
+			// Repeats: the query the network error hands back to is retried once the loop gives up on the
+			// refresh, and the fixture answers 498 again both times — nothing about that retry is this
+			// test's concern, only that the *session* survives it.
+			ShopOwnerCompanies: { errors: [graphQLError('Invalid token', undefined, 498)], status: 498 },
+			Refresh: { networkError: 'offline' }
+		})
+		setAccessToken('tok-1')
+
+		const { client, onSessionLost } = setup()
+		await info(client)
+
+		// Once, not the three attempts a lost race gets: a bare network error is not `REFRESH_RACE_RETRY`,
+		// and the whole point of the fix is leaving the session alone rather than hammering an endpoint
+		// that is not answering anyone.
+		expect(stub.calls.filter((call) => call.operationName === 'Refresh')).toHaveLength(1)
+		expect(onSessionLost).not.toHaveBeenCalled()
+		// Not cleared either: nothing came back to say the token itself is bad, only that the attempt to
+		// refresh it never reached anywhere.
+		expect(getAccessToken()).toBe('tok-1')
+	})
+
 	it('ends the session when the refresh itself errors', async () => {
 		stubGraphQL({
 			ShopOwnerCompanies: { errors: [graphQLError('Invalid token', undefined, 498)], status: 498 },

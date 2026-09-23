@@ -20,6 +20,16 @@ export interface TurnstileToken {
 	readonly token: string | null
 	readonly onToken: (token: string | null) => void
 	readonly read: () => string | null
+	/**
+	 * Withdraws the token after a guarded submit was refused.
+	 *
+	 * The backend's siteverify call spends the token on the very first attempt, before password or
+	 * registration validation ever runs — so a corrected resubmit sent with the same token is rejected
+	 * as a Cloudflare duplicate regardless of what changed. This clears the stored value so a resubmit
+	 * before a fresh solve arrives sends `null` rather than the spent token; the caller pairs it with
+	 * remounting `Turnstile` to actually ask the widget for a new one.
+	 */
+	readonly reset: () => void
 }
 
 export const useTurnstileToken = (): TurnstileToken => {
@@ -50,5 +60,9 @@ export const useTurnstileToken = (): TurnstileToken => {
 	const read = useCallback(() => latest.current, [])
 	// Stryker restore ArrayDeclaration
 
-	return { token, onToken, read }
+	const reset = useCallback(() => {
+		onToken(null)
+	}, [onToken])
+
+	return { token, onToken, read, reset }
 }
