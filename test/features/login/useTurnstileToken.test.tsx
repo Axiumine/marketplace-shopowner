@@ -101,4 +101,24 @@ describe('useTurnstileToken', () => {
 		expect(result.current.token).toBeNull()
 		expect(result.current.read()).toBeNull()
 	})
+
+	/*
+	 * ⚠️ The reason `reset` exists at all: the backend's siteverify call spends a Turnstile token on the
+	 * very first attempt, before the password is even checked. Left in place, a corrected resubmit would
+	 * carry the same, already-spent token and be refused as a Cloudflare duplicate regardless of what
+	 * changed — this is the other half of the fix, alongside remounting the widget in `LoginForm`.
+	 */
+	it('withdraws the token on reset, the way a failed submit does', () => {
+		const { result } = renderHook(() => useTurnstileToken())
+
+		act(() => {
+			result.current.onToken('a-turnstile-token')
+		})
+		act(() => {
+			result.current.reset()
+		})
+
+		expect(result.current.token).toBeNull()
+		expect(result.current.read()).toBeNull()
+	})
 })

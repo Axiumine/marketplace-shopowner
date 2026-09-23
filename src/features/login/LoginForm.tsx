@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useMutation } from 'urql'
 import { z } from 'zod'
@@ -55,6 +56,11 @@ export const LoginForm = () => {
 	const turnstile = useTurnstileToken()
 	const [loginState, executeLogin] = useMutation(LoginDocument)
 
+	// Bumped on every refused submit and handed to `Turnstile` as `key`, so React tears the widget down
+	// and mounts a fresh one instead of leaving the spent challenge in place. See `turnstile.reset()`
+	// below for the other half — withdrawing the token itself before the new widget has solved again.
+	const [turnstileKey, setTurnstileKey] = useState(0)
+
 	// No `defaultValues`: all three fields are registered, uncontrolled inputs, so react-hook-form reads
 	// their initial state off the DOM — `''` for the two text boxes and `false` for an unchecked box,
 	// which is what the table would have said. Stating it twice only creates somewhere for the two to
@@ -79,7 +85,14 @@ export const LoginForm = () => {
 			// string would put it in the browser history and in every referrer the app leaks.
 			setPendingEmail(values.email)
 			await navigate({ to: '/loading' })
+			return
 		}
+
+		// Cloudflare's siteverify call spends the token on this attempt alone, before the password is even
+		// checked — a corrected resubmit sent with the same token is refused as a duplicate regardless of
+		// what changed. Withdraw it and remount the widget so the next attempt carries a fresh one.
+		turnstile.reset()
+		setTurnstileKey((key) => key + 1)
 	})
 
 	// An empty token with no error is the one case the backend cannot express: the mutation is typed
@@ -125,7 +138,7 @@ export const LoginForm = () => {
 				Remember me on this device
 			</label>
 
-			<Turnstile onToken={turnstile.onToken} />
+			<Turnstile key={turnstileKey} onToken={turnstile.onToken} />
 
 			{loginState.error === undefined ? null : <Toast tone="error">{messageOf(loginState.error)}</Toast>}
 			{failed ? <Toast tone="error">Invalid credentials</Toast> : null}
