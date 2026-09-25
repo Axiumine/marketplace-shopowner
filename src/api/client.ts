@@ -35,6 +35,13 @@ export interface CreateGraphQLClientOptions {
 	 * a test injects its own so the window is deterministic instead of racing the real clock.
 	 */
 	now?: () => number
+	/**
+	 * Removes the breaker's `online` listener once aborted. Production callers pass nothing — the
+	 * client lives as long as the page, so the listener living that long too is correct. A test that
+	 * builds a client per test passes a per-test controller's signal so the listener does not outlive
+	 * the test and accumulate on the shared jsdom `window`.
+	 */
+	signal?: AbortSignal
 }
 
 /**
@@ -50,7 +57,7 @@ export interface CreateGraphQLClientOptions {
  * `fetchOptions.credentials: 'include'` is what carries the refresh cookie. It works because the app
  * and the services share one origin; see the comment in vite.config.ts.
  */
-export const createGraphQLClient = ({ onSessionLost, now = Date.now }: CreateGraphQLClientOptions): Client => {
+export const createGraphQLClient = ({ onSessionLost, now = Date.now, signal }: CreateGraphQLClientOptions): Client => {
 	/**
 	 * The refresh circuit breaker's state.
 	 *
@@ -70,8 +77,17 @@ export const createGraphQLClient = ({ onSessionLost, now = Date.now }: CreateGra
 	// The network coming back is the clearest signal there is, and it can arrive well before the
 	// current cooldown window would have elapsed on its own. No `window` outside a browser (SSR, a
 	// non-browser build) — the breaker still works there, it just waits out its window instead of
-	// hearing about a reconnect early.
-	if (typeof window !== 'undefined') window.addEventListener('online', resetBreaker)
+	// hearing about a reconnect early. `signal` is `undefined` for every production caller, which is
+	// the same as passing no options at all — the listener never removes itself. `exactOptionalPropertyTypes`
+	// rejects `{ signal: undefined }` outright, hence the conditional spread rather than `{ signal }`.
+	//
+	// The `signal?.aborted` guard is redundant with what `addEventListener` itself does for an
+	// already-aborted signal — spec-compliant DOM never adds the listener in that case either — but it
+	// is asserted explicitly rather than left to that internal check alone, since it costs nothing here.
+	if (typeof window !== 'undefined' && signal?.aborted !== true) {
+		const onlineOptions: AddEventListenerOptions = signal === undefined ? {} : { signal }
+		window.addEventListener('online', resetBreaker, onlineOptions)
+	}
 
 	return new Client({
 		url: ENDPOINT.shopOwnerResource,

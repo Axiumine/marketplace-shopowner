@@ -4,7 +4,7 @@ import type { RenderResult } from '@testing-library/react'
 import { render, waitFor } from '@testing-library/react'
 import type { ReactElement } from 'react'
 import { Provider as UrqlProvider } from 'urql'
-import { vi } from 'vitest'
+import { onTestFinished, vi } from 'vitest'
 
 import { createGraphQLClient } from '@/api/client'
 import { setAccessToken } from '@/api/tokenStore'
@@ -27,10 +27,19 @@ export interface RenderOptions {
 
 const DEFAULTS: Required<RenderOptions> = { token: 'tok-1', session: OWNER }
 
-/** A client wired to a spy, so a test can assert the session was dropped rather than infer it. */
+/**
+ * A client wired to a spy, so a test can assert the session was dropped rather than infer it.
+ *
+ * Also the one place every helper below builds a client, so this is the one place that has to stop
+ * the breaker's `online` listener from outliving the test — without it, a listener accumulates on the
+ * shared jsdom `window` for every client a test builds across the whole suite.
+ */
 export const clientWithSpy = () => {
 	const onSessionLost = vi.fn()
-	return { client: createGraphQLClient({ onSessionLost }), onSessionLost }
+	const controller = new AbortController()
+	onTestFinished(() => controller.abort())
+
+	return { client: createGraphQLClient({ onSessionLost, signal: controller.signal }), onSessionLost }
 }
 
 /**

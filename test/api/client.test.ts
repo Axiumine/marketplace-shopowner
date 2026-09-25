@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, onTestFinished, vi } from 'vitest'
 
 import { createGraphQLClient, type CreateGraphQLClientOptions } from '@/api/client'
 import { CTX_PUBLIC_AUTHORIZATION, CTX_SHOP_OWNER_RESOURCE, ENDPOINT } from '@/api/endpoints'
@@ -52,9 +52,15 @@ const raceLost = {
 	status: 409
 }
 
+// A fresh `AbortController` per client, aborted once the test finishes — otherwise every test in this
+// file leaves its own `online` listener behind on the shared jsdom `window`, and they pile up across
+// the whole suite. A test exercising the `signal` option itself passes its own through `overrides`.
 const setup = (overrides: Partial<CreateGraphQLClientOptions> = {}) => {
 	const onSessionLost = vi.fn()
-	return { client: createGraphQLClient({ onSessionLost, ...overrides }), onSessionLost }
+	const controller = new AbortController()
+	onTestFinished(() => controller.abort())
+
+	return { client: createGraphQLClient({ onSessionLost, signal: controller.signal, ...overrides }), onSessionLost }
 }
 
 const info = (client: ReturnType<typeof setup>['client']) =>
@@ -508,6 +514,84 @@ describe('createGraphQLClient', () => {
 
 			await info(client)
 			expect(refreshCalls(stub)).toBe(2)
+		})
+
+		// The same reconnect signal, with no `signal` option at all — the shape every production caller
+		// uses. Confirms the new option is additive: leaving it out keeps the listener registered exactly
+		// as before.
+		it('resets the window on `online` when no signal is given', async () => {
+			const stub = stubGraphQL({
+				ShopOwnerCompanies: { errors: [graphQLError('Invalid token', undefined, 498)], status: 498 },
+				Refresh: { networkError: 'offline' }
+			})
+			setAccessToken('tok-1')
+
+			let clock = 0
+			const client = createGraphQLClient({ onSessionLost: vi.fn(), now: () => clock })
+
+			await info(client) // Refresh #1: opens a 1s window, due to elapse at 1_000.
+			expect(refreshCalls(stub)).toBe(1)
+
+			clock = 500 // well inside the window
+			window.dispatchEvent(new Event('online'))
+
+			await info(client)
+			expect(refreshCalls(stub)).toBe(2)
+		})
+
+		// The fix itself: once the caller aborts, the breaker must stop hearing `online` — otherwise the
+		// listener a per-test client registers outlives the test and keeps firing against every client
+		// built afterwards on the same shared jsdom `window`.
+		it('no longer resets the window on `online` once the signal is aborted', async () => {
+			const stub = stubGraphQL({
+				ShopOwnerCompanies: { errors: [graphQLError('Invalid token', undefined, 498)], status: 498 },
+				Refresh: { networkError: 'offline' }
+			})
+			setAccessToken('tok-1')
+
+			let clock = 0
+			const controller = new AbortController()
+			const client = createGraphQLClient({ onSessionLost: vi.fn(), now: () => clock, signal: controller.signal })
+
+			await info(client) // Refresh #1: opens a 1s window, due to elapse at 1_000.
+			expect(refreshCalls(stub)).toBe(1)
+
+			controller.abort()
+
+			clock = 500 // well inside the window — an unaborted signal would have reset it by now
+			window.dispatchEvent(new Event('online'))
+
+			await info(client)
+			// Still inside the window: the abort means `online` no longer reaches the breaker.
+			expect(refreshCalls(stub)).toBe(1)
+
+			clock = 1_000 // the window elapses on its own instead
+			await info(client)
+			expect(refreshCalls(stub)).toBe(2)
+		})
+
+		// The other end of the same option: a signal that is already aborted when the client is built
+		// must never add the listener in the first place, not add-then-immediately-remove it.
+		it('registers no `online` listener when the signal is already aborted', async () => {
+			const stub = stubGraphQL({
+				ShopOwnerCompanies: { errors: [graphQLError('Invalid token', undefined, 498)], status: 498 },
+				Refresh: { networkError: 'offline' }
+			})
+			setAccessToken('tok-1')
+
+			let clock = 0
+			const controller = new AbortController()
+			controller.abort()
+			const client = createGraphQLClient({ onSessionLost: vi.fn(), now: () => clock, signal: controller.signal })
+
+			await info(client) // Refresh #1: opens a 1s window, due to elapse at 1_000.
+			expect(refreshCalls(stub)).toBe(1)
+
+			clock = 500 // well inside the window
+			window.dispatchEvent(new Event('online'))
+
+			await info(client)
+			expect(refreshCalls(stub)).toBe(1)
 		})
 
 		// ADR-019: marketplace-user builds a fresh urql client per SSR request, where there is no
