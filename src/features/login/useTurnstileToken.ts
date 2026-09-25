@@ -37,7 +37,7 @@ export const useTurnstileToken = (): TurnstileToken => {
 	const latest = useRef<string | null>(null)
 
 	/*
-	 * ⚠️ The two empty dependency arrays are excluded from mutation testing, and this is the one place in
+	 * ⚠️ The dependency arrays below are excluded from mutation testing, and this is the one place in
 	 * the repo where that is true — so it needs its reason written down rather than assumed.
 	 *
 	 * Stryker's `ArrayDeclaration` mutator rewrites `[]` as `['Stryker was here']`, and React compares
@@ -48,8 +48,13 @@ export const useTurnstileToken = (): TurnstileToken => {
 	 * times in `useTurnstileToken.test.tsx`, across a re-render, a token arrival and a closure created
 	 * before one.
 	 *
-	 * Scoped to this mutator and these two lines. A non-empty dependency list mutated the same way *does*
-	 * change behaviour — it stops tracking what it named — and stays under the gate everywhere else.
+	 * Scoped to this mutator and these three lines. A non-empty dependency list mutated the same way
+	 * *does* change behaviour in general — it stops tracking what it named — and stays under the gate
+	 * everywhere else. `reset`'s `[onToken]` is the one exception, and not for the same reason: `onToken`
+	 * is itself covered by the disable above, so it is `Object.is`-stable across every render for the
+	 * lifetime of the hook. Mutating `[onToken]` to `[]` cannot change which function `reset`'s closure
+	 * captured — both close over the very same, never-replaced `onToken` — so `reset` calls the identical
+	 * function either way, for every render sequence a test can produce.
 	 */
 	// Stryker disable ArrayDeclaration
 	const onToken = useCallback((next: string | null) => {
@@ -58,11 +63,11 @@ export const useTurnstileToken = (): TurnstileToken => {
 	}, [])
 
 	const read = useCallback(() => latest.current, [])
-	// Stryker restore ArrayDeclaration
 
 	const reset = useCallback(() => {
 		onToken(null)
 	}, [onToken])
+	// Stryker restore ArrayDeclaration
 
 	return { token, onToken, read, reset }
 }

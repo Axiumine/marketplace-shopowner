@@ -526,8 +526,17 @@ describe('createGraphQLClient', () => {
 			})
 			setAccessToken('tok-1')
 
+			const addEventListener = vi.spyOn(window, 'addEventListener')
+
 			let clock = 0
 			const client = createGraphQLClient({ onSessionLost: vi.fn(), now: () => clock })
+
+			// `exactOptionalPropertyTypes` rejects `{ signal: undefined }` outright, which is why
+			// `client.ts` spreads the option in rather than always naming it — `toStrictEqual`, unlike
+			// `toEqual`, tells the two shapes apart, so an options object that carries `signal: undefined`
+			// here fails this the same way it would fail `tsc`.
+			const onlineCall = addEventListener.mock.calls.find(([type]) => type === 'online')
+			expect(onlineCall?.[2]).toStrictEqual({})
 
 			await info(client) // Refresh #1: opens a 1s window, due to elapse at 1_000.
 			expect(refreshCalls(stub)).toBe(1)

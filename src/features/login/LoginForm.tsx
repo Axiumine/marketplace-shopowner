@@ -92,6 +92,14 @@ export const LoginForm = () => {
 		// checked — a corrected resubmit sent with the same token is refused as a duplicate regardless of
 		// what changed. Withdraw it and remount the widget so the next attempt carries a fresh one.
 		turnstile.reset()
+		// `key` is never rendered, compared for equality outside `Object.is`, or read anywhere but here —
+		// its one job is to differ from the value `Turnstile` was last given, so React tears the widget
+		// down and mounts a fresh one. Counting up or down satisfies that identically: either direction is
+		// strictly monotonic, so it can never repeat a value already handed to `Turnstile` within a
+		// session's reachable number of refused submits. `key - 1` is therefore equivalent to `key + 1`
+		// here — unlike replacing the updater itself, which would stop changing the value at all and is
+		// covered by `LoginFormTurnstileReset.test.tsx`.
+		// Stryker disable next-line ArithmeticOperator: equivalent — see the note above.
 		setTurnstileKey((key) => key + 1)
 	})
 
