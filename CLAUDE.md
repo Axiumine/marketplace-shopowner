@@ -49,10 +49,9 @@ app's slices are in [`REPO.md`](./REPO.md). `src/gql/` is **generated** — neve
 hook refuses it; `env` (no dot) is the committed template and is safe to read. To inspect the dotted one,
 print key names only: `grep -oE '^[A-Za-z_0-9]+' .env`.
 
-⚠️ **Never commit on `main`.** Branch first: `git switch -c <type>/<slug>`. **Push-on-request**: this
-repo has no remote yet — where it gets published, and under which org, is the user's call and has not
-been made — never run `git push` unless the user asked for it in that message. Merging is the user's
-call alone.
+⚠️ **Never commit on `main`.** Branch first: `git switch -c <type>/<slug>`. **Push-on-request**: `origin`
+is `github.com/Axiumine/marketplace-shopowner` — never run `git push` unless the user asked for it in
+that message. Merging is the user's call alone.
 
 ⚠️ **Never lower a coverage or mutation threshold, and never remove a gate.** 100% on all four coverage
 metrics, mutation score 100 — the same bar as every other repo. `git commit --no-verify` is not needed
