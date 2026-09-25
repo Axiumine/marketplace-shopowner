@@ -65,6 +65,7 @@ describe('LoginForm, with a Turnstile site key configured', () => {
 		const stub = stubGraphQL({
 			Login: [
 				{ data: { login: { accessToken: '', onboardingStep: '', onboardingDone: false } } },
+				{ data: { login: { accessToken: '', onboardingStep: '', onboardingDone: false } } },
 				{ data: { login: { accessToken: 'tok-2', onboardingStep: '', onboardingDone: false } } }
 			],
 			ShopOwnerCompanies: { data: { shopOwnerCompanies: [] } }
@@ -107,17 +108,40 @@ describe('LoginForm, with a Turnstile site key configured', () => {
 			expect(api.render).toHaveBeenCalledTimes(2)
 		})
 
-		// The fresh widget solves on its own and hands up a new token.
+		// A second refused attempt in a row. This is the regression case for the key updater itself: a
+		// version that always produces the same value (rather than one that keeps changing) would leave
+		// `turnstileKey` unchanged the second time, so `Turnstile` would never unmount and `widget-2`
+		// would stay in place instead of a fresh `widget-3` taking over.
 		act(() => {
 			api.optionsAt(1).callback('token-2')
 		})
 		await userEvent.clear(screen.getByLabelText('Password'))
-		await userEvent.type(screen.getByLabelText('Password'), 'password123')
+		await userEvent.type(screen.getByLabelText('Password'), 'still-wrong-password')
 		await userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
 
 		await waitFor(() => {
 			expect(stub.calls.filter((call) => call.operationName === 'Login')).toHaveLength(2)
 		})
 		expect(stub.calls[1]?.variables).toMatchObject({ turnstileToken: 'token-2' })
+
+		await waitFor(() => {
+			expect(api.remove).toHaveBeenCalledWith('widget-2')
+		})
+		await waitFor(() => {
+			expect(api.render).toHaveBeenCalledTimes(3)
+		})
+
+		// The third, fresh widget solves on its own and hands up a new token.
+		act(() => {
+			api.optionsAt(2).callback('token-3')
+		})
+		await userEvent.clear(screen.getByLabelText('Password'))
+		await userEvent.type(screen.getByLabelText('Password'), 'password123')
+		await userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
+
+		await waitFor(() => {
+			expect(stub.calls.filter((call) => call.operationName === 'Login')).toHaveLength(3)
+		})
+		expect(stub.calls[2]?.variables).toMatchObject({ turnstileToken: 'token-3' })
 	})
 })
