@@ -39,26 +39,26 @@ const CHANGED = { shouldDirty: true }
  * place; doing it at the call sites would cost six across three files, which is what this replaces.
  */
 export const writeAddress = <T extends ValuesAddress>(
-	found: FoundAddress,
-	setValue: UseFormSetValue<T>,
-	trigger: UseFormTrigger<T>
+  found: FoundAddress,
+  setValue: UseFormSetValue<T>,
+  trigger: UseFormTrigger<T>
 ): void => {
-	const write = setValue as unknown as UseFormSetValue<ValuesAddress>
-	const rivalida = trigger as unknown as UseFormTrigger<ValuesAddress>
+  const write = setValue as unknown as UseFormSetValue<ValuesAddress>
+  const rivalida = trigger as unknown as UseFormTrigger<ValuesAddress>
 
-	write('addressComplete', composedAddress(found), CHANGED)
-	write('street', found.street, CHANGED)
-	write('postalCode', found.postalCode, CHANGED)
-	write('city', found.city, CHANGED)
-	write('province', found.province, CHANGED)
-	write('latitude', String(found.lat), CHANGED)
-	write('longitude', String(found.lon), CHANGED)
+  write('addressComplete', composedAddress(found), CHANGED)
+  write('street', found.street, CHANGED)
+  write('postalCode', found.postalCode, CHANGED)
+  write('city', found.city, CHANGED)
+  write('province', found.province, CHANGED)
+  write('latitude', String(found.lat), CHANGED)
+  write('longitude', String(found.lon), CHANGED)
 
-	/*
-	 * Revalidated as a set, and not left to the next submit: the box is showing whichever of the seven
-	 * is in error, so an address that fixes a missing postal code has to clear that message the moment it is
-	 * picked. `void` because the form is not waiting on the answer — the errors it produces are read
-	 * from `formState` on the render it triggers.
-	 */
-	void rivalida([...FIELDS_ADDRESS])
+  /*
+   * Revalidated as a set, and not left to the next submit: the box is showing whichever of the seven
+   * is in error, so an address that fixes a missing postal code has to clear that message the moment it is
+   * picked. `void` because the form is not waiting on the answer — the errors it produces are read
+   * from `formState` on the render it triggers.
+   */
+  void rivalida([...FIELDS_ADDRESS])
 }

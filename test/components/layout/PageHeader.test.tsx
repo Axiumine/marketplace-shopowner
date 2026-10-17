@@ -14,19 +14,19 @@ const noCompanies = { ShopOwnerCompanies: { data: { shopOwnerCompanies: [] } } }
  * all rather than reaching for props no page passes.
  */
 describe('PageHeader', () => {
-	it('renders the title alone, with no breadcrumb trail', async () => {
-		stubGraphQL({})
-		await renderRoute('/home')
+  it('renders the title alone, with no breadcrumb trail', async () => {
+    stubGraphQL({})
+    await renderRoute('/home')
 
-		expect(screen.getByRole('heading', { name: 'Dashboard', level: 1 }).closest('header')).toMatchSnapshot()
-	})
+    expect(screen.getByRole('heading', { name: 'Dashboard', level: 1 }).closest('header')).toMatchSnapshot()
+  })
 
-	// A distinct visual state from the title-alone render above: the breadcrumb `nav` only exists when a
-	// page hands PageHeader a trail, and one crumb here carries a router `Link` while the other does not.
-	it('renders the title with a breadcrumb trail', async () => {
-		stubGraphQL(noCompanies)
-		await renderRoute('/companies')
+  // A distinct visual state from the title-alone render above: the breadcrumb `nav` only exists when a
+  // page hands PageHeader a trail, and one crumb here carries a router `Link` while the other does not.
+  it('renders the title with a breadcrumb trail', async () => {
+    stubGraphQL(noCompanies)
+    await renderRoute('/companies')
 
-		expect(screen.getByRole('heading', { name: 'Companies', level: 1 }).closest('header')).toMatchSnapshot()
-	})
+    expect(screen.getByRole('heading', { name: 'Companies', level: 1 }).closest('header')).toMatchSnapshot()
+  })
 })

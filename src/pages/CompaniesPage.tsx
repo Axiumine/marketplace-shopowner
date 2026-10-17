@@ -16,15 +16,15 @@ import { SaveChanges, useDiscardWarning, useSaving } from '@/features/saving'
  * section registry to hand each card its own new defaults.
  */
 export const CompaniesPage = () => {
-	const { register, saveAll, changed, version } = useSaving()
+  const { register, saveAll, changed, version } = useSaving()
 
-	useDiscardWarning(changed)
+  useDiscardWarning(changed)
 
-	return (
-		<>
-			<PageHeader title="Companies" crumbs={[{ name: 'Dashboard', to: '/home' }, { name: 'Companies' }]} />
-			<Companies key={`companies-${version}`} registerSection={register} />
-			<SaveChanges changed={changed} saveAll={saveAll} />
-		</>
-	)
+  return (
+    <>
+      <PageHeader title="Companies" crumbs={[{ name: 'Dashboard', to: '/home' }, { name: 'Companies' }]} />
+      <Companies key={`companies-${version}`} registerSection={register} />
+      <SaveChanges changed={changed} saveAll={saveAll} />
+    </>
+  )
 }

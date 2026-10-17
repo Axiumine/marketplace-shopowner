@@ -3,9 +3,9 @@ import type { ReactNode } from 'react'
 import { Button } from '@/components/ui/Button'
 
 interface FormSubmitProps {
-	children: ReactNode
-	/** The form's in-flight flag. Shows the spinner and blocks a second submit. */
-	loading?: boolean
+  children: ReactNode
+  /** The form's in-flight flag. Shows the spinner and blocks a second submit. */
+  loading?: boolean
 }
 
 /**
@@ -22,9 +22,9 @@ interface FormSubmitProps {
  * class is inert, so the same component fits either.
  */
 export const FormSubmit = ({ children, loading = false }: FormSubmitProps) => (
-	<div className="col-span-full flex justify-end">
-		<Button type="submit" padding="form" loading={loading}>
-			{children}
-		</Button>
-	</div>
+  <div className="col-span-full flex justify-end">
+    <Button type="submit" padding="form" loading={loading}>
+      {children}
+    </Button>
+  </div>
 )

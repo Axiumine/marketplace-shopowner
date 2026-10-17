@@ -36,35 +36,35 @@ const shop = { __typename: 'GraphQLCompany', _id: ID_COMPANY, legalName: 'Rivers
 const shopTwo = { __typename: 'GraphQLCompany', _id: ID_COMPANY_TWO, legalName: 'White Trading Ltd' }
 
 const item = {
-	__typename: 'GraphQLItem',
-	_id: ID_ITEM,
-	idCompany: ID_COMPANY,
-	idCategory: ID_CHILD,
-	name: 'Blue enamel mug',
-	description: 'Half a litre, dishwasher safe.',
-	slug: 'blue-enamel-mug',
-	published: true
+  __typename: 'GraphQLItem',
+  _id: ID_ITEM,
+  idCompany: ID_COMPANY,
+  idCategory: ID_CHILD,
+  name: 'Blue enamel mug',
+  description: 'Half a litre, dishwasher safe.',
+  slug: 'blue-enamel-mug',
+  published: true
 }
 
 /** A second item of the same shop — unpublished, which is the draft a catalogue page exists to finish. */
 const itemTwo = {
-	...item,
-	_id: ID_ITEM_TWO,
-	idCategory: ID_TOP,
-	name: 'Garden trowel',
-	description: 'Stainless steel, ash handle.',
-	// Unique per company, which is the whole of what `itemAdd` and `itemUpdate` answer 409 about.
-	slug: 'garden-trowel',
-	published: false
+  ...item,
+  _id: ID_ITEM_TWO,
+  idCategory: ID_TOP,
+  name: 'Garden trowel',
+  description: 'Stainless steel, ash handle.',
+  // Unique per company, which is the whole of what `itemAdd` and `itemUpdate` answer 409 about.
+  slug: 'garden-trowel',
+  published: false
 }
 
 const categoryTop = {
-	__typename: 'GraphQLItemCategory',
-	_id: ID_TOP,
-	idParent: null,
-	name: 'Homeware',
-	slug: 'homeware',
-	position: 1
+  __typename: 'GraphQLItemCategory',
+  _id: ID_TOP,
+  idParent: null,
+  name: 'Homeware',
+  slug: 'homeware',
+  position: 1
 }
 
 const categoryChild = { ...categoryTop, _id: ID_CHILD, idParent: ID_TOP, name: 'Mugs', slug: 'mugs', position: 2 }
@@ -93,7 +93,7 @@ const NEW = 'New item'
 const shopPicker = () => screen.getByLabelText('Shop')
 
 const chooseShop = async (id = ID_COMPANY) => {
-	fireEvent.change(await screen.findByLabelText('Shop'), { target: { value: id } })
+  fireEvent.change(await screen.findByLabelText('Shop'), { target: { value: id } })
 }
 
 /**
@@ -103,23 +103,23 @@ const chooseShop = async (id = ID_COMPANY) => {
  * `closest('section')`, not `parentElement`: the heading shares a flex row with the trash icon.
  */
 const card = (name = item.name) =>
-	within(screen.getByRole('heading', { name: name, level: 3 }).closest('section') as HTMLElement)
+  within(screen.getByRole('heading', { name: name, level: 3 }).closest('section') as HTMLElement)
 
 const box = (name?: string) => within(card(name).getByRole('region', { name: 'Item data' }))
 
 /** The right-hand half of an `EditableRow` while it is closed. */
 const rowValue = (label: string, name?: string): string => {
-	const row = box(name).getByText(label, { selector: 'span' }).parentElement as HTMLElement
-	return row.lastElementChild?.textContent ?? ''
+  const row = box(name).getByText(label, { selector: 'span' }).parentElement as HTMLElement
+  return row.lastElementChild?.textContent ?? ''
 }
 
 const open = async (label: string, name?: string) => {
-	await userEvent.click(box(name).getByRole('button', { name: `Change ${label}` }))
+  await userEvent.click(box(name).getByRole('button', { name: `Change ${label}` }))
 }
 
 /** `fireEvent.change`, never `userEvent.type`: every text box on this form carries a `maxLength`. */
 const write = (label: string, value: string, name?: string) => {
-	fireEvent.change(box(name).getByLabelText(label), { target: { value: value } })
+  fireEvent.change(box(name).getByLabelText(label), { target: { value: value } })
 }
 
 const save = () => screen.getByRole('button', { name: 'Save' })
@@ -163,11 +163,11 @@ const reads = (stub: GraphQLStub, name: string) => stub.calls.filter((call) => c
  * anything.
  */
 const SENT = {
-	idCompany: ID_COMPANY,
-	idCategory: ID_CHILD,
-	name: 'Blue enamel mug',
-	description: 'Half a litre, dishwasher safe.',
-	slug: 'blue-enamel-mug'
+  idCompany: ID_COMPANY,
+  idCategory: ID_CHILD,
+  name: 'Blue enamel mug',
+  description: 'Half a litre, dishwasher safe.',
+  slug: 'blue-enamel-mug'
 }
 
 /**
@@ -175,125 +175,125 @@ const SENT = {
  * instead of letting the session name it.
  */
 describe('Items — the shop picker', () => {
-	it('waits before offering a choice', async () => {
-		stubGraphQL({ ShopOwnerCompanies: { pending: true } })
-		await renderRoute(PAGE)
+  it('waits before offering a choice', async () => {
+    stubGraphQL({ ShopOwnerCompanies: { pending: true } })
+    await renderRoute(PAGE)
 
-		expect(screen.getByText('Loading shops')).toBeInTheDocument()
-		expect(screen.queryByLabelText('Shop')).not.toBeInTheDocument()
-	})
+    expect(screen.getByText('Loading shops')).toBeInTheDocument()
+    expect(screen.queryByLabelText('Shop')).not.toBeInTheDocument()
+  })
 
-	it('reports a failed read instead of an empty list of shops', async () => {
-		stubGraphQL({
-			ShopOwnerCompanies: { errors: [graphQLError('Server error', 'Companies unavailable', 500)], status: 500 }
-		})
-		await renderRoute(PAGE)
+  it('reports a failed read instead of an empty list of shops', async () => {
+    stubGraphQL({
+      ShopOwnerCompanies: { errors: [graphQLError('Server error', 'Companies unavailable', 500)], status: 500 }
+    })
+    await renderRoute(PAGE)
 
-		expect(await screen.findByRole('alert')).toHaveTextContent('Companies unavailable')
-		expect(screen.queryByLabelText('Shop')).not.toBeInTheDocument()
-		// The page frame is still there: the picker failed, the route did not.
-		expect(screen.getByRole('heading', { name: 'Items', level: 1 })).toBeInTheDocument()
-	})
+    expect(await screen.findByRole('alert')).toHaveTextContent('Companies unavailable')
+    expect(screen.queryByLabelText('Shop')).not.toBeInTheDocument()
+    // The page frame is still there: the picker failed, the route did not.
+    expect(screen.getByRole('heading', { name: 'Items', level: 1 })).toBeInTheDocument()
+  })
 
-	/*
-	 * An owner with no company has nothing an item could be filed into either — `itemAdd` takes an
-	 * `idCompany` and there is none — so the answer is where that starts, not an empty dropdown.
-	 */
-	it('sends an owner with no company to register one first', async () => {
-		stubGraphQL(shops([]))
-		await renderRoute(PAGE)
+  /*
+   * An owner with no company has nothing an item could be filed into either — `itemAdd` takes an
+   * `idCompany` and there is none — so the answer is where that starts, not an empty dropdown.
+   */
+  it('sends an owner with no company to register one first', async () => {
+    stubGraphQL(shops([]))
+    await renderRoute(PAGE)
 
-		expect(await screen.findByRole('status')).toHaveTextContent(
-			'Register a company first — an item belongs to one of your shops.'
-		)
-		expect(screen.queryByLabelText('Shop')).not.toBeInTheDocument()
-	})
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'Register a company first — an item belongs to one of your shops.'
+    )
+    expect(screen.queryByLabelText('Shop')).not.toBeInTheDocument()
+  })
 
-	/*
-	 * `data: null` with no error beside it — the query resolved and answered nothing, which is the shape a
-	 * partial GraphQL response has and the one the `?? []` behind this picker exists for. The answer is the
-	 * same as for an owner with no company: a picker offering an option built from nothing would be worse
-	 * than none, and it would be pointed at a shop id that does not exist.
-	 */
-	it('says the same when the query resolves with no data at all', async () => {
-		stubGraphQL({ ShopOwnerCompanies: { data: null } })
-		await renderRoute(PAGE)
+  /*
+   * `data: null` with no error beside it — the query resolved and answered nothing, which is the shape a
+   * partial GraphQL response has and the one the `?? []` behind this picker exists for. The answer is the
+   * same as for an owner with no company: a picker offering an option built from nothing would be worse
+   * than none, and it would be pointed at a shop id that does not exist.
+   */
+  it('says the same when the query resolves with no data at all', async () => {
+    stubGraphQL({ ShopOwnerCompanies: { data: null } })
+    await renderRoute(PAGE)
 
-		expect(await screen.findByRole('status')).toHaveTextContent(
-			'Register a company first — an item belongs to one of your shops.'
-		)
-		expect(screen.queryByLabelText('Shop')).not.toBeInTheDocument()
-	})
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'Register a company first — an item belongs to one of your shops.'
+    )
+    expect(screen.queryByLabelText('Shop')).not.toBeInTheDocument()
+  })
 
-	// The placeholder is an option of its own, and it is what the page opens on: a select that started on
-	// the first shop would load a catalogue the owner never asked for.
-	it('offers every shop of the owner, under a placeholder', async () => {
-		stubGraphQL(shops([shop, shopTwo]))
-		await renderRoute(PAGE)
+  // The placeholder is an option of its own, and it is what the page opens on: a select that started on
+  // the first shop would load a catalogue the owner never asked for.
+  it('offers every shop of the owner, under a placeholder', async () => {
+    stubGraphQL(shops([shop, shopTwo]))
+    await renderRoute(PAGE)
 
-		const options = within(await screen.findByLabelText('Shop')).getAllByRole('option')
-		expect(options.map((option) => option.textContent)).toEqual(['Select a shop', 'Rivers Trading Ltd', 'White Trading Ltd'])
-		expect(shopPicker()).toHaveValue('')
-	})
+    const options = within(await screen.findByLabelText('Shop')).getAllByRole('option')
+    expect(options.map((option) => option.textContent)).toEqual(['Select a shop', 'Rivers Trading Ltd', 'White Trading Ltd'])
+    expect(shopPicker()).toHaveValue('')
+  })
 
-	// The shop is state and the URL is not: choosing one loads a catalogue and leaves the address bar
-	// exactly where it was.
-	it('leaves the chosen shop out of the URL', async () => {
-		stubGraphQL(LOADED)
-		const { router } = await renderRoute(PAGE)
-		await chooseShop()
+  // The shop is state and the URL is not: choosing one loads a catalogue and leaves the address bar
+  // exactly where it was.
+  it('leaves the chosen shop out of the URL', async () => {
+    stubGraphQL(LOADED)
+    const { router } = await renderRoute(PAGE)
+    await chooseShop()
 
-		expect(await screen.findByRole('heading', { name: item.name, level: 3 })).toBeInTheDocument()
-		expect(router.state.location.pathname).toBe(PAGE)
-		expect(router.state.location.search).toEqual({})
-	})
+    expect(await screen.findByRole('heading', { name: item.name, level: 3 })).toBeInTheDocument()
+    expect(router.state.location.pathname).toBe(PAGE)
+    expect(router.state.location.search).toEqual({})
+  })
 
-	/*
-	 * ⚠️ Locked while anything on the page is dirty, and the discard guard cannot do this job: `useBlocker`
-	 * sees navigations, and switching shop is a `useState` on a page that never moves. Every card would be
-	 * replaced at once, with no question asked and no undo.
-	 */
-	it('locks the choice while the page holds unsaved edits, and says why', async () => {
-		stubGraphQL(LOADED)
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * ⚠️ Locked while anything on the page is dirty, and the discard guard cannot do this job: `useBlocker`
+   * sees navigations, and switching shop is a `useState` on a page that never moves. Every card would be
+   * replaced at once, with no question asked and no undo.
+   */
+  it('locks the choice while the page holds unsaved edits, and says why', async () => {
+    stubGraphQL(LOADED)
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
+    await screen.findByRole('heading', { name: item.name, level: 3 })
 
-		expect(shopPicker()).toBeEnabled()
-		expect(screen.queryByText('Save or leave the page before changing shop.')).not.toBeInTheDocument()
+    expect(shopPicker()).toBeEnabled()
+    expect(screen.queryByText('Save or leave the page before changing shop.')).not.toBeInTheDocument()
 
-		await open('Name')
-		write('Name', 'Blue enamel mug, large')
+    await open('Name')
+    write('Name', 'Blue enamel mug, large')
 
-		await waitFor(() => {
-			expect(shopPicker()).toBeDisabled()
-		})
-		expect(screen.getByText('Save or leave the page before changing shop.')).toBeInTheDocument()
-	})
+    await waitFor(() => {
+      expect(shopPicker()).toBeDisabled()
+    })
+    expect(screen.getByText('Save or leave the page before changing shop.')).toBeInTheDocument()
+  })
 
-	// A different shop is a different set of cards, and the ones on screen are not reused: an open editor
-	// carried across would be one shop's typing on another shop's item.
-	it('replaces the catalogue when the shop changes', async () => {
-		const stub = stubGraphQL({
-			...shops([shop, shopTwo]),
-			...taxonomy([categoryTop, categoryChild]),
-			CompanyItems: [{ data: { companyItems: [item] } }, { data: { companyItems: [itemTwo] } }]
-		})
-		await renderRoute(PAGE)
-		await chooseShop()
+  // A different shop is a different set of cards, and the ones on screen are not reused: an open editor
+  // carried across would be one shop's typing on another shop's item.
+  it('replaces the catalogue when the shop changes', async () => {
+    const stub = stubGraphQL({
+      ...shops([shop, shopTwo]),
+      ...taxonomy([categoryTop, categoryChild]),
+      CompanyItems: [{ data: { companyItems: [item] } }, { data: { companyItems: [itemTwo] } }]
+    })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
+    await screen.findByRole('heading', { name: item.name, level: 3 })
 
-		await chooseShop(ID_COMPANY_TWO)
+    await chooseShop(ID_COMPANY_TWO)
 
-		expect(await screen.findByRole('heading', { name: itemTwo.name, level: 3 })).toBeInTheDocument()
-		expect(screen.queryByRole('heading', { name: item.name, level: 3 })).toBeNull()
-		expect(reads(stub, 'CompanyItems').map((call) => call.variables)).toEqual([
-			{ idCompany: ID_COMPANY },
-			{ idCompany: ID_COMPANY_TWO }
-		])
-	})
+    expect(await screen.findByRole('heading', { name: itemTwo.name, level: 3 })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: item.name, level: 3 })).toBeNull()
+    expect(reads(stub, 'CompanyItems').map((call) => call.variables)).toEqual([
+      { idCompany: ID_COMPANY },
+      { idCompany: ID_COMPANY_TWO }
+    ])
+  })
 })
 
 /**
@@ -303,212 +303,212 @@ describe('Items — the shop picker', () => {
  * should try to.
  */
 describe('Items — the catalogue', () => {
-	it('waits before claiming the shop is empty', async () => {
-		stubGraphQL({ ...shops([shop]), CompanyItems: { pending: true }, ...taxonomy([categoryTop]) })
-		await renderRoute(PAGE)
-		await chooseShop()
+  it('waits before claiming the shop is empty', async () => {
+    stubGraphQL({ ...shops([shop]), CompanyItems: { pending: true }, ...taxonomy([categoryTop]) })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		expect(await screen.findByText('Loading items')).toBeInTheDocument()
-		expect(screen.queryByText('No item in this shop.')).not.toBeInTheDocument()
-	})
+    expect(await screen.findByText('Loading items')).toBeInTheDocument()
+    expect(screen.queryByText('No item in this shop.')).not.toBeInTheDocument()
+  })
 
-	// The taxonomy is the other half of the wait: cards drawn before it arrives would offer an empty
-	// picker and read every stored category as retired.
-	it('waits for the taxonomy as well as for the items', async () => {
-		stubGraphQL({ ...shops([shop]), ...catalogue([item]), ItemCategories: { pending: true } })
-		await renderRoute(PAGE)
-		await chooseShop()
+  // The taxonomy is the other half of the wait: cards drawn before it arrives would offer an empty
+  // picker and read every stored category as retired.
+  it('waits for the taxonomy as well as for the items', async () => {
+    stubGraphQL({ ...shops([shop]), ...catalogue([item]), ItemCategories: { pending: true } })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		expect(await screen.findByText('Loading items')).toBeInTheDocument()
-		expect(screen.queryByRole('heading', { name: item.name, level: 3 })).toBeNull()
-	})
+    expect(await screen.findByText('Loading items')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: item.name, level: 3 })).toBeNull()
+  })
 
-	it('says so when the shop has no item', async () => {
-		stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop]) })
-		await renderRoute(PAGE)
-		await chooseShop()
+  it('says so when the shop has no item', async () => {
+    stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop]) })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		expect(await screen.findByText('No item in this shop.')).toBeInTheDocument()
-	})
+    expect(await screen.findByText('No item in this shop.')).toBeInTheDocument()
+  })
 
-	/*
-	 * `data: null` with no error beside it: the query resolved and answered with nothing, which is a shape
-	 * the wire allows and urql passes straight through. Read as the empty list it is — anything else puts a
-	 * card on screen for an item that does not exist.
-	 */
-	it('says so when the query resolves with no data at all', async () => {
-		stubGraphQL({ ...shops([shop]), CompanyItems: { data: null }, ...taxonomy([categoryTop]) })
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * `data: null` with no error beside it: the query resolved and answered with nothing, which is a shape
+   * the wire allows and urql passes straight through. Read as the empty list it is — anything else puts a
+   * card on screen for an item that does not exist.
+   */
+  it('says so when the query resolves with no data at all', async () => {
+    stubGraphQL({ ...shops([shop]), CompanyItems: { data: null }, ...taxonomy([categoryTop]) })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		expect(await screen.findByText('No item in this shop.')).toBeInTheDocument()
-	})
+    expect(await screen.findByText('No item in this shop.')).toBeInTheDocument()
+  })
 
-	// "None" is a statement about the catalogue, and a failed read knows nothing about it: an owner with
-	// thirty items would be told the shop is empty, which reads as data loss rather than as an error.
-	it('reports a failed items read without claiming the shop is empty', async () => {
-		stubGraphQL({
-			...shops([shop]),
-			CompanyItems: { errors: [graphQLError('Server error', 'Items unavailable', 500)], status: 500 },
-			...taxonomy([categoryTop])
-		})
-		await renderRoute(PAGE)
-		await chooseShop()
+  // "None" is a statement about the catalogue, and a failed read knows nothing about it: an owner with
+  // thirty items would be told the shop is empty, which reads as data loss rather than as an error.
+  it('reports a failed items read without claiming the shop is empty', async () => {
+    stubGraphQL({
+      ...shops([shop]),
+      CompanyItems: { errors: [graphQLError('Server error', 'Items unavailable', 500)], status: 500 },
+      ...taxonomy([categoryTop])
+    })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		expect(await screen.findByRole('alert')).toHaveTextContent('Items unavailable')
-		expect(screen.queryByText('No item in this shop.')).not.toBeInTheDocument()
-	})
+    expect(await screen.findByRole('alert')).toHaveTextContent('Items unavailable')
+    expect(screen.queryByText('No item in this shop.')).not.toBeInTheDocument()
+  })
 
-	// One failure line for two queries: either one missing leaves a page that cannot save anything, so a
-	// taxonomy that failed is reported even though the items arrived.
-	it('reports a failed taxonomy read', async () => {
-		stubGraphQL({
-			...shops([shop]),
-			...catalogue([item]),
-			ItemCategories: { errors: [graphQLError('Server error', 'Categories unavailable', 500)], status: 500 }
-		})
-		await renderRoute(PAGE)
-		await chooseShop()
+  // One failure line for two queries: either one missing leaves a page that cannot save anything, so a
+  // taxonomy that failed is reported even though the items arrived.
+  it('reports a failed taxonomy read', async () => {
+    stubGraphQL({
+      ...shops([shop]),
+      ...catalogue([item]),
+      ItemCategories: { errors: [graphQLError('Server error', 'Categories unavailable', 500)], status: 500 }
+    })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		expect(await screen.findByRole('alert')).toHaveTextContent('Categories unavailable')
-		expect(screen.queryByRole('heading', { name: item.name, level: 3 })).toBeNull()
-	})
+    expect(await screen.findByRole('alert')).toHaveTextContent('Categories unavailable')
+    expect(screen.queryByRole('heading', { name: item.name, level: 3 })).toBeNull()
+  })
 
-	/*
-	 * ⚠️ A taxonomy nobody has filled in yet, which is a state only the Admin tier can leave this page in.
-	 * `itemAdd` refuses a category that does not exist, so a card opened here could never be saved — the
-	 * plus is dead and the reason is on screen rather than under it.
-	 */
-	it('refuses to open a card while the taxonomy is empty', async () => {
-		stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([]) })
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * ⚠️ A taxonomy nobody has filled in yet, which is a state only the Admin tier can leave this page in.
+   * `itemAdd` refuses a category that does not exist, so a card opened here could never be saved — the
+   * plus is dead and the reason is on screen rather than under it.
+   */
+  it('refuses to open a card while the taxonomy is empty', async () => {
+    stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([]) })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		// By text rather than by role: `Spinner` is a `role="status"` too, so the first status on the page
-		// while the taxonomy is still in flight is the spinner and not this.
-		expect(
-			await screen.findByText('No category exists yet. An admin has to fill in the taxonomy before an item can be filed.')
-		).toBeInTheDocument()
-		expect(plus()).toBeDisabled()
-		expect(screen.queryByText('No item in this shop.')).not.toBeInTheDocument()
-	})
+    // By text rather than by role: `Spinner` is a `role="status"` too, so the first status on the page
+    // while the taxonomy is still in flight is the spinner and not this.
+    expect(
+      await screen.findByText('No category exists yet. An admin has to fill in the taxonomy before an item can be filed.')
+    ).toBeInTheDocument()
+    expect(plus()).toBeDisabled()
+    expect(screen.queryByText('No item in this shop.')).not.toBeInTheDocument()
+  })
 
-	/*
-	 * The same refusal for a taxonomy read that resolved with nothing at all rather than with an empty
-	 * list. The distinction matters here and not on the items query: `options` is computed *above* the
-	 * fetching branch, because the plus is drawn outside it, so an `?? []` that let anything through
-	 * would arm the one button that must not be armed.
-	 */
-	it('refuses to open a card when the taxonomy resolves with no data at all', async () => {
-		stubGraphQL({ ...shops([shop]), ...catalogue([]), ItemCategories: { data: null } })
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * The same refusal for a taxonomy read that resolved with nothing at all rather than with an empty
+   * list. The distinction matters here and not on the items query: `options` is computed *above* the
+   * fetching branch, because the plus is drawn outside it, so an `?? []` that let anything through
+   * would arm the one button that must not be armed.
+   */
+  it('refuses to open a card when the taxonomy resolves with no data at all', async () => {
+    stubGraphQL({ ...shops([shop]), ...catalogue([]), ItemCategories: { data: null } })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		expect(
-			await screen.findByText('No category exists yet. An admin has to fill in the taxonomy before an item can be filed.')
-		).toBeInTheDocument()
-		expect(plus()).toBeDisabled()
-	})
+    expect(
+      await screen.findByText('No category exists yet. An admin has to fill in the taxonomy before an item can be filed.')
+    ).toBeInTheDocument()
+    expect(plus()).toBeDisabled()
+  })
 
-	it('names the shop it is asking about, and nothing else', async () => {
-		const stub = stubGraphQL(LOADED)
-		await renderRoute(PAGE)
-		await chooseShop()
+  it('names the shop it is asking about, and nothing else', async () => {
+    const stub = stubGraphQL(LOADED)
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
+    await screen.findByRole('heading', { name: item.name, level: 3 })
 
-		expect(reads(stub, 'CompanyItems')[0]?.variables).toEqual({ idCompany: ID_COMPANY })
-		// The taxonomy is the platform's, not the shop's: a shop id here would ask for a per-owner
-		// taxonomy, which is the one thing a shared one must never become.
-		expect(reads(stub, 'ItemCategories')[0]?.variables).toEqual({})
-	})
+    expect(reads(stub, 'CompanyItems')[0]?.variables).toEqual({ idCompany: ID_COMPANY })
+    // The taxonomy is the platform's, not the shop's: a shop id here would ask for a per-owner
+    // taxonomy, which is the one thing a shared one must never become.
+    expect(reads(stub, 'ItemCategories')[0]?.variables).toEqual({})
+  })
 
-	it('shows every field the collection holds', async () => {
-		stubGraphQL(LOADED)
-		await renderRoute(PAGE)
-		await chooseShop()
+  it('shows every field the collection holds', async () => {
+    stubGraphQL(LOADED)
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		expect(await screen.findByRole('heading', { name: item.name, level: 3 })).toBeInTheDocument()
-		expect(rowValue('Name')).toBe('Blue enamel mug')
-		expect(rowValue('Description')).toBe('Half a litre, dishwasher safe.')
-		expect(rowValue('Slug')).toBe('blue-enamel-mug')
-		// The label the picker offers, not the stored id: an owner has never seen an ObjectId and could not
-		// tell two apart.
-		expect(rowValue('Category')).toBe('Homeware / Mugs')
-	})
+    expect(await screen.findByRole('heading', { name: item.name, level: 3 })).toBeInTheDocument()
+    expect(rowValue('Name')).toBe('Blue enamel mug')
+    expect(rowValue('Description')).toBe('Half a litre, dishwasher safe.')
+    expect(rowValue('Slug')).toBe('blue-enamel-mug')
+    // The label the picker offers, not the stored id: an owner has never seen an ObjectId and could not
+    // tell two apart.
+    expect(rowValue('Category')).toBe('Homeware / Mugs')
+  })
 
-	/*
-	 * ⚠️ The flag is stated outside the form, and the box holds nothing about it. Every other row of "Item
-	 * data" is something the page's Save writes; `published` is not in `GraphQLInputItem` any more, so a
-	 * row there would promise a save that cannot happen.
-	 */
-	it('states the publish flag in the header, not among the fields', async () => {
-		stubGraphQL(LOADED)
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * ⚠️ The flag is stated outside the form, and the box holds nothing about it. Every other row of "Item
+   * data" is something the page's Save writes; `published` is not in `GraphQLInputItem` any more, so a
+   * row there would promise a save that cannot happen.
+   */
+  it('states the publish flag in the header, not among the fields', async () => {
+    stubGraphQL(LOADED)
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
+    await screen.findByRole('heading', { name: item.name, level: 3 })
 
-		expect(publishedSays()).toBe('Published: Yes')
-		expect(box().queryByText('Published')).toBeNull()
-		expect(card().queryByLabelText('Published')).toBeNull()
-	})
+    expect(publishedSays()).toBe('Published: Yes')
+    expect(box().queryByText('Published')).toBeNull()
+    expect(card().queryByLabelText('Published')).toBeNull()
+  })
 
-	// ⚠️ There is no price row and none is missing: `item` carries no `price`, because cart, order,
-	// delivery and payment have no model anywhere on this platform.
-	it('has no price to show', async () => {
-		stubGraphQL(LOADED)
-		await renderRoute(PAGE)
-		await chooseShop()
+  // ⚠️ There is no price row and none is missing: `item` carries no `price`, because cart, order,
+  // delivery and payment have no model anywhere on this platform.
+  it('has no price to show', async () => {
+    stubGraphQL(LOADED)
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
+    await screen.findByRole('heading', { name: item.name, level: 3 })
 
-		expect(box().queryByText('Price')).toBeNull()
-	})
+    expect(box().queryByText('Price')).toBeNull()
+  })
 
-	it('renders every item of the shop, drafts included', async () => {
-		stubGraphQL({ ...shops([shop]), ...catalogue([item, itemTwo]), ...taxonomy([categoryTop, categoryChild]) })
-		await renderRoute(PAGE)
-		await chooseShop()
+  it('renders every item of the shop, drafts included', async () => {
+    stubGraphQL({ ...shops([shop]), ...catalogue([item, itemTwo]), ...taxonomy([categoryTop, categoryChild]) })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		expect(await screen.findByRole('heading', { name: item.name, level: 3 })).toBeInTheDocument()
-		expect(screen.getByRole('heading', { name: itemTwo.name, level: 3 })).toBeInTheDocument()
-		// A draft is exactly what the owner opened this page to finish, so it is on the list and says so.
-		expect(publishedSays(itemTwo.name)).toBe('Published: No')
-		expect(rowValue('Category', itemTwo.name)).toBe('Homeware')
-	})
+    expect(await screen.findByRole('heading', { name: item.name, level: 3 })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: itemTwo.name, level: 3 })).toBeInTheDocument()
+    // A draft is exactly what the owner opened this page to finish, so it is on the list and says so.
+    expect(publishedSays(itemTwo.name)).toBe('Published: No')
+    expect(rowValue('Category', itemTwo.name)).toBe('Homeware')
+  })
 
-	/*
-	 * ⚠️ A category retired under the owner. The row shows the placeholder rather than a stale name, and
-	 * the editor opens on the empty option — so the schema refuses the save until a category is chosen,
-	 * instead of silently re-filing the item under whichever option happens to be first.
-	 */
-	it('shows the placeholder for an item whose category is gone', async () => {
-		stubGraphQL({
-			...shops([shop]),
-			...catalogue([{ ...item, idCategory: '65f0000000000000000000c9' }]),
-			...taxonomy([categoryTop, categoryChild])
-		})
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * ⚠️ A category retired under the owner. The row shows the placeholder rather than a stale name, and
+   * the editor opens on the empty option — so the schema refuses the save until a category is chosen,
+   * instead of silently re-filing the item under whichever option happens to be first.
+   */
+  it('shows the placeholder for an item whose category is gone', async () => {
+    stubGraphQL({
+      ...shops([shop]),
+      ...catalogue([{ ...item, idCategory: '65f0000000000000000000c9' }]),
+      ...taxonomy([categoryTop, categoryChild])
+    })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
+    await screen.findByRole('heading', { name: item.name, level: 3 })
 
-		expect(rowValue('Category')).toBe('---')
+    expect(rowValue('Category')).toBe('---')
 
-		await open('Category')
+    await open('Category')
 
-		expect(box().getByLabelText('Category')).toHaveValue('')
-	})
+    expect(box().getByLabelText('Category')).toHaveValue('')
+  })
 
-	it('renders', async () => {
-		stubGraphQL(LOADED)
-		await renderRoute(PAGE)
-		await chooseShop()
+  it('renders', async () => {
+    stubGraphQL(LOADED)
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		expect(screen.getByRole('main')).toMatchSnapshot()
-	})
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    expect(screen.getByRole('main')).toMatchSnapshot()
+  })
 })
 
 /**
@@ -520,264 +520,264 @@ describe('Items — the catalogue', () => {
  * make every save of an open card a move.
  */
 describe('Items — editing', () => {
-	const editBothNames = async () => {
-		await renderRoute(PAGE)
-		await chooseShop()
+  const editBothNames = async () => {
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: itemTwo.name, level: 3 })
-		await open('Name')
-		write('Name', 'Blue enamel mug, large')
-		await open('Name', itemTwo.name)
-		write('Name', 'Garden trowel, wide', itemTwo.name)
-		await userEvent.click(save())
-	}
+    await screen.findByRole('heading', { name: itemTwo.name, level: 3 })
+    await open('Name')
+    write('Name', 'Blue enamel mug, large')
+    await open('Name', itemTwo.name)
+    write('Name', 'Garden trowel, wide', itemTwo.name)
+    await userEvent.click(save())
+  }
 
-	it('turns a row into its editor, seeded with the stored value', async () => {
-		stubGraphQL(LOADED)
-		await renderRoute(PAGE)
-		await chooseShop()
+  it('turns a row into its editor, seeded with the stored value', async () => {
+    stubGraphQL(LOADED)
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await open('Description')
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await open('Description')
 
-		expect(box().getByLabelText('Description')).toHaveValue('Half a litre, dishwasher safe.')
-		expect(save()).toBeDisabled()
-	})
+    expect(box().getByLabelText('Description')).toHaveValue('Half a litre, dishwasher safe.')
+    expect(save()).toBeDisabled()
+  })
 
-	// The heading follows the stored name rather than the box: it is what tells two cards apart, and a
-	// heading that followed the keystrokes would rename the card the owner is still deciding about.
-	it('leaves the heading on the stored name while the box is edited', async () => {
-		stubGraphQL(LOADED)
-		await renderRoute(PAGE)
-		await chooseShop()
+  // The heading follows the stored name rather than the box: it is what tells two cards apart, and a
+  // heading that followed the keystrokes would rename the card the owner is still deciding about.
+  it('leaves the heading on the stored name while the box is edited', async () => {
+    stubGraphQL(LOADED)
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await open('Name')
-		write('Name', 'Blue enamel mug, large')
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await open('Name')
+    write('Name', 'Blue enamel mug, large')
 
-		expect(screen.getByRole('heading', { name: item.name, level: 3 })).toBeInTheDocument()
-		expect(screen.queryByRole('heading', { name: 'Blue enamel mug, large', level: 3 })).toBeNull()
-	})
+    expect(screen.getByRole('heading', { name: item.name, level: 3 })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Blue enamel mug, large', level: 3 })).toBeNull()
+  })
 
-	it('sends the whole item, with the shop of the list it was drawn in', async () => {
-		const stub = stubGraphQL({ ...LOADED, ...OK })
-		await renderRoute(PAGE)
-		await chooseShop()
+  it('sends the whole item, with the shop of the list it was drawn in', async () => {
+    const stub = stubGraphQL({ ...LOADED, ...OK })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await open('Description')
-		write('Description', 'Half a litre, enamelled steel.')
-		await userEvent.click(save())
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await open('Description')
+    write('Description', 'Half a litre, enamelled steel.')
+    await userEvent.click(save())
 
-		expect(await screen.findByText('Changes saved.')).toBeInTheDocument()
-		expect(writes(stub)).toEqual([
-			expect.objectContaining({
-				variables: { _id: ID_ITEM, item: { ...SENT, description: 'Half a litre, enamelled steel.' } }
-			})
-		])
-	})
+    expect(await screen.findByText('Changes saved.')).toBeInTheDocument()
+    expect(writes(stub)).toEqual([
+      expect.objectContaining({
+        variables: { _id: ID_ITEM, item: { ...SENT, description: 'Half a litre, enamelled steel.' } }
+      })
+    ])
+  })
 
-	// The picker writes the id, and the two levels are one flat list of options: a subcategory is chosen
-	// the same way a top-level category is.
-	it('re-files the item under the category that was picked', async () => {
-		const stub = stubGraphQL({ ...LOADED, ...OK })
-		await renderRoute(PAGE)
-		await chooseShop()
+  // The picker writes the id, and the two levels are one flat list of options: a subcategory is chosen
+  // the same way a top-level category is.
+  it('re-files the item under the category that was picked', async () => {
+    const stub = stubGraphQL({ ...LOADED, ...OK })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await open('Category')
-		fireEvent.change(box().getByLabelText('Category'), { target: { value: ID_TOP } })
-		await userEvent.click(save())
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await open('Category')
+    fireEvent.change(box().getByLabelText('Category'), { target: { value: ID_TOP } })
+    await userEvent.click(save())
 
-		await screen.findByText('Changes saved.')
-		expect(writes(stub)[0]?.variables).toMatchObject({ item: { idCategory: ID_TOP } })
-	})
+    await screen.findByText('Changes saved.')
+    expect(writes(stub)[0]?.variables).toMatchObject({ item: { idCategory: ID_TOP } })
+  })
 
-	/*
-	 * ⚠️ The regression the split is about, asserted from the side that used to cause it: an owner edits
-	 * one box of a card loaded while the item was published, an admin takes the item down in between,
-	 * and the save must not put it back. `SENT` names no `published` at all, so there is nothing in the
-	 * write for the server to `$set` it from.
-	 */
-	it('never sends the publish flag with an ordinary save', async () => {
-		const stub = stubGraphQL({ ...LOADED, ...OK })
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * ⚠️ The regression the split is about, asserted from the side that used to cause it: an owner edits
+   * one box of a card loaded while the item was published, an admin takes the item down in between,
+   * and the save must not put it back. `SENT` names no `published` at all, so there is nothing in the
+   * write for the server to `$set` it from.
+   */
+  it('never sends the publish flag with an ordinary save', async () => {
+    const stub = stubGraphQL({ ...LOADED, ...OK })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await open('Slug')
-		write('Slug', 'blue-enamel-mug-large')
-		await userEvent.click(save())
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await open('Slug')
+    write('Slug', 'blue-enamel-mug-large')
+    await userEvent.click(save())
 
-		await screen.findByText('Changes saved.')
-		expect(writes(stub)[0]?.variables).toEqual({ _id: ID_ITEM, item: { ...SENT, slug: 'blue-enamel-mug-large' } })
-		expect(publishes(stub)).toHaveLength(0)
-	})
+    await screen.findByText('Changes saved.')
+    expect(writes(stub)[0]?.variables).toEqual({ _id: ID_ITEM, item: { ...SENT, slug: 'blue-enamel-mug-large' } })
+    expect(publishes(stub)).toHaveLength(0)
+  })
 
-	/*
-	 * ⚠️ The save context names `GraphQLItem` and nothing else, so the refresh rests entirely on the cached
-	 * items response carrying that typename — `itemUpdate` answers a bare `Boolean` and mentions none.
-	 *
-	 * Counted as requests rather than read off the screen: the page remounts its sections after a save and
-	 * a remount re-executes the query, off the cache and silently, unless the mutation invalidated it.
-	 */
-	it('refetches the items after a rename', async () => {
-		const stub = stubGraphQL({ ...LOADED, ...OK })
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * ⚠️ The save context names `GraphQLItem` and nothing else, so the refresh rests entirely on the cached
+   * items response carrying that typename — `itemUpdate` answers a bare `Boolean` and mentions none.
+   *
+   * Counted as requests rather than read off the screen: the page remounts its sections after a save and
+   * a remount re-executes the query, off the cache and silently, unless the mutation invalidated it.
+   */
+  it('refetches the items after a rename', async () => {
+    const stub = stubGraphQL({ ...LOADED, ...OK })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
+    await screen.findByRole('heading', { name: item.name, level: 3 })
 
-		expect(reads(stub, 'CompanyItems')).toHaveLength(1)
+    expect(reads(stub, 'CompanyItems')).toHaveLength(1)
 
-		await open('Name')
-		write('Name', 'Blue enamel mug, large')
-		await userEvent.click(save())
+    await open('Name')
+    write('Name', 'Blue enamel mug, large')
+    await userEvent.click(save())
 
-		await screen.findByText('Changes saved.')
-		await waitFor(() => {
-			expect(reads(stub, 'CompanyItems')).toHaveLength(2)
-		})
-		// The taxonomy is not invalidated by anything this app can do — it is the Admin tier's, and a
-		// refetch of it on every save would be a request per press for a list that cannot have changed.
-		expect(reads(stub, 'ItemCategories')).toHaveLength(1)
-	})
+    await screen.findByText('Changes saved.')
+    await waitFor(() => {
+      expect(reads(stub, 'CompanyItems')).toHaveLength(2)
+    })
+    // The taxonomy is not invalidated by anything this app can do — it is the Admin tier's, and a
+    // refetch of it on every save would be a request per press for a list that cannot have changed.
+    expect(reads(stub, 'ItemCategories')).toHaveLength(1)
+  })
 
-	/*
-	 * An item nobody touched is not merely nothing to send — it must not be *validated* either, or a
-	 * stored item the current rules would reject blocks a save the owner made on a different card. A slug
-	 * stored before the shape was enforced is what such an item looks like.
-	 */
-	it('leaves an untouched item alone while another is saved', async () => {
-		const stub = stubGraphQL({
-			...shops([shop]),
-			...catalogue([{ ...item, slug: 'Blue_Enamel_Mug' }, itemTwo]),
-			...taxonomy([categoryTop, categoryChild]),
-			...OK
-		})
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * An item nobody touched is not merely nothing to send — it must not be *validated* either, or a
+   * stored item the current rules would reject blocks a save the owner made on a different card. A slug
+   * stored before the shape was enforced is what such an item looks like.
+   */
+  it('leaves an untouched item alone while another is saved', async () => {
+    const stub = stubGraphQL({
+      ...shops([shop]),
+      ...catalogue([{ ...item, slug: 'Blue_Enamel_Mug' }, itemTwo]),
+      ...taxonomy([categoryTop, categoryChild]),
+      ...OK
+    })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: itemTwo.name, level: 3 })
-		await open('Name', itemTwo.name)
-		write('Name', 'Garden trowel, wide', itemTwo.name)
-		await userEvent.click(save())
+    await screen.findByRole('heading', { name: itemTwo.name, level: 3 })
+    await open('Name', itemTwo.name)
+    write('Name', 'Garden trowel, wide', itemTwo.name)
+    await userEvent.click(save())
 
-		await screen.findByText('Changes saved.')
-		expect(writes(stub)).toHaveLength(1)
-		expect(writes(stub)[0]?.variables).toMatchObject({ _id: ID_ITEM_TWO })
-		expect(screen.queryByText('The slug is lowercase letters and digits, joined by single hyphens')).not.toBeInTheDocument()
-	})
+    await screen.findByText('Changes saved.')
+    expect(writes(stub)).toHaveLength(1)
+    expect(writes(stub)[0]?.variables).toMatchObject({ _id: ID_ITEM_TWO })
+    expect(screen.queryByText('The slug is lowercase letters and digits, joined by single hyphens')).not.toBeInTheDocument()
+  })
 
-	// One item refusing must not swallow the other's edit, which is why each card is its own section.
-	it('stops at the item that was refused', async () => {
-		const stub = stubGraphQL({
-			...shops([shop]),
-			...catalogue([item, itemTwo]),
-			...taxonomy([categoryTop, categoryChild]),
-			ItemUpdate: { errors: [graphQLError('Server error', 'Slug already used in this shop', 409)], status: 409 }
-		})
-		await editBothNames()
+  // One item refusing must not swallow the other's edit, which is why each card is its own section.
+  it('stops at the item that was refused', async () => {
+    const stub = stubGraphQL({
+      ...shops([shop]),
+      ...catalogue([item, itemTwo]),
+      ...taxonomy([categoryTop, categoryChild]),
+      ItemUpdate: { errors: [graphQLError('Server error', 'Slug already used in this shop', 409)], status: 409 }
+    })
+    await editBothNames()
 
-		expect(await screen.findByRole('alert')).toHaveTextContent('Slug already used in this shop')
-		expect(writes(stub)).toHaveLength(1)
-		expect(save()).toBeEnabled()
-	})
+    expect(await screen.findByRole('alert')).toHaveTextContent('Slug already used in this shop')
+    expect(writes(stub)).toHaveLength(1)
+    expect(save()).toBeEnabled()
+  })
 
-	/*
-	 * The card's toast belongs to the card, and a save that fixed it has to take it down.
-	 *
-	 * ⚠️ Not something the page's remount does for it: the remount only happens when *every* section
-	 * succeeded, so the interesting case is exactly this one — the first item is written on the second
-	 * press while the second is refused, nothing remounts, and the first card's old refusal would still be
-	 * on screen next to the new one.
-	 */
-	it('clears its own refusal when the retry goes through', async () => {
-		stubGraphQL({
-			...shops([shop]),
-			...catalogue([item, itemTwo]),
-			...taxonomy([categoryTop, categoryChild]),
-			ItemUpdate: [
-				{ errors: [graphQLError('Server error', 'Slug already used in this shop', 409)], status: 409 },
-				{ data: { itemUpdate: true } },
-				{ errors: [graphQLError('Server error', 'Category no longer exists', 404)], status: 404 }
-			]
-		})
-		await editBothNames()
+  /*
+   * The card's toast belongs to the card, and a save that fixed it has to take it down.
+   *
+   * ⚠️ Not something the page's remount does for it: the remount only happens when *every* section
+   * succeeded, so the interesting case is exactly this one — the first item is written on the second
+   * press while the second is refused, nothing remounts, and the first card's old refusal would still be
+   * on screen next to the new one.
+   */
+  it('clears its own refusal when the retry goes through', async () => {
+    stubGraphQL({
+      ...shops([shop]),
+      ...catalogue([item, itemTwo]),
+      ...taxonomy([categoryTop, categoryChild]),
+      ItemUpdate: [
+        { errors: [graphQLError('Server error', 'Slug already used in this shop', 409)], status: 409 },
+        { data: { itemUpdate: true } },
+        { errors: [graphQLError('Server error', 'Category no longer exists', 404)], status: 404 }
+      ]
+    })
+    await editBothNames()
 
-		expect(await screen.findByText('Slug already used in this shop')).toBeInTheDocument()
+    expect(await screen.findByText('Slug already used in this shop')).toBeInTheDocument()
 
-		await userEvent.click(save())
+    await userEvent.click(save())
 
-		expect(await screen.findByText('Category no longer exists')).toBeInTheDocument()
-		expect(screen.queryByText('Slug already used in this shop')).not.toBeInTheDocument()
-	})
+    expect(await screen.findByText('Category no longer exists')).toBeInTheDocument()
+    expect(screen.queryByText('Slug already used in this shop')).not.toBeInTheDocument()
+  })
 
-	// `false` with no error at all: no resolver answers that way, but `Boolean!` says it could, and a save
-	// reported as successful would be worse than a generic line.
-	it('reports a bare refusal', async () => {
-		stubGraphQL({ ...LOADED, ItemUpdate: { data: { itemUpdate: false } } })
-		await renderRoute(PAGE)
-		await chooseShop()
+  // `false` with no error at all: no resolver answers that way, but `Boolean!` says it could, and a save
+  // reported as successful would be worse than a generic line.
+  it('reports a bare refusal', async () => {
+    stubGraphQL({ ...LOADED, ItemUpdate: { data: { itemUpdate: false } } })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await open('Name')
-		write('Name', 'Blue enamel mug, large')
-		await userEvent.click(save())
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await open('Name')
+    write('Name', 'Blue enamel mug, large')
+    await userEvent.click(save())
 
-		expect(await screen.findByRole('alert')).toHaveTextContent('Save failed.')
-		expect(screen.queryByText('Changes saved.')).not.toBeInTheDocument()
-	})
+    expect(await screen.findByRole('alert')).toHaveTextContent('Save failed.')
+    expect(screen.queryByText('Changes saved.')).not.toBeInTheDocument()
+  })
 
-	/*
-	 * The whitespace is the point: the schema trims before it validates, so a required box holding three
-	 * spaces is empty — and the parsed value is what reaches the wire, so it cannot be padded either.
-	 */
-	it.each([
-		['Name', '   ', 'Name is required'],
-		['Description', '   ', 'Description is required'],
-		['Slug', '   ', 'The slug is at least 2 characters'],
-		['Slug', 'Blue Enamel Mug', 'The slug is lowercase letters and digits, joined by single hyphens'],
-		['Name', 'x'.repeat(151), 'Name cannot exceed 150 characters']
-	])('refuses %s holding %s', async (field, value, message) => {
-		const stub = stubGraphQL({ ...LOADED, ...OK })
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * The whitespace is the point: the schema trims before it validates, so a required box holding three
+   * spaces is empty — and the parsed value is what reaches the wire, so it cannot be padded either.
+   */
+  it.each([
+    ['Name', '   ', 'Name is required'],
+    ['Description', '   ', 'Description is required'],
+    ['Slug', '   ', 'The slug is at least 2 characters'],
+    ['Slug', 'Blue Enamel Mug', 'The slug is lowercase letters and digits, joined by single hyphens'],
+    ['Name', 'x'.repeat(151), 'Name cannot exceed 150 characters']
+  ])('refuses %s holding %s', async (field, value, message) => {
+    const stub = stubGraphQL({ ...LOADED, ...OK })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await open(field)
-		write(field, value)
-		await userEvent.click(save())
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await open(field)
+    write(field, value)
+    await userEvent.click(save())
 
-		expect(await page().findByText(message)).toBeInTheDocument()
-		expect(writes(stub)).toEqual([])
-	})
+    expect(await page().findByText(message)).toBeInTheDocument()
+    expect(writes(stub)).toEqual([])
+  })
 
-	/*
-	 * The retired category, from the owner's side: the card cannot be saved until one is chosen.
-	 *
-	 * ⚠️ Read off the toast rather than off the card, and that is the case the toast exists for — the
-	 * Category row is closed, so there is no box on screen for the message to sit under, and the owner
-	 * would otherwise be looking at a refused save with nothing on the page saying why.
-	 */
-	it('refuses to save an item back under no category at all', async () => {
-		const stub = stubGraphQL({
-			...shops([shop]),
-			...catalogue([{ ...item, idCategory: '65f0000000000000000000c9' }]),
-			...taxonomy([categoryTop, categoryChild]),
-			...OK
-		})
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * The retired category, from the owner's side: the card cannot be saved until one is chosen.
+   *
+   * ⚠️ Read off the toast rather than off the card, and that is the case the toast exists for — the
+   * Category row is closed, so there is no box on screen for the message to sit under, and the owner
+   * would otherwise be looking at a refused save with nothing on the page saying why.
+   */
+  it('refuses to save an item back under no category at all', async () => {
+    const stub = stubGraphQL({
+      ...shops([shop]),
+      ...catalogue([{ ...item, idCategory: '65f0000000000000000000c9' }]),
+      ...taxonomy([categoryTop, categoryChild]),
+      ...OK
+    })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await open('Name')
-		write('Name', 'Blue enamel mug, large')
-		await userEvent.click(save())
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await open('Name')
+    write('Name', 'Blue enamel mug, large')
+    await userEvent.click(save())
 
-		expect(await screen.findByRole('alert')).toHaveTextContent('Category is required')
-		expect(writes(stub)).toEqual([])
-	})
+    expect(await screen.findByRole('alert')).toHaveTextContent('Category is required')
+    expect(writes(stub)).toEqual([])
+  })
 })
 
 /**
@@ -791,187 +791,187 @@ describe('Items — editing', () => {
  * refetched, and the label is drawn from the answer.
  */
 describe('Items — publishing', () => {
-	it('takes a published item off the public site, on its own', async () => {
-		const stub = stubGraphQL({ ...LOADED, ...OK_PUBLISH })
-		await renderRoute(PAGE)
-		await chooseShop()
+  it('takes a published item off the public site, on its own', async () => {
+    const stub = stubGraphQL({ ...LOADED, ...OK_PUBLISH })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
+    await screen.findByRole('heading', { name: item.name, level: 3 })
 
-		expect(publishButton()).toHaveTextContent('Unpublish')
-		// The quiet variant, because taking something down is not what the owner came here to do — the
-		// draft's button below is the loud one.
-		expect(publishButton()).toHaveClass('bg-secondary')
+    expect(publishButton()).toHaveTextContent('Unpublish')
+    // The quiet variant, because taking something down is not what the owner came here to do — the
+    // draft's button below is the loud one.
+    expect(publishButton()).toHaveClass('bg-secondary')
 
-		await userEvent.click(publishButton())
+    await userEvent.click(publishButton())
 
-		expect(publishes(stub)).toHaveLength(1)
-		expect(publishes(stub)[0]?.variables).toEqual({ _id: ID_ITEM, published: false })
-		// Not queued behind the page's Save, and not a change the page thinks it still owes: the write
-		// already happened, so leaving the page now loses nothing.
-		expect(writes(stub)).toHaveLength(0)
-		expect(save()).toBeDisabled()
-	})
+    expect(publishes(stub)).toHaveLength(1)
+    expect(publishes(stub)[0]?.variables).toEqual({ _id: ID_ITEM, published: false })
+    // Not queued behind the page's Save, and not a change the page thinks it still owes: the write
+    // already happened, so leaving the page now loses nothing.
+    expect(writes(stub)).toHaveLength(0)
+    expect(save()).toBeDisabled()
+  })
 
-	// The draft is the other direction, and the button offers the action rather than describing the state.
-	it('publishes a draft', async () => {
-		const stub = stubGraphQL({
-			...shops([shop]),
-			...catalogue([item, itemTwo]),
-			...taxonomy([categoryTop, categoryChild]),
-			...OK_PUBLISH
-		})
-		await renderRoute(PAGE)
-		await chooseShop()
+  // The draft is the other direction, and the button offers the action rather than describing the state.
+  it('publishes a draft', async () => {
+    const stub = stubGraphQL({
+      ...shops([shop]),
+      ...catalogue([item, itemTwo]),
+      ...taxonomy([categoryTop, categoryChild]),
+      ...OK_PUBLISH
+    })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: itemTwo.name, level: 3 })
+    await screen.findByRole('heading', { name: itemTwo.name, level: 3 })
 
-		expect(publishButton(itemTwo.name)).toHaveTextContent('Publish')
-		// The primary variant: finishing a draft is what the owner opened this page for.
-		expect(publishButton(itemTwo.name)).toHaveClass('bg-third')
+    expect(publishButton(itemTwo.name)).toHaveTextContent('Publish')
+    // The primary variant: finishing a draft is what the owner opened this page for.
+    expect(publishButton(itemTwo.name)).toHaveClass('bg-third')
 
-		await userEvent.click(publishButton(itemTwo.name))
+    await userEvent.click(publishButton(itemTwo.name))
 
-		expect(publishes(stub)[0]?.variables).toEqual({ _id: ID_ITEM_TWO, published: true })
-	})
+    expect(publishes(stub)[0]?.variables).toEqual({ _id: ID_ITEM_TWO, published: true })
+  })
 
-	/*
-	 * ⚠️ The label is the *server's* answer, one refetch later — which is why `CompanyItems` is queued
-	 * twice here with a different flag each time. A card that flipped its own copy would go on saying
-	 * "published" after a write the collection refused.
-	 */
-	it('says what the collection holds once the write has been read back', async () => {
-		const stub = stubGraphQL({
-			...shops([shop]),
-			CompanyItems: [{ data: { companyItems: [item] } }, { data: { companyItems: [{ ...item, published: false }] } }],
-			...taxonomy([categoryTop, categoryChild]),
-			...OK_PUBLISH
-		})
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * ⚠️ The label is the *server's* answer, one refetch later — which is why `CompanyItems` is queued
+   * twice here with a different flag each time. A card that flipped its own copy would go on saying
+   * "published" after a write the collection refused.
+   */
+  it('says what the collection holds once the write has been read back', async () => {
+    const stub = stubGraphQL({
+      ...shops([shop]),
+      CompanyItems: [{ data: { companyItems: [item] } }, { data: { companyItems: [{ ...item, published: false }] } }],
+      ...taxonomy([categoryTop, categoryChild]),
+      ...OK_PUBLISH
+    })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
+    await screen.findByRole('heading', { name: item.name, level: 3 })
 
-		expect(publishedSays()).toBe('Published: Yes')
+    expect(publishedSays()).toBe('Published: Yes')
 
-		await userEvent.click(publishButton())
+    await userEvent.click(publishButton())
 
-		await waitFor(() => {
-			expect(publishedSays()).toBe('Published: No')
-		})
-		expect(reads(stub, 'CompanyItems')).toHaveLength(2)
-		expect(publishButton()).toHaveTextContent('Publish')
-	})
+    await waitFor(() => {
+      expect(publishedSays()).toBe('Published: No')
+    })
+    expect(reads(stub, 'CompanyItems')).toHaveLength(2)
+    expect(publishButton()).toHaveTextContent('Publish')
+  })
 
-	// A refusal is the item's own toast, beside the card it is about — the same place a refused save lands.
-	it('surfaces the server message when the publish is refused', async () => {
-		stubGraphQL({
-			...LOADED,
-			ItemUpdatePublished: { errors: [graphQLError('Forbidden', 'This item is not yours', 403)], status: 403 }
-		})
-		await renderRoute(PAGE)
-		await chooseShop()
+  // A refusal is the item's own toast, beside the card it is about — the same place a refused save lands.
+  it('surfaces the server message when the publish is refused', async () => {
+    stubGraphQL({
+      ...LOADED,
+      ItemUpdatePublished: { errors: [graphQLError('Forbidden', 'This item is not yours', 403)], status: 403 }
+    })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await userEvent.click(publishButton())
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await userEvent.click(publishButton())
 
-		expect(await screen.findByRole('alert')).toHaveTextContent('This item is not yours')
-		// Nothing was written, so the header still states what the collection holds.
-		expect(publishedSays()).toBe('Published: Yes')
-	})
+    expect(await screen.findByRole('alert')).toHaveTextContent('This item is not yours')
+    // Nothing was written, so the header still states what the collection holds.
+    expect(publishedSays()).toBe('Published: Yes')
+  })
 
-	/*
-	 * A `false` with no error beside it — the mutation is declared `Boolean!` and answering anything but
-	 * `true` is not a state the service produces, which is exactly why the call site tests the value
-	 * rather than the absence of an error. A truthiness check here would report a silent failure as a
-	 * success.
-	 */
-	it('reports a publish the server did not confirm', async () => {
-		stubGraphQL({ ...LOADED, ItemUpdatePublished: { data: { itemUpdatePublished: false } } })
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * A `false` with no error beside it — the mutation is declared `Boolean!` and answering anything but
+   * `true` is not a state the service produces, which is exactly why the call site tests the value
+   * rather than the absence of an error. A truthiness check here would report a silent failure as a
+   * success.
+   */
+  it('reports a publish the server did not confirm', async () => {
+    stubGraphQL({ ...LOADED, ItemUpdatePublished: { data: { itemUpdatePublished: false } } })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await userEvent.click(publishButton())
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await userEvent.click(publishButton())
 
-		expect(await screen.findByRole('alert')).toHaveTextContent('Publishing failed.')
-	})
+    expect(await screen.findByRole('alert')).toHaveTextContent('Publishing failed.')
+  })
 
-	// The card's own toast, cleared by the press that worked — the page does not remount after this write,
-	// so a message left behind would outlive what it was about.
-	it('clears its toast once a later publish goes through', async () => {
-		stubGraphQL({
-			...LOADED,
-			ItemUpdatePublished: [{ data: { itemUpdatePublished: false } }, { data: { itemUpdatePublished: true } }]
-		})
-		await renderRoute(PAGE)
-		await chooseShop()
+  // The card's own toast, cleared by the press that worked — the page does not remount after this write,
+  // so a message left behind would outlive what it was about.
+  it('clears its toast once a later publish goes through', async () => {
+    stubGraphQL({
+      ...LOADED,
+      ItemUpdatePublished: [{ data: { itemUpdatePublished: false } }, { data: { itemUpdatePublished: true } }]
+    })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await userEvent.click(publishButton())
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await userEvent.click(publishButton())
 
-		expect(await screen.findByRole('alert')).toHaveTextContent('Publishing failed.')
+    expect(await screen.findByRole('alert')).toHaveTextContent('Publishing failed.')
 
-		await userEvent.click(publishButton())
+    await userEvent.click(publishButton())
 
-		await waitFor(() => {
-			expect(screen.queryByRole('alert')).toBeNull()
-		})
-	})
+    await waitFor(() => {
+      expect(screen.queryByRole('alert')).toBeNull()
+    })
+  })
 
-	/*
-	 * ⚠️ Disabled while the item is queued for withdrawal. It is the one pair of controls on this card that
-	 * could contradict each other: the publish writes now and the deletion writes on Save, so publishing an
-	 * item about to be withdrawn would land first and be undone seconds later.
-	 */
-	it('refuses to publish an item queued for deletion', async () => {
-		const stub = stubGraphQL({ ...LOADED, ...OK_PUBLISH, ...OK_DEL })
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * ⚠️ Disabled while the item is queued for withdrawal. It is the one pair of controls on this card that
+   * could contradict each other: the publish writes now and the deletion writes on Save, so publishing an
+   * item about to be withdrawn would land first and be undone seconds later.
+   */
+  it('refuses to publish an item queued for deletion', async () => {
+    const stub = stubGraphQL({ ...LOADED, ...OK_PUBLISH, ...OK_DEL })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await userEvent.click(card().getByRole('button', { name: 'Delete item' }))
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await userEvent.click(card().getByRole('button', { name: 'Delete item' }))
 
-		expect(publishButton()).toBeDisabled()
+    expect(publishButton()).toBeDisabled()
 
-		// Cancelling the deletion hands it back: the queue is a decision the owner can undo.
-		await userEvent.click(card().getByRole('button', { name: 'Cancel item deletion' }))
+    // Cancelling the deletion hands it back: the queue is a decision the owner can undo.
+    await userEvent.click(card().getByRole('button', { name: 'Cancel item deletion' }))
 
-		expect(publishButton()).toBeEnabled()
-		expect(publishes(stub)).toHaveLength(0)
-	})
+    expect(publishButton()).toBeEnabled()
+    expect(publishes(stub)).toHaveLength(0)
+  })
 
-	// The switch is shut while its own write is in flight, so a second press cannot queue a second one —
-	// two presses of a toggle would ask for opposite states off the same stale flag.
-	it('shuts the switch while the write is in flight', async () => {
-		stubGraphQL({ ...LOADED, ItemUpdatePublished: { pending: true } })
-		await renderRoute(PAGE)
-		await chooseShop()
+  // The switch is shut while its own write is in flight, so a second press cannot queue a second one —
+  // two presses of a toggle would ask for opposite states off the same stale flag.
+  it('shuts the switch while the write is in flight', async () => {
+    stubGraphQL({ ...LOADED, ItemUpdatePublished: { pending: true } })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await userEvent.click(publishButton())
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await userEvent.click(publishButton())
 
-		await waitFor(() => {
-			expect(publishButton()).toBeDisabled()
-		})
-		expect(within(publishButton()).getByRole('status')).toBeInTheDocument()
-	})
+    await waitFor(() => {
+      expect(publishButton()).toBeDisabled()
+    })
+    expect(within(publishButton()).getByRole('status')).toBeInTheDocument()
+  })
 
-	/*
-	 * A new card has nothing to publish — `itemAdd` stamps `false` and the item does not exist until the
-	 * page's Save writes it — so the switch is not there at all, while the state is still stated.
-	 */
-	it('offers no switch on a card that has never been saved', async () => {
-		stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop, categoryChild]) })
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * A new card has nothing to publish — `itemAdd` stamps `false` and the item does not exist until the
+   * page's Save writes it — so the switch is not there at all, while the state is still stated.
+   */
+  it('offers no switch on a card that has never been saved', async () => {
+    stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop, categoryChild]) })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByText('No item in this shop.')
-		await userEvent.click(plus())
+    await screen.findByText('No item in this shop.')
+    await userEvent.click(plus())
 
-		expect(card(NEW).queryByRole('button', { name: /publish$/i })).toBeNull()
-		expect(publishedSays(NEW)).toBe('Published: No')
-	})
+    expect(card(NEW).queryByRole('button', { name: /publish$/i })).toBeNull()
+    expect(publishedSays(NEW)).toBe('Published: No')
+  })
 })
 
 /**
@@ -988,352 +988,352 @@ describe('Items — publishing', () => {
  * left for this file is the wiring: which ids travel, which flag, and what the owner is told afterwards.
  */
 describe('Items — bulk publishing', () => {
-	const bar = () => screen.getByRole('checkbox', { name: 'Select all' })
+  const bar = () => screen.getByRole('checkbox', { name: 'Select all' })
 
-	const tick = async (name: string) => {
-		await userEvent.click(screen.getByRole('checkbox', { name: `Select ${name}` }))
-	}
+  const tick = async (name: string) => {
+    await userEvent.click(screen.getByRole('checkbox', { name: `Select ${name}` }))
+  }
 
-	const publishSelected = () => screen.getByRole('button', { name: /Publish selected$/ })
-	const unpublishSelected = () => screen.getByRole('button', { name: /Unpublish selected$/ })
+  const publishSelected = () => screen.getByRole('button', { name: /Publish selected$/ })
+  const unpublishSelected = () => screen.getByRole('button', { name: /Unpublish selected$/ })
 
-	const bulks = (stub: GraphQLStub) => stub.calls.filter((call) => call.operationName === 'ItemsUpdatePublished')
+  const bulks = (stub: GraphQLStub) => stub.calls.filter((call) => call.operationName === 'ItemsUpdatePublished')
 
-	const BOTH = { ...shops([shop]), ...catalogue([item, itemTwo]), ...taxonomy([categoryTop, categoryChild]) }
-	const OK_BULK = { ItemsUpdatePublished: { data: { itemsUpdatePublished: true } } }
+  const BOTH = { ...shops([shop]), ...catalogue([item, itemTwo]), ...taxonomy([categoryTop, categoryChild]) }
+  const OK_BULK = { ItemsUpdatePublished: { data: { itemsUpdatePublished: true } } }
 
-	const loaded = async (replies: Record<string, unknown> = {}) => {
-		const stub = stubGraphQL({ ...BOTH, ...replies })
-		await renderRoute(PAGE)
-		await chooseShop()
-		await screen.findByRole('heading', { name: itemTwo.name, level: 3 })
-		return stub
-	}
+  const loaded = async (replies: Record<string, unknown> = {}) => {
+    const stub = stubGraphQL({ ...BOTH, ...replies })
+    await renderRoute(PAGE)
+    await chooseShop()
+    await screen.findByRole('heading', { name: itemTwo.name, level: 3 })
+    return stub
+  }
 
-	// Nothing to select, nothing to offer: an empty shop shows the "No item" line and no bar over it.
-	it('offers no bar on a shop with no item', async () => {
-		stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop, categoryChild]) })
-		await renderRoute(PAGE)
-		await chooseShop()
+  // Nothing to select, nothing to offer: an empty shop shows the "No item" line and no bar over it.
+  it('offers no bar on a shop with no item', async () => {
+    stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop, categoryChild]) })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		expect(await screen.findByText('No item in this shop.')).toBeInTheDocument()
-		expect(screen.queryByRole('checkbox', { name: 'Select all' })).not.toBeInTheDocument()
-	})
+    expect(await screen.findByText('No item in this shop.')).toBeInTheDocument()
+    expect(screen.queryByRole('checkbox', { name: 'Select all' })).not.toBeInTheDocument()
+  })
 
-	it('counts the selection against the catalogue', async () => {
-		await loaded()
+  it('counts the selection against the catalogue', async () => {
+    await loaded()
 
-		expect(screen.getByText('0 of 2 selected')).toBeInTheDocument()
-		await tick(item.name)
-		expect(screen.getByText('1 of 2 selected')).toBeInTheDocument()
-	})
+    expect(screen.getByText('0 of 2 selected')).toBeInTheDocument()
+    await tick(item.name)
+    expect(screen.getByText('1 of 2 selected')).toBeInTheDocument()
+  })
 
-	it('ticks every item at once', async () => {
-		await loaded()
+  it('ticks every item at once', async () => {
+    await loaded()
 
-		await userEvent.click(bar())
+    await userEvent.click(bar())
 
-		expect(screen.getByRole('checkbox', { name: `Select ${item.name}` })).toBeChecked()
-		expect(screen.getByRole('checkbox', { name: `Select ${itemTwo.name}` })).toBeChecked()
-		expect(screen.getByText('2 of 2 selected')).toBeInTheDocument()
-	})
+    expect(screen.getByRole('checkbox', { name: `Select ${item.name}` })).toBeChecked()
+    expect(screen.getByRole('checkbox', { name: `Select ${itemTwo.name}` })).toBeChecked()
+    expect(screen.getByText('2 of 2 selected')).toBeInTheDocument()
+  })
 
-	// The same box the other way round, so the test cannot pass on a control that only ever ticks.
-	it('unticks every item when it is already whole', async () => {
-		await loaded()
+  // The same box the other way round, so the test cannot pass on a control that only ever ticks.
+  it('unticks every item when it is already whole', async () => {
+    await loaded()
 
-		await userEvent.click(bar())
-		await userEvent.click(bar())
+    await userEvent.click(bar())
+    await userEvent.click(bar())
 
-		expect(screen.getByRole('checkbox', { name: `Select ${item.name}` })).not.toBeChecked()
-		expect(screen.getByText('0 of 2 selected')).toBeInTheDocument()
-	})
+    expect(screen.getByRole('checkbox', { name: `Select ${item.name}` })).not.toBeChecked()
+    expect(screen.getByText('0 of 2 selected')).toBeInTheDocument()
+  })
 
-	// The select-all box reads the selection rather than remembering its own presses: ticking the last
-	// card by hand fills it, and untickng one empties it again.
-	it('fills and empties itself as the cards are ticked by hand', async () => {
-		await loaded()
+  // The select-all box reads the selection rather than remembering its own presses: ticking the last
+  // card by hand fills it, and untickng one empties it again.
+  it('fills and empties itself as the cards are ticked by hand', async () => {
+    await loaded()
 
-		await tick(item.name)
-		expect(bar()).not.toBeChecked()
+    await tick(item.name)
+    expect(bar()).not.toBeChecked()
 
-		await tick(itemTwo.name)
-		expect(bar()).toBeChecked()
+    await tick(itemTwo.name)
+    expect(bar()).toBeChecked()
 
-		await tick(itemTwo.name)
-		expect(bar()).not.toBeChecked()
-	})
+    await tick(itemTwo.name)
+    expect(bar()).not.toBeChecked()
+  })
 
-	/*
-	 * ⚠️ Untoggling one card must remove only that card's id, not the whole selection and not the wrong
-	 * one — `bar()` alone cannot tell these apart: with two items selected, emptying the selection
-	 * entirely and removing just the one un-ticked card both leave the "select all" box unchecked. Each
-	 * card's own checkbox is what tells a toggle that clears everything, or one that keeps the wrong id
-	 * and drops the right one, apart from the toggle that removes exactly the id that was pressed.
-	 */
-	it('un-ticking one card leaves every other ticked card ticked', async () => {
-		await loaded()
+  /*
+   * ⚠️ Untoggling one card must remove only that card's id, not the whole selection and not the wrong
+   * one — `bar()` alone cannot tell these apart: with two items selected, emptying the selection
+   * entirely and removing just the one un-ticked card both leave the "select all" box unchecked. Each
+   * card's own checkbox is what tells a toggle that clears everything, or one that keeps the wrong id
+   * and drops the right one, apart from the toggle that removes exactly the id that was pressed.
+   */
+  it('un-ticking one card leaves every other ticked card ticked', async () => {
+    await loaded()
 
-		await tick(item.name)
-		await tick(itemTwo.name)
+    await tick(item.name)
+    await tick(itemTwo.name)
 
-		await tick(itemTwo.name)
+    await tick(itemTwo.name)
 
-		expect(screen.getByRole('checkbox', { name: `Select ${item.name}` })).toBeChecked()
-		expect(screen.getByRole('checkbox', { name: `Select ${itemTwo.name}` })).not.toBeChecked()
-	})
+    expect(screen.getByRole('checkbox', { name: `Select ${item.name}` })).toBeChecked()
+    expect(screen.getByRole('checkbox', { name: `Select ${itemTwo.name}` })).not.toBeChecked()
+  })
 
-	it('does nothing until something is ticked', async () => {
-		await loaded()
+  it('does nothing until something is ticked', async () => {
+    await loaded()
 
-		expect(publishSelected()).toBeDisabled()
-		expect(unpublishSelected()).toBeDisabled()
-	})
+    expect(publishSelected()).toBeDisabled()
+    expect(unpublishSelected()).toBeDisabled()
+  })
 
-	/*
-	 * ⚠️ One call carrying the ticked ids and nothing else — not one call per card. The bulk mutation
-	 * exists because a shop with a real catalogue is otherwise several hundred round trips, each with its
-	 * own ownership check.
-	 */
-	it('publishes exactly what was ticked, in one write', async () => {
-		const stub = await loaded(OK_BULK)
+  /*
+   * ⚠️ One call carrying the ticked ids and nothing else — not one call per card. The bulk mutation
+   * exists because a shop with a real catalogue is otherwise several hundred round trips, each with its
+   * own ownership check.
+   */
+  it('publishes exactly what was ticked, in one write', async () => {
+    const stub = await loaded(OK_BULK)
 
-		await tick(itemTwo.name)
-		await userEvent.click(publishSelected())
+    await tick(itemTwo.name)
+    await userEvent.click(publishSelected())
 
-		await waitFor(() => {
-			expect(bulks(stub)).toHaveLength(1)
-		})
-		expect(bulks(stub)[0]?.variables).toEqual({ _ids: [ID_ITEM_TWO], published: true })
-		// The per-card publish switch is a different control and must not have fired as well.
-		expect(publishes(stub)).toHaveLength(0)
-	})
+    await waitFor(() => {
+      expect(bulks(stub)).toHaveLength(1)
+    })
+    expect(bulks(stub)[0]?.variables).toEqual({ _ids: [ID_ITEM_TWO], published: true })
+    // The per-card publish switch is a different control and must not have fired as well.
+    expect(publishes(stub)).toHaveLength(0)
+  })
 
-	it('takes the whole catalogue off the public site in one write', async () => {
-		const stub = await loaded(OK_BULK)
+  it('takes the whole catalogue off the public site in one write', async () => {
+    const stub = await loaded(OK_BULK)
 
-		await userEvent.click(bar())
-		await userEvent.click(unpublishSelected())
+    await userEvent.click(bar())
+    await userEvent.click(unpublishSelected())
 
-		await waitFor(() => {
-			expect(bulks(stub)).toHaveLength(1)
-		})
-		expect(bulks(stub)[0]?.variables).toEqual({ _ids: [ID_ITEM, ID_ITEM_TWO], published: false })
-	})
+    await waitFor(() => {
+      expect(bulks(stub)).toHaveLength(1)
+    })
+    expect(bulks(stub)[0]?.variables).toEqual({ _ids: [ID_ITEM, ID_ITEM_TWO], published: false })
+  })
 
-	// Nothing in the bar holds the new value: `CTX_SAVE_ITEM` invalidates `GraphQLItem`, the list is read
-	// again, and every card's "Published" line is redrawn from what the server actually stored.
-	it('reads the catalogue back after a bulk write', async () => {
-		const stub = await loaded(OK_BULK)
+  // Nothing in the bar holds the new value: `CTX_SAVE_ITEM` invalidates `GraphQLItem`, the list is read
+  // again, and every card's "Published" line is redrawn from what the server actually stored.
+  it('reads the catalogue back after a bulk write', async () => {
+    const stub = await loaded(OK_BULK)
 
-		await userEvent.click(bar())
-		await userEvent.click(unpublishSelected())
+    await userEvent.click(bar())
+    await userEvent.click(unpublishSelected())
 
-		await waitFor(() => {
-			expect(reads(stub, 'CompanyItems')).toHaveLength(2)
-		})
-	})
+    await waitFor(() => {
+      expect(reads(stub, 'CompanyItems')).toHaveLength(2)
+    })
+  })
 
-	// A clean run clears the selection: what it was about has happened, and a bar still saying "2 of 2
-	// selected" invites the same write a second time.
-	it('drops the selection once the write goes through', async () => {
-		await loaded(OK_BULK)
+  // A clean run clears the selection: what it was about has happened, and a bar still saying "2 of 2
+  // selected" invites the same write a second time.
+  it('drops the selection once the write goes through', async () => {
+    await loaded(OK_BULK)
 
-		await userEvent.click(bar())
-		await userEvent.click(publishSelected())
+    await userEvent.click(bar())
+    await userEvent.click(publishSelected())
 
-		await waitFor(() => {
-			expect(screen.getByText('0 of 2 selected')).toBeInTheDocument()
-		})
-		expect(publishSelected()).toBeDisabled()
-	})
+    await waitFor(() => {
+      expect(screen.getByText('0 of 2 selected')).toBeInTheDocument()
+    })
+    expect(publishSelected()).toBeDisabled()
+  })
 
-	/*
-	 * ⚠️ The selection is **kept** after a refusal, on purpose. Each run is its own transaction, so a
-	 * failure can leave part of the selection written — keeping the ticks is what lets the owner press
-	 * again and finish the job over the same ids.
-	 */
-	it('surfaces the server message and keeps the selection', async () => {
-		await loaded({
-			ItemsUpdatePublished: { errors: [graphQLError('Forbidden', 'One of these items is not yours', 403)], status: 403 }
-		})
+  /*
+   * ⚠️ The selection is **kept** after a refusal, on purpose. Each run is its own transaction, so a
+   * failure can leave part of the selection written — keeping the ticks is what lets the owner press
+   * again and finish the job over the same ids.
+   */
+  it('surfaces the server message and keeps the selection', async () => {
+    await loaded({
+      ItemsUpdatePublished: { errors: [graphQLError('Forbidden', 'One of these items is not yours', 403)], status: 403 }
+    })
 
-		await userEvent.click(bar())
-		await userEvent.click(publishSelected())
+    await userEvent.click(bar())
+    await userEvent.click(publishSelected())
 
-		expect(await screen.findByRole('alert')).toHaveTextContent('One of these items is not yours')
-		expect(screen.getByText('2 of 2 selected')).toBeInTheDocument()
-	})
+    expect(await screen.findByRole('alert')).toHaveTextContent('One of these items is not yours')
+    expect(screen.getByText('2 of 2 selected')).toBeInTheDocument()
+  })
 
-	/*
-	 * A `false` with no error beside it. The mutation is declared `Boolean!`, so anything but `true` is
-	 * not a state the service produces — and a truthiness check would report it as a shop that went dark
-	 * when it did not.
-	 */
-	it('reports a bulk write the server did not confirm', async () => {
-		await loaded({ ItemsUpdatePublished: { data: { itemsUpdatePublished: false } } })
+  /*
+   * A `false` with no error beside it. The mutation is declared `Boolean!`, so anything but `true` is
+   * not a state the service produces — and a truthiness check would report it as a shop that went dark
+   * when it did not.
+   */
+  it('reports a bulk write the server did not confirm', async () => {
+    await loaded({ ItemsUpdatePublished: { data: { itemsUpdatePublished: false } } })
 
-		await tick(item.name)
-		await userEvent.click(unpublishSelected())
+    await tick(item.name)
+    await userEvent.click(unpublishSelected())
 
-		// The literal copy, not the exported constant: importing `BULK_REFUSED` here would make this
-		// assertion compare the constant to itself, which passes for whatever the constant happens to
-		// hold — including an empty string.
-		expect(await screen.findByRole('alert')).toHaveTextContent('The write was refused.')
-		expect(screen.getByText('1 of 2 selected')).toBeInTheDocument()
-	})
+    // The literal copy, not the exported constant: importing `BULK_REFUSED` here would make this
+    // assertion compare the constant to itself, which passes for whatever the constant happens to
+    // hold — including an empty string.
+    expect(await screen.findByRole('alert')).toHaveTextContent('The write was refused.')
+    expect(screen.getByText('1 of 2 selected')).toBeInTheDocument()
+  })
 
-	it('shuts both buttons while the write is in flight', async () => {
-		await loaded({ ItemsUpdatePublished: { pending: true } })
+  it('shuts both buttons while the write is in flight', async () => {
+    await loaded({ ItemsUpdatePublished: { pending: true } })
 
-		await tick(item.name)
-		await userEvent.click(publishSelected())
+    await tick(item.name)
+    await userEvent.click(publishSelected())
 
-		await waitFor(() => {
-			expect(publishSelected()).toBeDisabled()
-		})
-		expect(unpublishSelected()).toBeDisabled()
-	})
+    await waitFor(() => {
+      expect(publishSelected()).toBeDisabled()
+    })
+    expect(unpublishSelected()).toBeDisabled()
+  })
 
-	/*
-	 * ⚠️ A card that has never been saved carries no tick, and it needs no guard inside `FormItem` to say
-	 * so: the box is rendered by the list beside the card rather than by the card, and the list draws one
-	 * per *stored* item. A new card has no `_id` to put in a variable set.
-	 */
-	it('gives a new card no tick of its own', async () => {
-		await loaded()
+  /*
+   * ⚠️ A card that has never been saved carries no tick, and it needs no guard inside `FormItem` to say
+   * so: the box is rendered by the list beside the card rather than by the card, and the list draws one
+   * per *stored* item. A new card has no `_id` to put in a variable set.
+   */
+  it('gives a new card no tick of its own', async () => {
+    await loaded()
 
-		await userEvent.click(plus())
+    await userEvent.click(plus())
 
-		expect(await screen.findByRole('heading', { name: NEW, level: 3 })).toBeInTheDocument()
-		// Two stored items, two boxes — plus the bar's own, which is not one of the catalogue's.
-		expect(screen.getAllByRole('checkbox', { name: /^Select / })).toHaveLength(3)
-		expect(screen.getByText('0 of 2 selected')).toBeInTheDocument()
-	})
+    expect(await screen.findByRole('heading', { name: NEW, level: 3 })).toBeInTheDocument()
+    // Two stored items, two boxes — plus the bar's own, which is not one of the catalogue's.
+    expect(screen.getAllByRole('checkbox', { name: /^Select / })).toHaveLength(3)
+    expect(screen.getByText('0 of 2 selected')).toBeInTheDocument()
+  })
 })
 
 describe('Items — deletion', () => {
-	const trash = (name?: string) => card(name).getByRole('button', { name: 'Delete item' })
+  const trash = (name?: string) => card(name).getByRole('button', { name: 'Delete item' })
 
-	it('queues the deletion behind the mask instead of writing it', async () => {
-		const stub = stubGraphQL({ ...LOADED, ...OK_DEL })
-		await renderRoute(PAGE)
-		await chooseShop()
+  it('queues the deletion behind the mask instead of writing it', async () => {
+    const stub = stubGraphQL({ ...LOADED, ...OK_DEL })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
+    await screen.findByRole('heading', { name: item.name, level: 3 })
 
-		expect(mask()).toBeNull()
+    expect(mask()).toBeNull()
 
-		await userEvent.click(trash())
+    await userEvent.click(trash())
 
-		expect(mask()).toHaveClass('backdrop-blur-sm')
-		expect(deletes(stub)).toEqual([])
-		expect(save()).toBeEnabled()
-	})
+    expect(mask()).toHaveClass('backdrop-blur-sm')
+    expect(deletes(stub)).toEqual([])
+    expect(save()).toBeEnabled()
+  })
 
-	// The one way back out, and the reason the title row stays sharp: the trash the owner has to press
-	// again is the only control the mask must not cover.
-	it('takes the deletion back', async () => {
-		stubGraphQL(LOADED)
-		await renderRoute(PAGE)
-		await chooseShop()
+  // The one way back out, and the reason the title row stays sharp: the trash the owner has to press
+  // again is the only control the mask must not cover.
+  it('takes the deletion back', async () => {
+    stubGraphQL(LOADED)
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await userEvent.click(trash())
-		await userEvent.click(card().getByRole('button', { name: 'Cancel item deletion' }))
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await userEvent.click(trash())
+    await userEvent.click(card().getByRole('button', { name: 'Cancel item deletion' }))
 
-		expect(mask()).toBeNull()
-		expect(save()).toBeDisabled()
-	})
+    expect(mask()).toBeNull()
+    expect(save()).toBeDisabled()
+  })
 
-	// The heading is the one part of the card the mask does not cover, so it is the only place the queued
-	// state can be read at all.
-	it('strikes the name through while the deletion is queued', async () => {
-		stubGraphQL(LOADED)
-		await renderRoute(PAGE)
-		await chooseShop()
+  // The heading is the one part of the card the mask does not cover, so it is the only place the queued
+  // state can be read at all.
+  it('strikes the name through while the deletion is queued', async () => {
+    stubGraphQL(LOADED)
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		const title = await screen.findByRole('heading', { name: item.name, level: 3 })
+    const title = await screen.findByRole('heading', { name: item.name, level: 3 })
 
-		// The whole class list, not just the absence of `line-through`: the queued state is expressed by
-		// what the ternary adds, so its empty alternative is as much a part of the rule as the struck one.
-		expect(title.className.trim()).toBe('text-lg font-bold')
+    // The whole class list, not just the absence of `line-through`: the queued state is expressed by
+    // what the ternary adds, so its empty alternative is as much a part of the rule as the struck one.
+    expect(title.className.trim()).toBe('text-lg font-bold')
 
-		await userEvent.click(trash())
+    await userEvent.click(trash())
 
-		expect(title).toHaveClass('text-tip', 'line-through')
-	})
+    expect(title).toHaveClass('text-tip', 'line-through')
+  })
 
-	it('withdraws the item on Save', async () => {
-		const stub = stubGraphQL({ ...LOADED, ...OK_DEL })
-		await renderRoute(PAGE)
-		await chooseShop()
+  it('withdraws the item on Save', async () => {
+    const stub = stubGraphQL({ ...LOADED, ...OK_DEL })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await userEvent.click(trash())
-		await userEvent.click(save())
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await userEvent.click(trash())
+    await userEvent.click(save())
 
-		await waitFor(() => {
-			expect(deletes(stub)).toHaveLength(1)
-		})
-		expect(deletes(stub)[0]?.variables).toEqual({ _id: ID_ITEM })
-		expect(writes(stub)).toEqual([])
-		expect(await screen.findByText('Changes saved.')).toBeInTheDocument()
-		expect(screen.queryByRole('alert')).toBeNull()
-	})
+    await waitFor(() => {
+      expect(deletes(stub)).toHaveLength(1)
+    })
+    expect(deletes(stub)[0]?.variables).toEqual({ _id: ID_ITEM })
+    expect(writes(stub)).toEqual([])
+    expect(await screen.findByText('Changes saved.')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).toBeNull()
+  })
 
-	// Deletion wins over an edit made in the same press — asserted with both queued at once, because
-	// "nothing was written" is otherwise indistinguishable from "nothing was edited".
-	it('does not write the fields of a card it is about to withdraw', async () => {
-		const stub = stubGraphQL({ ...LOADED, ...OK, ...OK_DEL })
-		await renderRoute(PAGE)
-		await chooseShop()
+  // Deletion wins over an edit made in the same press — asserted with both queued at once, because
+  // "nothing was written" is otherwise indistinguishable from "nothing was edited".
+  it('does not write the fields of a card it is about to withdraw', async () => {
+    const stub = stubGraphQL({ ...LOADED, ...OK, ...OK_DEL })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await open('Name')
-		write('Name', 'Blue enamel mug, large')
-		await userEvent.click(trash())
-		await userEvent.click(save())
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await open('Name')
+    write('Name', 'Blue enamel mug, large')
+    await userEvent.click(trash())
+    await userEvent.click(save())
 
-		await waitFor(() => {
-			expect(deletes(stub)).toHaveLength(1)
-		})
-		expect(writes(stub)).toEqual([])
-	})
+    await waitFor(() => {
+      expect(deletes(stub)).toHaveLength(1)
+    })
+    expect(writes(stub)).toEqual([])
+  })
 
-	it('reports a bare refusal', async () => {
-		stubGraphQL({ ...LOADED, ItemDel: { data: { itemDel: false } } })
-		await renderRoute(PAGE)
-		await chooseShop()
+  it('reports a bare refusal', async () => {
+    stubGraphQL({ ...LOADED, ItemDel: { data: { itemDel: false } } })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await userEvent.click(trash())
-		await userEvent.click(save())
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await userEvent.click(trash())
+    await userEvent.click(save())
 
-		expect(await screen.findByRole('alert')).toHaveTextContent('Deletion failed.')
-	})
+    expect(await screen.findByRole('alert')).toHaveTextContent('Deletion failed.')
+  })
 
-	/*
-	 * The 403 a second withdrawal answers with — `funItemDel` refuses an item already carrying `deleted`,
-	 * which is what two tabs on the same catalogue produce. The toast is outside the mask for exactly
-	 * this: the owner has to read why while the card is still queued.
-	 */
-	it('surfaces the server message and leaves the card queued', async () => {
-		stubGraphQL({
-			...LOADED,
-			ItemDel: { errors: [graphQLError('Forbidden', 'Item not found in this company', 403)], status: 403 }
-		})
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * The 403 a second withdrawal answers with — `funItemDel` refuses an item already carrying `deleted`,
+   * which is what two tabs on the same catalogue produce. The toast is outside the mask for exactly
+   * this: the owner has to read why while the card is still queued.
+   */
+  it('surfaces the server message and leaves the card queued', async () => {
+    stubGraphQL({
+      ...LOADED,
+      ItemDel: { errors: [graphQLError('Forbidden', 'Item not found in this company', 403)], status: 403 }
+    })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await userEvent.click(trash())
-		await userEvent.click(save())
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await userEvent.click(trash())
+    await userEvent.click(save())
 
-		expect(await screen.findByRole('alert')).toHaveTextContent('Item not found in this company')
-		expect(mask()).not.toBeNull()
-		expect(mask()).not.toContainElement(card().getByRole('button', { name: 'Cancel item deletion' }))
-	})
+    expect(await screen.findByRole('alert')).toHaveTextContent('Item not found in this company')
+    expect(mask()).not.toBeNull()
+    expect(mask()).not.toContainElement(card().getByRole('button', { name: 'Cancel item deletion' }))
+  })
 })
 
 /**
@@ -1341,315 +1341,315 @@ describe('Items — deletion', () => {
  * same Save button, and sent to `itemAdd` with the shop whose catalogue is on screen.
  */
 describe('Items — new item', () => {
-	const newCard = () => screen.getByRole('heading', { name: NEW, level: 3 }).closest('section') as HTMLElement
+  const newCard = () => screen.getByRole('heading', { name: NEW, level: 3 }).closest('section') as HTMLElement
 
-	/** Both of them, in the order they were opened — two cards share one heading, so `card()` cannot. */
-	const newCards = () =>
-		screen.getAllByRole('heading', { name: NEW, level: 3 }).map((title) => title.closest('section') as HTMLElement)
+  /** Both of them, in the order they were opened — two cards share one heading, so `card()` cannot. */
+  const newCards = () =>
+    screen.getAllByRole('heading', { name: NEW, level: 3 }).map((title) => title.closest('section') as HTMLElement)
 
-	const add = async () => {
-		await userEvent.click(plus())
-	}
+  const add = async () => {
+    await userEvent.click(plus())
+  }
 
-	/** A card filled the way an owner would: four boxes typed and a category picked. */
-	const fill = () => {
-		write('Name', 'Garden trowel', NEW)
-		write('Description', 'Stainless steel, ash handle.', NEW)
-		write('Slug', 'garden-trowel', NEW)
-		fireEvent.change(box(NEW).getByLabelText('Category'), { target: { value: ID_TOP } })
-	}
+  /** A card filled the way an owner would: four boxes typed and a category picked. */
+  const fill = () => {
+    write('Name', 'Garden trowel', NEW)
+    write('Description', 'Stainless steel, ash handle.', NEW)
+    write('Slug', 'garden-trowel', NEW)
+    fireEvent.change(box(NEW).getByLabelText('Category'), { target: { value: ID_TOP } })
+  }
 
-	/**
-	 * One press carrying two sections: an edit to the item that exists, and a filled new card behind it.
-	 * The order is the point — the stored item is written first, so what the stub answers to the *add* is
-	 * what each test using this is asking about.
-	 */
-	const editAndAdd = async () => {
-		await renderRoute(PAGE)
-		await chooseShop()
+  /**
+   * One press carrying two sections: an edit to the item that exists, and a filled new card behind it.
+   * The order is the point — the stored item is written first, so what the stub answers to the *add* is
+   * what each test using this is asking about.
+   */
+  const editAndAdd = async () => {
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await add()
-		await open('Description')
-		write('Description', 'Half a litre, enamelled steel.')
-		fill()
-		await userEvent.click(save())
-	}
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await add()
+    await open('Description')
+    write('Description', 'Half a litre, enamelled steel.')
+    fill()
+    await userEvent.click(save())
+  }
 
-	/*
-	 * "No item in this shop." is about the catalogue, and an open card is the answer to it — the two on
-	 * screen together would be the page contradicting itself.
-	 *
-	 * The card counts as a pending change from the moment it appears, before a character is typed: it is
-	 * an item the owner asked for and the page has not written.
-	 */
-	it('replaces the empty-list message with a card, already worth saving', async () => {
-		stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop, categoryChild]) })
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * "No item in this shop." is about the catalogue, and an open card is the answer to it — the two on
+   * screen together would be the page contradicting itself.
+   *
+   * The card counts as a pending change from the moment it appears, before a character is typed: it is
+   * an item the owner asked for and the page has not written.
+   */
+  it('replaces the empty-list message with a card, already worth saving', async () => {
+    stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop, categoryChild]) })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByText('No item in this shop.')
-		expect(save()).toBeDisabled()
+    await screen.findByText('No item in this shop.')
+    expect(save()).toBeDisabled()
 
-		await add()
+    await add()
 
-		expect(screen.getByRole('heading', { name: NEW, level: 3 })).toBeInTheDocument()
-		expect(screen.queryByText('No item in this shop.')).not.toBeInTheDocument()
-		expect(save()).toBeEnabled()
-	})
+    expect(screen.getByRole('heading', { name: NEW, level: 3 })).toBeInTheDocument()
+    expect(screen.queryByText('No item in this shop.')).not.toBeInTheDocument()
+    expect(save()).toBeEnabled()
+  })
 
-	// New cards go under the items that exist: the list is the record, and what is being added to it does
-	// not push the record down the page.
-	it('adds the card below the items already stored', async () => {
-		stubGraphQL(LOADED)
-		await renderRoute(PAGE)
-		await chooseShop()
+  // New cards go under the items that exist: the list is the record, and what is being added to it does
+  // not push the record down the page.
+  it('adds the card below the items already stored', async () => {
+    stubGraphQL(LOADED)
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await add()
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await add()
 
-		// Filtered, because `Infobox` titles are `h3` too — every card contributes one of them.
-		const titles = screen
-			.getAllByRole('heading', { level: 3 })
-			.map((title) => title.textContent)
-			.filter((text) => text === item.name || text === NEW)
-		expect(titles).toEqual([item.name, NEW])
-	})
+    // Filtered, because `Infobox` titles are `h3` too — every card contributes one of them.
+    const titles = screen
+      .getAllByRole('heading', { level: 3 })
+      .map((title) => title.textContent)
+      .filter((text) => text === item.name || text === NEW)
+    expect(titles).toEqual([item.name, NEW])
+  })
 
-	// Every row opens on its editor, because there is no stored value for a closed row to show — a card of
-	// dashes with a pen beside each would read as a rendering bug.
-	it('opens every row of the card on its editor', async () => {
-		stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop, categoryChild]) })
-		await renderRoute(PAGE)
-		await chooseShop()
+  // Every row opens on its editor, because there is no stored value for a closed row to show — a card of
+  // dashes with a pen beside each would read as a rendering bug.
+  it('opens every row of the card on its editor', async () => {
+    stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop, categoryChild]) })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByText('No item in this shop.')
-		await add()
+    await screen.findByText('No item in this shop.')
+    await add()
 
-		expect(box(NEW).getByLabelText('Name')).toHaveValue('')
-		expect(box(NEW).getByLabelText('Description')).toHaveValue('')
-		expect(box(NEW).getByLabelText('Slug')).toHaveValue('')
-		// The placeholder: the owner has to choose rather than accept whichever category is first.
-		expect(box(NEW).getByLabelText('Category')).toHaveValue('')
-		// No pen anywhere on the card: a row that is already open has nothing to open.
-		expect(within(newCard()).queryByRole('button', { name: 'Change Name' })).toBeNull()
-	})
+    expect(box(NEW).getByLabelText('Name')).toHaveValue('')
+    expect(box(NEW).getByLabelText('Description')).toHaveValue('')
+    expect(box(NEW).getByLabelText('Slug')).toHaveValue('')
+    // The placeholder: the owner has to choose rather than accept whichever category is first.
+    expect(box(NEW).getByLabelText('Category')).toHaveValue('')
+    // No pen anywhere on the card: a row that is already open has nothing to open.
+    expect(within(newCard()).queryByRole('button', { name: 'Change Name' })).toBeNull()
+  })
 
-	// The one icon it carries, and it is not a delete: there is nothing stored to withdraw. It is also the
-	// only way out of the leave guard the card arms the moment it appears.
-	it('throws the card away when its trash is pressed', async () => {
-		stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop, categoryChild]) })
-		await renderRoute(PAGE)
-		await chooseShop()
+  // The one icon it carries, and it is not a delete: there is nothing stored to withdraw. It is also the
+  // only way out of the leave guard the card arms the moment it appears.
+  it('throws the card away when its trash is pressed', async () => {
+    stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop, categoryChild]) })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByText('No item in this shop.')
-		await add()
-		await userEvent.click(within(newCard()).getByRole('button', { name: 'Cancel new item' }))
+    await screen.findByText('No item in this shop.')
+    await add()
+    await userEvent.click(within(newCard()).getByRole('button', { name: 'Cancel new item' }))
 
-		expect(screen.queryByRole('heading', { name: NEW, level: 3 })).toBeNull()
-		expect(screen.getByText('No item in this shop.')).toBeInTheDocument()
-		expect(save()).toBeDisabled()
-	})
+    expect(screen.queryByRole('heading', { name: NEW, level: 3 })).toBeNull()
+    expect(screen.getByText('No item in this shop.')).toBeInTheDocument()
+    expect(save()).toBeDisabled()
+  })
 
-	/*
-	 * ⚠️ Each card is keyed by a uuid of its own, and this is what says so. Keyed by position instead,
-	 * discarding the first of two would hand its React state — an empty form — to the second, and the
-	 * typing would vanish from a card the owner never touched.
-	 */
-	it("keeps a second card's contents when the first is discarded", async () => {
-		stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop, categoryChild]) })
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * ⚠️ Each card is keyed by a uuid of its own, and this is what says so. Keyed by position instead,
+   * discarding the first of two would hand its React state — an empty form — to the second, and the
+   * typing would vanish from a card the owner never touched.
+   */
+  it("keeps a second card's contents when the first is discarded", async () => {
+    stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop, categoryChild]) })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByText('No item in this shop.')
-		await add()
-		await add()
+    await screen.findByText('No item in this shop.')
+    await add()
+    await add()
 
-		fireEvent.change(within(newCards()[1] as HTMLElement).getByLabelText('Name'), { target: { value: 'Garden trowel' } })
-		await userEvent.click(within(newCards()[0] as HTMLElement).getByRole('button', { name: 'Cancel new item' }))
+    fireEvent.change(within(newCards()[1] as HTMLElement).getByLabelText('Name'), { target: { value: 'Garden trowel' } })
+    await userEvent.click(within(newCards()[0] as HTMLElement).getByRole('button', { name: 'Cancel new item' }))
 
-		expect(newCards()).toHaveLength(1)
-		expect(within(newCards()[0] as HTMLElement).getByLabelText('Name')).toHaveValue('Garden trowel')
-	})
+    expect(newCards()).toHaveLength(1)
+    expect(within(newCards()[0] as HTMLElement).getByLabelText('Name')).toHaveValue('Garden trowel')
+  })
 
-	/*
-	 * ⚠️ The card is seeded with an empty string per field rather than with nothing at all: react-hook-form
-	 * hands the schema whatever it was given, and `''` fails the rule the form wrote under the box it
-	 * belongs to — `undefined` fails zod's type check instead, with "expected string, received undefined"
-	 * shown to an owner.
-	 */
-	it("refuses an untouched card in this form's own words", async () => {
-		const stub = stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop]), ...OK_ADD })
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * ⚠️ The card is seeded with an empty string per field rather than with nothing at all: react-hook-form
+   * hands the schema whatever it was given, and `''` fails the rule the form wrote under the box it
+   * belongs to — `undefined` fails zod's type check instead, with "expected string, received undefined"
+   * shown to an owner.
+   */
+  it("refuses an untouched card in this form's own words", async () => {
+    const stub = stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop]), ...OK_ADD })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByText('No item in this shop.')
-		await add()
-		await userEvent.click(save())
+    await screen.findByText('No item in this shop.')
+    await add()
+    await userEvent.click(save())
 
-		expect(await page().findByText('Name is required')).toBeInTheDocument()
-		expect(page().getByText('Description is required')).toBeInTheDocument()
-		expect(page().getByText('The slug is at least 2 characters')).toBeInTheDocument()
-		expect(page().getByText('Category is required')).toBeInTheDocument()
-		expect(adds(stub)).toEqual([])
-		expect(screen.queryByText('Changes saved.')).not.toBeInTheDocument()
-	})
+    expect(await page().findByText('Name is required')).toBeInTheDocument()
+    expect(page().getByText('Description is required')).toBeInTheDocument()
+    expect(page().getByText('The slug is at least 2 characters')).toBeInTheDocument()
+    expect(page().getByText('Category is required')).toBeInTheDocument()
+    expect(adds(stub)).toEqual([])
+    expect(screen.queryByText('Changes saved.')).not.toBeInTheDocument()
+  })
 
-	/*
-	 * The same refusal as the owner sees it: the boxes turn red and the toast in the corner lists the same
-	 * sentences they carry — the Save button is below however many cards, and the box that refused may
-	 * well be scrolled off the top of the page.
-	 *
-	 * ⚠️ Read through `within(warning)` and not `page()`: each sentence is on screen twice, and the toast
-	 * stack is portalled to `document.body`, outside `main`.
-	 */
-	it('lists what has to be corrected, and drops each line as it is corrected', async () => {
-		stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop]), ...OK_ADD })
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * The same refusal as the owner sees it: the boxes turn red and the toast in the corner lists the same
+   * sentences they carry — the Save button is below however many cards, and the box that refused may
+   * well be scrolled off the top of the page.
+   *
+   * ⚠️ Read through `within(warning)` and not `page()`: each sentence is on screen twice, and the toast
+   * stack is portalled to `document.body`, outside `main`.
+   */
+  it('lists what has to be corrected, and drops each line as it is corrected', async () => {
+    stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop]), ...OK_ADD })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByText('No item in this shop.')
-		await add()
-		await userEvent.click(save())
+    await screen.findByText('No item in this shop.')
+    await add()
+    await userEvent.click(save())
 
-		const warning = await screen.findByRole('alert')
-		const rows = () =>
-			within(warning)
-				.getAllByRole('listitem')
-				.map((row) => row.textContent ?? '')
-		const name = () => box(NEW).getByLabelText('Name')
+    const warning = await screen.findByRole('alert')
+    const rows = () =>
+      within(warning)
+        .getAllByRole('listitem')
+        .map((row) => row.textContent ?? '')
+    const name = () => box(NEW).getByLabelText('Name')
 
-		expect(warning).toHaveTextContent(VALIDATION_HEADER)
-		expect(rows()).toContain('Name is required')
-		expect(name()).toHaveClass('border-2', 'bg-app-error/10')
+    expect(warning).toHaveTextContent(VALIDATION_HEADER)
+    expect(rows()).toContain('Name is required')
+    expect(name()).toHaveClass('border-2', 'bg-app-error/10')
 
-		write('Name', 'Garden trowel', NEW)
+    write('Name', 'Garden trowel', NEW)
 
-		await waitFor(() => {
-			expect(rows()).not.toContain('Name is required')
-		})
-		expect(name()).toHaveClass('border', 'bg-white')
-		// The rest of the list stays: one corrected box is not a saved form, and a toast that emptied
-		// itself on the first fix would say the save is ready when it is not.
-		expect(rows()).toContain('Description is required')
-	})
+    await waitFor(() => {
+      expect(rows()).not.toContain('Name is required')
+    })
+    expect(name()).toHaveClass('border', 'bg-white')
+    // The rest of the list stays: one corrected box is not a saved form, and a toast that emptied
+    // itself on the first fix would say the save is ready when it is not.
+    expect(rows()).toContain('Description is required')
+  })
 
-	/*
-	 * The whole point of the card.
-	 *
-	 * ⚠️ **The shop comes from the picker, not from a box.** `itemAdd` files the item into the `idCompany`
-	 * it is given, and the only one this card can send is the shop whose catalogue is on screen.
-	 *
-	 * ⚠️ The shop starts with an item in it, and that is not decoration: `additionalTypenames` invalidates
-	 * a cached response by the typenames the response *carries*, and an empty list carries none. A first
-	 * shop is therefore the one case where the new item does not appear until something else refetches —
-	 * which is why the card drops itself rather than waiting for the list to say it may.
-	 */
-	it('files the item into the chosen shop and drops the card once it is stored', async () => {
-		const stub = stubGraphQL({
-			...shops([shop]),
-			CompanyItems: [{ data: { companyItems: [item] } }, { data: { companyItems: [item, itemTwo] } }],
-			...taxonomy([categoryTop, categoryChild]),
-			...OK_ADD
-		})
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * The whole point of the card.
+   *
+   * ⚠️ **The shop comes from the picker, not from a box.** `itemAdd` files the item into the `idCompany`
+   * it is given, and the only one this card can send is the shop whose catalogue is on screen.
+   *
+   * ⚠️ The shop starts with an item in it, and that is not decoration: `additionalTypenames` invalidates
+   * a cached response by the typenames the response *carries*, and an empty list carries none. A first
+   * shop is therefore the one case where the new item does not appear until something else refetches —
+   * which is why the card drops itself rather than waiting for the list to say it may.
+   */
+  it('files the item into the chosen shop and drops the card once it is stored', async () => {
+    const stub = stubGraphQL({
+      ...shops([shop]),
+      CompanyItems: [{ data: { companyItems: [item] } }, { data: { companyItems: [item, itemTwo] } }],
+      ...taxonomy([categoryTop, categoryChild]),
+      ...OK_ADD
+    })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByRole('heading', { name: item.name, level: 3 })
-		await add()
-		fill()
-		await userEvent.click(save())
+    await screen.findByRole('heading', { name: item.name, level: 3 })
+    await add()
+    fill()
+    await userEvent.click(save())
 
-		await screen.findByText('Changes saved.')
-		expect(adds(stub)).toHaveLength(1)
-		expect(adds(stub)[0]?.variables).toEqual({
-			item: {
-				idCompany: ID_COMPANY,
-				idCategory: ID_TOP,
-				name: 'Garden trowel',
-				description: 'Stainless steel, ash handle.',
-				slug: 'garden-trowel'
-				// No `published`: `itemAdd` stamps `false` on the server, so a new item is a draft
-				// whatever the client sends — and the client can no longer send anything.
-			}
-		})
-		// The list refetches on `additionalTypenames` and the stored item takes the card's place. A
-		// placeholder left behind would offer to add the same item a second time.
-		expect(screen.queryByRole('heading', { name: NEW, level: 3 })).toBeNull()
-		expect(await screen.findByRole('heading', { name: itemTwo.name, level: 3 })).toBeInTheDocument()
-	})
+    await screen.findByText('Changes saved.')
+    expect(adds(stub)).toHaveLength(1)
+    expect(adds(stub)[0]?.variables).toEqual({
+      item: {
+        idCompany: ID_COMPANY,
+        idCategory: ID_TOP,
+        name: 'Garden trowel',
+        description: 'Stainless steel, ash handle.',
+        slug: 'garden-trowel'
+        // No `published`: `itemAdd` stamps `false` on the server, so a new item is a draft
+        // whatever the client sends — and the client can no longer send anything.
+      }
+    })
+    // The list refetches on `additionalTypenames` and the stored item takes the card's place. A
+    // placeholder left behind would offer to add the same item a second time.
+    expect(screen.queryByRole('heading', { name: NEW, level: 3 })).toBeNull()
+    expect(await screen.findByRole('heading', { name: itemTwo.name, level: 3 })).toBeInTheDocument()
+  })
 
-	/*
-	 * ⚠️ An `OnlyIdType` with nothing in it. The call site tests `itemAdd._id === undefined` rather than
-	 * the object, because an object is truthy even when every field inside it is missing — a truthiness
-	 * check would read this as a success, drop the card and throw away an item nobody stored.
-	 */
-	it('reports an answer carrying no id and keeps the card', async () => {
-		stubGraphQL({
-			...shops([shop]),
-			...catalogue([]),
-			...taxonomy([categoryTop]),
-			ItemAdd: { data: { itemAdd: {} } }
-		})
-		await renderRoute(PAGE)
-		await chooseShop()
+  /*
+   * ⚠️ An `OnlyIdType` with nothing in it. The call site tests `itemAdd._id === undefined` rather than
+   * the object, because an object is truthy even when every field inside it is missing — a truthiness
+   * check would read this as a success, drop the card and throw away an item nobody stored.
+   */
+  it('reports an answer carrying no id and keeps the card', async () => {
+    stubGraphQL({
+      ...shops([shop]),
+      ...catalogue([]),
+      ...taxonomy([categoryTop]),
+      ItemAdd: { data: { itemAdd: {} } }
+    })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByText('No item in this shop.')
-		await add()
-		fill()
-		await userEvent.click(save())
+    await screen.findByText('No item in this shop.')
+    await add()
+    fill()
+    await userEvent.click(save())
 
-		expect(await screen.findByRole('alert')).toHaveTextContent('Save failed.')
-		expect(screen.getByRole('heading', { name: NEW, level: 3 })).toBeInTheDocument()
-		expect(screen.queryByText('Changes saved.')).not.toBeInTheDocument()
-		expect(save()).toBeEnabled()
-	})
+    expect(await screen.findByRole('alert')).toHaveTextContent('Save failed.')
+    expect(screen.getByRole('heading', { name: NEW, level: 3 })).toBeInTheDocument()
+    expect(screen.queryByText('Changes saved.')).not.toBeInTheDocument()
+    expect(save()).toBeEnabled()
+  })
 
-	// The duplicate slug is the refusal this mutation really answers with — unique per company, so two
-	// shops may each hold a `garden-trowel` and one shop may not.
-	it('surfaces the server message when the add fails', async () => {
-		stubGraphQL({
-			...shops([shop]),
-			...catalogue([]),
-			...taxonomy([categoryTop]),
-			ItemAdd: { errors: [graphQLError('Server error', 'Slug already used in this shop', 409)], status: 409 }
-		})
-		await renderRoute(PAGE)
-		await chooseShop()
+  // The duplicate slug is the refusal this mutation really answers with — unique per company, so two
+  // shops may each hold a `garden-trowel` and one shop may not.
+  it('surfaces the server message when the add fails', async () => {
+    stubGraphQL({
+      ...shops([shop]),
+      ...catalogue([]),
+      ...taxonomy([categoryTop]),
+      ItemAdd: { errors: [graphQLError('Server error', 'Slug already used in this shop', 409)], status: 409 }
+    })
+    await renderRoute(PAGE)
+    await chooseShop()
 
-		await screen.findByText('No item in this shop.')
-		await add()
-		fill()
-		await userEvent.click(save())
+    await screen.findByText('No item in this shop.')
+    await add()
+    fill()
+    await userEvent.click(save())
 
-		expect(await screen.findByRole('alert')).toHaveTextContent('Slug already used in this shop')
-		expect(screen.getByRole('heading', { name: NEW, level: 3 })).toBeInTheDocument()
-	})
+    expect(await screen.findByRole('alert')).toHaveTextContent('Slug already used in this shop')
+    expect(screen.getByRole('heading', { name: NEW, level: 3 })).toBeInTheDocument()
+  })
 
-	// The card is one more section of the page's save, registered after the items that exist: an edit to a
-	// stored item and a new card are written in that order, by one press of one button.
-	it('saves an edited item and a new card in the same press', async () => {
-		const stub = stubGraphQL({ ...LOADED, ...OK, ...OK_ADD })
-		await editAndAdd()
+  // The card is one more section of the page's save, registered after the items that exist: an edit to a
+  // stored item and a new card are written in that order, by one press of one button.
+  it('saves an edited item and a new card in the same press', async () => {
+    const stub = stubGraphQL({ ...LOADED, ...OK, ...OK_ADD })
+    await editAndAdd()
 
-		await screen.findByText('Changes saved.')
-		expect(writes(stub)[0]?.variables).toMatchObject({ _id: ID_ITEM, item: { description: 'Half a litre, enamelled steel.' } })
-		expect(adds(stub)[0]?.variables).toMatchObject({ item: { slug: 'garden-trowel' } })
-	})
+    await screen.findByText('Changes saved.')
+    expect(writes(stub)[0]?.variables).toMatchObject({ _id: ID_ITEM, item: { description: 'Half a litre, enamelled steel.' } })
+    expect(adds(stub)[0]?.variables).toMatchObject({ item: { slug: 'garden-trowel' } })
+  })
 
-	/*
-	 * New cards are registered after the items that exist, and the page stops at the first section that
-	 * refuses — so a card that fails does so with the item above it already written. That is not a
-	 * rollback the page could offer: the two are separate mutations on separate documents. What it must do
-	 * instead is say which half failed and keep the card, which is the half still unsaved.
-	 */
-	it('leaves the item above it written when the card is refused', async () => {
-		const stub = stubGraphQL({ ...LOADED, ...OK, ItemAdd: { data: { itemAdd: {} } } })
-		await editAndAdd()
+  /*
+   * New cards are registered after the items that exist, and the page stops at the first section that
+   * refuses — so a card that fails does so with the item above it already written. That is not a
+   * rollback the page could offer: the two are separate mutations on separate documents. What it must do
+   * instead is say which half failed and keep the card, which is the half still unsaved.
+   */
+  it('leaves the item above it written when the card is refused', async () => {
+    const stub = stubGraphQL({ ...LOADED, ...OK, ItemAdd: { data: { itemAdd: {} } } })
+    await editAndAdd()
 
-		expect(await screen.findByRole('alert')).toHaveTextContent('Save failed.')
-		expect(writes(stub)).toHaveLength(1)
-		expect(adds(stub)).toHaveLength(1)
-		expect(screen.getByRole('heading', { name: NEW, level: 3 })).toBeInTheDocument()
-	})
+    expect(await screen.findByRole('alert')).toHaveTextContent('Save failed.')
+    expect(writes(stub)).toHaveLength(1)
+    expect(adds(stub)).toHaveLength(1)
+    expect(screen.getByRole('heading', { name: NEW, level: 3 })).toBeInTheDocument()
+  })
 })

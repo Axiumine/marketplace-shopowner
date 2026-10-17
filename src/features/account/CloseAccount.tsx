@@ -43,76 +43,76 @@ export const CLOSE_REFUSED = 'The account was not closed.'
  * identical whether the server had anything left to delete or not.
  */
 export const CloseAccount = () => {
-	const [confirmed, setConfirmed] = useState(false)
-	const [refused, setRefused] = useState<string | undefined>(undefined)
-	const [del, runDel] = useMutation(ShopOwnerDelDocument)
-	const logout = useLogout()
+  const [confirmed, setConfirmed] = useState(false)
+  const [refused, setRefused] = useState<string | undefined>(undefined)
+  const [del, runDel] = useMutation(ShopOwnerDelDocument)
+  const logout = useLogout()
 
-	const close = async () => {
-		const outcome = await runDel({}, CTX_SHOP_OWNER_RESOURCE)
+  const close = async () => {
+    const outcome = await runDel({}, CTX_SHOP_OWNER_RESOURCE)
 
-		if (outcome.data?.shopOwnerDel !== true) {
-			setRefused(outcome.error === undefined ? CLOSE_REFUSED : messageOf(outcome.error))
-			return
-		}
+    if (outcome.data?.shopOwnerDel !== true) {
+      setRefused(outcome.error === undefined ? CLOSE_REFUSED : messageOf(outcome.error))
+      return
+    }
 
-		await logout()
-	}
+    await logout()
+  }
 
-	return (
-		<Infobox title="Close my account">
-			<div className="flex flex-col gap-4 text-sm">
-				<p>
-					Closing your account takes your shops and everything in their catalogues off the marketplace straight away, and ends
-					every session you have open — here and in any other browser.
-				</p>
+  return (
+    <Infobox title="Close my account">
+      <div className="flex flex-col gap-4 text-sm">
+        <p>
+          Closing your account takes your shops and everything in their catalogues off the marketplace straight away, and ends
+          every session you have open — here and in any other browser.
+        </p>
 
-				<p>
-					You have <strong>thirty days</strong> to change your mind. Register again at this same email address inside that window
-					and confirm the message we send you: the account comes back as it was, with the same shops, the same items and the same
-					details. They come back <strong>unpublished</strong> — you put them back on the marketplace yourself, when you are
-					ready — and the account goes back into the approval queue, so an admin approves it once more before you can sign in.
-				</p>
+        <p>
+          You have <strong>thirty days</strong> to change your mind. Register again at this same email address inside that window
+          and confirm the message we send you: the account comes back as it was, with the same shops, the same items and the same
+          details. They come back <strong>unpublished</strong> — you put them back on the marketplace yourself, when you are
+          ready — and the account goes back into the approval queue, so an admin approves it once more before you can sign in.
+        </p>
 
-				{/*
-				 * Said here because it is the one consequence an owner may believe they are buying: closing and
-				 * re-registering is not a way out of a suspension. ADR-044 gives the admin tier the only hand
-				 * that lifts one, and ADR-046 leaves `disabled`, `disabledBy` and `disabledReason` untouched
-				 * through the whole restore, precisely so this route cannot be used as one.
-				 */}
-				<p>
-					A suspension is not lifted by closing your account. If an admin has suspended you, the suspension comes back with the
-					account, and only an admin can take it off.
-				</p>
+        {/*
+         * Said here because it is the one consequence an owner may believe they are buying: closing and
+         * re-registering is not a way out of a suspension. ADR-044 gives the admin tier the only hand
+         * that lifts one, and ADR-046 leaves `disabled`, `disabledBy` and `disabledReason` untouched
+         * through the whole restore, precisely so this route cannot be used as one.
+         */}
+        <p>
+          A suspension is not lifted by closing your account. If an admin has suspended you, the suspension comes back with the
+          account, and only an admin can take it off.
+        </p>
 
-				<p>
-					After thirty days your personal details are overwritten and the account cannot be brought back at all. Nothing here is
-					a way to have your data kept — it is the opposite.
-				</p>
+        <p>
+          After thirty days your personal details are overwritten and the account cannot be brought back at all. Nothing here is
+          a way to have your data kept — it is the opposite.
+        </p>
 
-				<CheckboxField
-					label={CONFIRM_LABEL}
-					checked={confirmed}
-					onChange={() => {
-						setConfirmed((current) => !current)
-					}}
-				/>
+        <CheckboxField
+          label={CONFIRM_LABEL}
+          checked={confirmed}
+          onChange={() => {
+            setConfirmed((current) => !current)
+          }}
+        />
 
-				<div>
-					<Button
-						variant="danger"
-						disabled={!confirmed}
-						loading={del.fetching}
-						onClick={() => {
-							void close()
-						}}
-					>
-						Close my account
-					</Button>
-				</div>
+        <div>
+          <Button
+            variant="danger"
+            disabled={!confirmed}
+            loading={del.fetching}
+            onClick={() => {
+              void close()
+            }}
+          >
+            Close my account
+          </Button>
+        </div>
 
-				{refused === undefined ? null : <Toast tone="error">{refused}</Toast>}
-			</div>
-		</Infobox>
-	)
+        {refused === undefined ? null : <Toast tone="error">{refused}</Toast>}
+      </div>
+    </Infobox>
+  )
 }

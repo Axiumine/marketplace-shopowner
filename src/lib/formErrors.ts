@@ -21,16 +21,16 @@ const ADDRESS_FIELDS: ReadonlySet<string> = new Set(FIELDS_ADDRESS)
  * a walk of the document.
  */
 const collect = (node: unknown, messages: string[]): void => {
-	if (typeof node !== 'object' || node === null) return
+  if (typeof node !== 'object' || node === null) return
 
-	const { message } = node as { message?: unknown }
+  const { message } = node as { message?: unknown }
 
-	if (typeof message === 'string') {
-		messages.push(message)
-		return
-	}
+  if (typeof message === 'string') {
+    messages.push(message)
+    return
+  }
 
-	for (const child of Object.values(node)) collect(child, messages)
+  for (const child of Object.values(node)) collect(child, messages)
 }
 
 /**
@@ -49,17 +49,17 @@ const collect = (node: unknown, messages: string[]): void => {
  * sentence twice, and a toast that says "the field is required" three times says nothing three times.
  */
 export const messagesToFix = (errors: FieldErrors): string[] => {
-	const messages: string[] = []
-	// Asserted, because `FieldErrors` is the shape of a form nobody named a values type for: its mapped
-	// type resolves to nothing concrete, so it is not assignable to the seven optional keys below even
-	// though every error it can hold is exactly one of them.
-	const address = addressError(errors as ErrorsAddress)
+  const messages: string[] = []
+  // Asserted, because `FieldErrors` is the shape of a form nobody named a values type for: its mapped
+  // type resolves to nothing concrete, so it is not assignable to the seven optional keys below even
+  // though every error it can hold is exactly one of them.
+  const address = addressError(errors as ErrorsAddress)
 
-	if (address !== undefined) messages.push(address)
+  if (address !== undefined) messages.push(address)
 
-	for (const [field, error] of Object.entries(errors)) {
-		if (!ADDRESS_FIELDS.has(field)) collect(error, messages)
-	}
+  for (const [field, error] of Object.entries(errors)) {
+    if (!ADDRESS_FIELDS.has(field)) collect(error, messages)
+  }
 
-	return [...new Set(messages)]
+  return [...new Set(messages)]
 }

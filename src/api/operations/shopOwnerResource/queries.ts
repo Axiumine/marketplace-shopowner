@@ -16,29 +16,29 @@ import { graphql } from '@gql/shopOwnerResource'
  * query behind them. It is also the app's session probe — see LoadingPage.
  */
 export const ShopOwnerCompaniesDocument = graphql(`
-	query ShopOwnerCompanies {
-		shopOwnerCompanies {
-			_id
-			legalName
-			vatNumber
-			taxCode
-			contactPerson
-			administrator
-			uniqueCode
-			certifiedEmail
-			registryExtract
-			address {
-				street
-				postalCode
-				city
-				province
-				position {
-					type
-					coordinates
-				}
-			}
-		}
-	}
+  query ShopOwnerCompanies {
+    shopOwnerCompanies {
+      _id
+      legalName
+      vatNumber
+      taxCode
+      contactPerson
+      administrator
+      uniqueCode
+      certifiedEmail
+      registryExtract
+      address {
+        street
+        postalCode
+        city
+        province
+        position {
+          type
+          coordinates
+        }
+      }
+    }
+  }
 `)
 
 /**
@@ -58,17 +58,17 @@ export const ShopOwnerCompaniesDocument = graphql(`
  * edited in place and there is no second query behind them.
  */
 export const CompanyItemsDocument = graphql(`
-	query CompanyItems($idCompany: ID!) {
-		companyItems(idCompany: $idCompany) {
-			_id
-			idCompany
-			idCategory
-			name
-			description
-			slug
-			published
-		}
-	}
+  query CompanyItems($idCompany: ID!) {
+    companyItems(idCompany: $idCompany) {
+      _id
+      idCompany
+      idCategory
+      name
+      description
+      slug
+      published
+    }
+  }
 `)
 
 /**
@@ -84,13 +84,13 @@ export const CompanyItemsDocument = graphql(`
  * is what puts each child under its own parent.
  */
 export const ItemCategoriesDocument = graphql(`
-	query ItemCategories {
-		itemCategories {
-			_id
-			idParent
-			name
-			slug
-			position
-		}
-	}
+  query ItemCategories {
+    itemCategories {
+      _id
+      idParent
+      name
+      slug
+      position
+    }
+  }
 `)

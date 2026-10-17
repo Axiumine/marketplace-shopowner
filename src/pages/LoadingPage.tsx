@@ -19,10 +19,10 @@ export const DEFAULT_REDIRECT = '/home'
  * rejected explicitly — it is a protocol-relative URL, not a path, and it starts with a slash.
  */
 export const safeRedirect = (target: string | undefined): string => {
-	if (target === undefined) return DEFAULT_REDIRECT
-	if (!target.startsWith('/')) return DEFAULT_REDIRECT
-	if (target.startsWith('//')) return DEFAULT_REDIRECT
-	return target
+  if (target === undefined) return DEFAULT_REDIRECT
+  if (!target.startsWith('/')) return DEFAULT_REDIRECT
+  if (target.startsWith('//')) return DEFAULT_REDIRECT
+  return target
 }
 
 /**
@@ -48,35 +48,35 @@ export const safeRedirect = (target: string | undefined): string => {
  * warning on `ShopOwnerIdentity`.
  */
 export const LoadingPage = ({ redirect }: { redirect: string | undefined }) => {
-	const navigate = useNavigate()
-	const router = useRouter()
-	const [result] = useQuery({ query: ShopOwnerCompaniesDocument, context: CTX_SHOP_OWNER_RESOURCE })
+  const navigate = useNavigate()
+  const router = useRouter()
+  const [result] = useQuery({ query: ShopOwnerCompaniesDocument, context: CTX_SHOP_OWNER_RESOURCE })
 
-	// `!== undefined` and not a truthiness test: the query answers a non-null list, and an owner with no
-	// companies yet answers `[]` — which is falsy in every JS sense and is a perfectly good session.
-	const authenticated = result.data?.shopOwnerCompanies !== undefined
-	const failed = result.error !== undefined
+  // `!== undefined` and not a truthiness test: the query answers a non-null list, and an owner with no
+  // companies yet answers `[]` — which is falsy in every JS sense and is a perfectly good session.
+  const authenticated = result.data?.shopOwnerCompanies !== undefined
+  const failed = result.error !== undefined
 
-	useEffect(() => {
-		if (authenticated) {
-			setSession({ email: getPendingEmail() })
-			// `history.push` rather than `navigate({ to })`: the target is a runtime string and the
-			// router's `to` is a union of known route paths, so this is the one navigation that cannot be
-			// type-checked. `safeRedirect` is what makes it safe instead.
-			router.history.push(safeRedirect(redirect))
-			return
-		}
+  useEffect(() => {
+    if (authenticated) {
+      setSession({ email: getPendingEmail() })
+      // `history.push` rather than `navigate({ to })`: the target is a runtime string and the
+      // router's `to` is a union of known route paths, so this is the one navigation that cannot be
+      // type-checked. `safeRedirect` is what makes it safe instead.
+      router.history.push(safeRedirect(redirect))
+      return
+    }
 
-		if (failed) {
-			clearAccessToken()
-			clearSession()
-			void navigate({ to: '/' })
-		}
-	}, [authenticated, failed, navigate, router, redirect])
+    if (failed) {
+      clearAccessToken()
+      clearSession()
+      void navigate({ to: '/' })
+    }
+  }, [authenticated, failed, navigate, router, redirect])
 
-	return (
-		<div className="flex h-full items-center justify-center">
-			<Spinner label="Loading session" />
-		</div>
-	)
+  return (
+    <div className="flex h-full items-center justify-center">
+      <Spinner label="Loading session" />
+    </div>
+  )
 }

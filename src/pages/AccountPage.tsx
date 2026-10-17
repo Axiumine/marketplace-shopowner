@@ -15,8 +15,8 @@ import { CloseAccount } from '@/features/account/CloseAccount'
  * confirmation, and it ends the session it was pressed in.
  */
 export const AccountPage = () => (
-	<>
-		<PageHeader title="Account" crumbs={[{ name: 'Dashboard', to: '/home' }, { name: 'Account' }]} />
-		<CloseAccount />
-	</>
+  <>
+    <PageHeader title="Account" crumbs={[{ name: 'Dashboard', to: '/home' }, { name: 'Account' }]} />
+    <CloseAccount />
+  </>
 )

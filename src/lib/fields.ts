@@ -28,13 +28,13 @@ import { z } from 'zod'
 export const SHAPE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export const required = (label: string, max: number) =>
-	z.string().trim().min(1, `${label} is required`).max(max, `${label} cannot exceed ${max} characters`)
+  z.string().trim().min(1, `${label} is required`).max(max, `${label} cannot exceed ${max} characters`)
 
 export const optional = (label: string, max: number) => z.string().trim().max(max, `${label} cannot exceed ${max} characters`)
 
 /** Blank stays blank — it is how a contact is removed. Anything else has to look like an address. */
 export const optionalEmail = (label: string, max: number) =>
-	optional(label, max).refine((value) => value === '' || SHAPE_EMAIL.test(value), `${label} is not a valid address`)
+  optional(label, max).refine((value) => value === '' || SHAPE_EMAIL.test(value), `${label} is not a valid address`)
 
 /**
  * One half of the GeoJSON pair, typed into a text box.
@@ -48,11 +48,11 @@ export const optionalEmail = (label: string, max: number) =>
  * it would put a latitude a `2dsphere` index cannot key past the form.
  */
 export const coordinate = (label: string, limit: number) =>
-	z
-		.string()
-		.trim()
-		.refine((value) => value !== '' && Number.isFinite(Number(value)), `${label} must be a number`)
-		.refine((value) => Math.abs(Number(value)) <= limit, `${label} is outside -${limit}..${limit}`)
+  z
+    .string()
+    .trim()
+    .refine((value) => value !== '' && Number.isFinite(Number(value)), `${label} must be a number`)
+    .refine((value) => Math.abs(Number(value)) <= limit, `${label} is outside -${limit}..${limit}`)
 
 /**
  * The rule the address box is checked by, in both forms that have one.
@@ -81,11 +81,11 @@ export const ADDRESS_MESSAGE = 'Select the address from the list'
  * asserted directly.
  */
 export const EMPTY_ADDRESS = {
-	addressComplete: '',
-	street: '',
-	postalCode: '',
-	city: '',
-	province: '',
-	longitude: '',
-	latitude: ''
+  addressComplete: '',
+  street: '',
+  postalCode: '',
+  city: '',
+  province: '',
+  longitude: '',
+  latitude: ''
 }

@@ -24,8 +24,8 @@ const COUNTRY_CENTER = { lat: 39.8283, lon: -98.5795 }
 
 /** A point the map can be framed on. Same two names the geocoder answers with. */
 interface Point {
-	readonly lat: number
-	readonly lon: number
+  readonly lat: number
+  readonly lon: number
 }
 
 /**
@@ -36,10 +36,10 @@ interface Point {
  * old matches behind it, ready to reappear under the next address the moment anything set the flag back.
  */
 type Outcome =
-	| { readonly type: 'searching' }
-	| { readonly type: 'found'; readonly results: readonly FoundAddress[] }
-	| { readonly type: 'empty' }
-	| { readonly type: 'error' }
+  | { readonly type: 'searching' }
+  | { readonly type: 'found'; readonly results: readonly FoundAddress[] }
+  | { readonly type: 'empty' }
+  | { readonly type: 'error' }
 
 /**
  * What the geocoder said, and which query it said it about.
@@ -48,8 +48,8 @@ type Outcome =
  * for what used to be there are still in state, correct about a query nobody is asking any more.
  */
 interface Response {
-	readonly query: string
-	readonly outcome: Outcome
+  readonly query: string
+  readonly outcome: Outcome
 }
 
 /** Below `MIN_LENGTH` nothing is worth a request. `trim`, because four spaces are not an address. */
@@ -75,10 +75,10 @@ const geocodable = (text: string): boolean => text.trim().length >= MIN_LENGTH
  *    caught up, so the spinner marks a request and not a pause in typing.
  */
 const outcomeOf = (typed: string, query: string, response: Response | null): Outcome | null => {
-	if (!geocodable(typed)) return null
-	if (response?.query === query) return response.outcome
+  if (!geocodable(typed)) return null
+  if (response?.query === query) return response.outcome
 
-	return geocodable(query) ? { type: 'searching' } : null
+  return geocodable(query) ? { type: 'searching' } : null
 }
 
 /*
@@ -88,33 +88,33 @@ const outcomeOf = (typed: string, query: string, response: Response | null): Out
  * meaningful name stay on the meaningful event.
  */
 interface AddressFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'onSelect' | 'onChange'> {
-	label: string
-	/** The address text. Controlled by the form: picking a suggestion rewrites it from the outside. */
-	value: string
-	error?: string | undefined
-	/**
-	 * Required, unlike the DOM's own.
-	 *
-	 * It is not just passed through — the field listens to it, because what the *keyboard* put in the box
-	 * is the only thing worth geocoding and it is the one thing `value` cannot tell apart from what the
-	 * form wrote back after a pick.
-	 */
-	onChange: ChangeEventHandler<HTMLInputElement>
-	/** Called with the whole geocoded address, so the form can fill postal code, city and province from it. */
-	onSelect: (address: FoundAddress) => void
-	/**
-	 * Where to frame the map before anything is typed. The country centre when nothing is given.
-	 *
-	 * For a form editing an address that already exists: the shop is somewhere, the map knows where, and
-	 * opening the editor on the middle of the country loses that for no reason. A form creating one passes
-	 * nothing, because there is nothing to pass.
-	 */
-	initialCenter?: Point | null | undefined
-	ref?: Ref<HTMLInputElement>
+  label: string
+  /** The address text. Controlled by the form: picking a suggestion rewrites it from the outside. */
+  value: string
+  error?: string | undefined
+  /**
+   * Required, unlike the DOM's own.
+   *
+   * It is not just passed through — the field listens to it, because what the *keyboard* put in the box
+   * is the only thing worth geocoding and it is the one thing `value` cannot tell apart from what the
+   * form wrote back after a pick.
+   */
+  onChange: ChangeEventHandler<HTMLInputElement>
+  /** Called with the whole geocoded address, so the form can fill postal code, city and province from it. */
+  onSelect: (address: FoundAddress) => void
+  /**
+   * Where to frame the map before anything is typed. The country centre when nothing is given.
+   *
+   * For a form editing an address that already exists: the shop is somewhere, the map knows where, and
+   * opening the editor on the middle of the country loses that for no reason. A form creating one passes
+   * nothing, because there is nothing to pass.
+   */
+  initialCenter?: Point | null | undefined
+  ref?: Ref<HTMLInputElement>
 }
 
 const HINT_CLASS =
-	'w-full rounded-box px-3 py-2 text-left text-sm hover:bg-palette-bg1 focus-visible:bg-palette-bg1 focus-visible:outline-none'
+  'w-full rounded-box px-3 py-2 text-left text-sm hover:bg-palette-bg1 focus-visible:bg-palette-bg1 focus-visible:outline-none'
 
 /**
  * An address box that geocodes what is typed into it: suggestions from OpenStreetMap underneath, and a
@@ -130,120 +130,120 @@ const HINT_CLASS =
  * home address and the company's legal seat, where the same OSM answer lands in different fields.
  */
 export const AddressField = ({
-	label,
-	value,
-	error,
-	onChange,
-	onSelect,
-	initialCenter = null,
-	className = '',
-	ref,
-	...rest
+  label,
+  value,
+  error,
+  onChange,
+  onSelect,
+  initialCenter = null,
+  className = '',
+  ref,
+  ...rest
 }: AddressFieldProps) => {
-	const [response, setResponse] = useState<Response | null>(null)
-	const [point, setPoint] = useState<FoundAddress | null>(null)
+  const [response, setResponse] = useState<Response | null>(null)
+  const [point, setPoint] = useState<FoundAddress | null>(null)
 
-	/**
-	 * What the keyboard has put in the box since the last pick, and the only thing ever geocoded.
-	 *
-	 * ⚠️ Not `value`. The box is controlled by the form, and the form writes to it twice: once as the
-	 * owner types, and again when a pick is accepted — and that second write came *from* the geocoder.
-	 * Searching for it reopens the list under an address that was already chosen, asking OSM to confirm
-	 * what it just said. Which of the two a given `value` is cannot be read off the value itself: it
-	 * depends on what the form chose to write, and the two forms using this field write different things
-	 * — a street here, the whole composed line there.
-	 *
-	 * Reset to empty by a pick rather than left holding the text that led to it. That is what closes the
-	 * list for good: nothing is typed, so there is nothing to search for, and a debounce still in flight
-	 * from before the pick settles onto the empty string instead of reopening the list behind it.
-	 */
-	const [typed, setTyped] = useState('')
-	const query = useDebouncedValue(typed, SEARCH_DEBOUNCE_MS)
+  /**
+   * What the keyboard has put in the box since the last pick, and the only thing ever geocoded.
+   *
+   * ⚠️ Not `value`. The box is controlled by the form, and the form writes to it twice: once as the
+   * owner types, and again when a pick is accepted — and that second write came *from* the geocoder.
+   * Searching for it reopens the list under an address that was already chosen, asking OSM to confirm
+   * what it just said. Which of the two a given `value` is cannot be read off the value itself: it
+   * depends on what the form chose to write, and the two forms using this field write different things
+   * — a street here, the whole composed line there.
+   *
+   * Reset to empty by a pick rather than left holding the text that led to it. That is what closes the
+   * list for good: nothing is typed, so there is nothing to search for, and a debounce still in flight
+   * from before the pick settles onto the empty string instead of reopening the list behind it.
+   */
+  const [typed, setTyped] = useState('')
+  const query = useDebouncedValue(typed, SEARCH_DEBOUNCE_MS)
 
-	const outcome = outcomeOf(typed, query, response)
+  const outcome = outcomeOf(typed, query, response)
 
-	useEffect(() => {
-		if (!geocodable(query)) return
+  useEffect(() => {
+    if (!geocodable(query)) return
 
-		const controller = new AbortController()
+    const controller = new AbortController()
 
-		searchAddresses(query, controller.signal)
-			.then((found) => {
-				const first = found[0]
-				if (first === undefined) {
-					setResponse({ query, outcome: { type: 'empty' } })
-					return
-				}
+    searchAddresses(query, controller.signal)
+      .then((found) => {
+        const first = found[0]
+        if (first === undefined) {
+          setResponse({ query, outcome: { type: 'empty' } })
+          return
+        }
 
-				// The map follows the best match as the address is typed, before anything is picked.
-				setPoint(first)
-				setResponse({ query, outcome: { type: 'found', results: found } })
-			})
-			.catch(() => {
-				// An aborted request is this effect's own cleanup, not a failure: the owner typed another
-				// character. Reporting it would flash "search unavailable" between two keystrokes.
-				if (controller.signal.aborted) return
+        // The map follows the best match as the address is typed, before anything is picked.
+        setPoint(first)
+        setResponse({ query, outcome: { type: 'found', results: found } })
+      })
+      .catch(() => {
+        // An aborted request is this effect's own cleanup, not a failure: the owner typed another
+        // character. Reporting it would flash "search unavailable" between two keystrokes.
+        if (controller.signal.aborted) return
 
-				setResponse({ query, outcome: { type: 'error' } })
-			})
+        setResponse({ query, outcome: { type: 'error' } })
+      })
 
-		// Aborting is what keeps the answers in order. Without it a slow request for `Main Str` can land
-		// after a fast one for `1 Main Street` and replace the newer suggestions with older ones.
-		return () => {
-			controller.abort()
-		}
-	}, [query])
+    // Aborting is what keeps the answers in order. Without it a slow request for `Main Str` can land
+    // after a fast one for `1 Main Street` and replace the newer suggestions with older ones.
+    return () => {
+      controller.abort()
+    }
+  }, [query])
 
-	const choose = (address: FoundAddress) => {
-		setTyped('')
-		setPoint(address)
-		setResponse(null)
-		onSelect(address)
-	}
+  const choose = (address: FoundAddress) => {
+    setTyped('')
+    setPoint(address)
+    setResponse(null)
+    onSelect(address)
+  }
 
-	const center = point ?? initialCenter ?? COUNTRY_CENTER
+  const center = point ?? initialCenter ?? COUNTRY_CENTER
 
-	return (
-		<div className={`flex flex-col gap-2 ${className}`}>
-			<TextField
-				label={label}
-				error={error}
-				value={value}
-				autoComplete="off"
-				ref={ref}
-				onChange={(event) => {
-					setTyped(event.target.value)
-					onChange(event)
-				}}
-				{...rest}
-			/>
+  return (
+    <div className={`flex flex-col gap-2 ${className}`}>
+      <TextField
+        label={label}
+        error={error}
+        value={value}
+        autoComplete="off"
+        ref={ref}
+        onChange={(event) => {
+          setTyped(event.target.value)
+          onChange(event)
+        }}
+        {...rest}
+      />
 
-			{outcome?.type === 'searching' ? <Spinner label="Searching addresses" /> : null}
-			{outcome?.type === 'error' ? <Alert tone="error">Address search unavailable</Alert> : null}
-			{outcome?.type === 'empty' ? (
-				<p role="status" className="text-sm text-tip">
-					No address found
-				</p>
-			) : null}
-			{outcome?.type === 'found' ? (
-				<ul aria-label="Addresses found" className="rounded-box border border-tip bg-white">
-					{outcome.results.map((result) => (
-						<li key={result.id} className="border-b border-palette-bg1 last:border-b-0">
-							<button
-								type="button"
-								className={HINT_CLASS}
-								onClick={() => {
-									choose(result)
-								}}
-							>
-								{result.label}
-							</button>
-						</li>
-					))}
-				</ul>
-			) : null}
+      {outcome?.type === 'searching' ? <Spinner label="Searching addresses" /> : null}
+      {outcome?.type === 'error' ? <Alert tone="error">Address search unavailable</Alert> : null}
+      {outcome?.type === 'empty' ? (
+        <p role="status" className="text-sm text-tip">
+          No address found
+        </p>
+      ) : null}
+      {outcome?.type === 'found' ? (
+        <ul aria-label="Addresses found" className="rounded-box border border-tip bg-white">
+          {outcome.results.map((result) => (
+            <li key={result.id} className="border-b border-palette-bg1 last:border-b-0">
+              <button
+                type="button"
+                className={HINT_CLASS}
+                onClick={() => {
+                  choose(result)
+                }}
+              >
+                {result.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
-			<AddressMap lat={center.lat} lon={center.lon} title="Address map" />
-		</div>
-	)
+      <AddressMap lat={center.lat} lon={center.lon} title="Address map" />
+    </div>
+  )
 }

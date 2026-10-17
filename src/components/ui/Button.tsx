@@ -6,9 +6,9 @@ export type ButtonVariant = 'primary' | 'ghost' | 'danger'
 export type ButtonPadding = 'default' | 'form'
 
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
-	primary: 'bg-third text-palette-white hover:bg-tomato',
-	ghost: 'bg-secondary text-palette-bg hover:bg-primary',
-	danger: 'bg-app-error text-palette-white hover:bg-tomato'
+  primary: 'bg-third text-palette-white hover:bg-tomato',
+  ghost: 'bg-secondary text-palette-bg hover:bg-primary',
+  danger: 'bg-app-error text-palette-white hover:bg-tomato'
 }
 
 /*
@@ -17,8 +17,8 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
  * coin toss. Same reason `TextField` keeps its right padding out of its own base class.
  */
 const PADDING_CLASS: Record<ButtonPadding, string> = {
-	default: 'px-4',
-	form: 'px-[30px]'
+  default: 'px-4',
+  form: 'px-[30px]'
 }
 
 /**
@@ -30,16 +30,16 @@ const PADDING_CLASS: Record<ButtonPadding, string> = {
  * selector, one pseudo-class more specific than the bare utility.
  */
 const BASE_CLASS =
-	'inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold ' +
-	'transition-colors disabled:cursor-not-allowed disabled:opacity-50'
+  'inline-flex cursor-pointer items-center justify-center gap-2 rounded-box py-2 text-sm font-semibold ' +
+  'transition-colors disabled:cursor-not-allowed disabled:opacity-50'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-	variant?: ButtonVariant
-	/** How much room the label gets on either side. `form` is the wider one every form's submit uses. */
-	padding?: ButtonPadding
-	/** Shows a spinner and disables the button. A loading button is always disabled — never one alone. */
-	loading?: boolean
-	children: ReactNode
+  variant?: ButtonVariant
+  /** How much room the label gets on either side. `form` is the wider one every form's submit uses. */
+  padding?: ButtonPadding
+  /** Shows a spinner and disables the button. A loading button is always disabled — never one alone. */
+  loading?: boolean
+  children: ReactNode
 }
 
 /**
@@ -49,20 +49,20 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * way a "Show password" toggle ends up posting the login form. Forms opt in explicitly.
  */
 export const Button = ({
-	variant = 'primary',
-	padding = 'default',
-	loading = false,
-	disabled = false,
-	children,
-	...rest
+  variant = 'primary',
+  padding = 'default',
+  loading = false,
+  disabled = false,
+  children,
+  ...rest
 }: ButtonProps) => (
-	<button
-		type="button"
-		className={`${BASE_CLASS} ${VARIANT_CLASS[variant]} ${PADDING_CLASS[padding]}`}
-		disabled={disabled || loading}
-		{...rest}
-	>
-		{loading ? <Spinner /> : null}
-		{children}
-	</button>
+  <button
+    type="button"
+    className={`${BASE_CLASS} ${VARIANT_CLASS[variant]} ${PADDING_CLASS[padding]}`}
+    disabled={disabled || loading}
+    {...rest}
+  >
+    {loading ? <Spinner /> : null}
+    {children}
+  </button>
 )

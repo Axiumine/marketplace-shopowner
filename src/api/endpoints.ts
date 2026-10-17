@@ -19,10 +19,10 @@ import { env } from '@/env'
  * by construction.
  */
 export const ENDPOINT = {
-	publicAuthorization: env.publicAuthorization,
-	shopOwnerAuthorization: env.shopOwnerAuthorization,
-	shopOwnerResource: env.shopOwnerResource,
-	logout: env.logout
+  publicAuthorization: env.publicAuthorization,
+  shopOwnerAuthorization: env.shopOwnerAuthorization,
+  shopOwnerResource: env.shopOwnerResource,
+  logout: env.logout
 } as const
 
 export const CTX_PUBLIC_AUTHORIZATION: Partial<OperationContext> = Object.freeze({ url: ENDPOINT.publicAuthorization })

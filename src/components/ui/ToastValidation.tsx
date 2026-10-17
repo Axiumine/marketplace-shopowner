@@ -26,18 +26,18 @@ export const VALIDATION_HEADER = 'Fix these fields before saving:'
  * key would let React keep a `<li>` in place while its content changed under it.
  */
 export const ToastValidation = ({ errors }: { errors: FieldErrors }) => {
-	const messages = messagesToFix(errors)
+  const messages = messagesToFix(errors)
 
-	if (messages.length === 0) return null
+  if (messages.length === 0) return null
 
-	return (
-		<Toast tone="error">
-			<span className="font-semibold">{VALIDATION_HEADER}</span>
-			<ul className="mt-1 list-disc pl-4">
-				{messages.map((message) => (
-					<li key={message}>{message}</li>
-				))}
-			</ul>
-		</Toast>
-	)
+  return (
+    <Toast tone="error">
+      <span className="font-semibold">{VALIDATION_HEADER}</span>
+      <ul className="mt-1 list-disc pl-4">
+        {messages.map((message) => (
+          <li key={message}>{message}</li>
+        ))}
+      </ul>
+    </Toast>
+  )
 }

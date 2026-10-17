@@ -11,12 +11,12 @@
 export const NO_VALUE = '---'
 
 const DATE_TIME_FORMAT = new Intl.DateTimeFormat('en-GB', {
-	day: 'numeric',
-	month: 'long',
-	year: 'numeric',
-	hour: '2-digit',
-	minute: '2-digit',
-	second: '2-digit'
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  second: '2-digit'
 })
 
 /*
@@ -45,13 +45,13 @@ const DATE_FORMAT = new Intl.DateTimeFormat('en-GB', { day: '2-digit', month: '2
  * an owner table is worse than a dash, and the check costs one comparison.
  */
 export const formatDateTime = (iso: string): string => {
-	const date = new Date(iso)
-	return Number.isNaN(date.getTime()) ? NO_VALUE : DATE_TIME_FORMAT.format(date)
+  const date = new Date(iso)
+  return Number.isNaN(date.getTime()) ? NO_VALUE : DATE_TIME_FORMAT.format(date)
 }
 
 export const formatDate = (iso: string): string => {
-	const date = new Date(iso)
-	return Number.isNaN(date.getTime()) ? NO_VALUE : DATE_FORMAT.format(date)
+  const date = new Date(iso)
+  return Number.isNaN(date.getTime()) ? NO_VALUE : DATE_FORMAT.format(date)
 }
 
 /** A missing value renders as the placeholder, never as an empty cell or the string `null`. */
@@ -85,14 +85,14 @@ export const handleNullBoolYN = (val: boolean | null | undefined): string => (va
  * where `---` is not "nothing" but three characters the owner has to delete.
  */
 export const toDateInput = (iso: string): string => {
-	const date = new Date(iso)
-	return Number.isNaN(date.getTime()) ? '' : date.toISOString().slice(0, 10)
+  const date = new Date(iso)
+  return Number.isNaN(date.getTime()) ? '' : date.toISOString().slice(0, 10)
 }
 
 /** As above for `<input type="time">`: the `HH:MM` half of a stored opening hour, in UTC. */
 export const toTimeInput = (iso: string): string => {
-	const date = new Date(iso)
-	return Number.isNaN(date.getTime()) ? '' : date.toISOString().slice(11, 16)
+  const date = new Date(iso)
+  return Number.isNaN(date.getTime()) ? '' : date.toISOString().slice(11, 16)
 }
 
 /**
@@ -116,4 +116,4 @@ export const emptyInNull = (value: string): string | null => (value === '' ? nul
 
 /** `1 main street, 02109 Boston (MA)` */
 export const formatAddress = (address: { street: string; postalCode: string; city: string; province: string }): string =>
-	`${address.street}, ${address.postalCode} ${address.city} (${address.province})`
+  `${address.street}, ${address.postalCode} ${address.city} (${address.province})`

@@ -9,8 +9,8 @@ import { Link } from '@tanstack/react-router'
  * A navigation target is exactly the kind of string that goes stale silently when a route is renamed.
  */
 export const WigButton = ({ title, phrase, to }: { title: string; phrase: string; to: NonNullable<LinkProps['to']> }) => (
-	<Link to={to} className="block rounded-box border-4 border-third bg-white p-4 shadow transition-shadow hover:shadow-lg">
-		<h2 className="font-bold">{title}</h2>
-		<p className="text-sm text-tip">{phrase}</p>
-	</Link>
+  <Link to={to} className="block rounded-box border-4 border-third bg-white p-4 shadow transition-shadow hover:shadow-lg">
+    <h2 className="font-bold">{title}</h2>
+    <p className="text-sm text-tip">{phrase}</p>
+  </Link>
 )

@@ -43,7 +43,7 @@ against the resolver in the service repo before trusting a slice; recorded diver
 app's slices are in [`REPO.md`](./REPO.md). `src/gql/` is **generated** — never edit it, run
 `yarn codegen`.
 
-⚠️ **Tabs, not spaces** (eslint `indent: ['error','tab']`), matching every repo in the workspace.
+⚠️ **Two spaces, not tabs** (prettier `useTabs: false`, `tabWidth: 2`; eslint `indent: ['error', 2]`), matching every repo in the workspace (ADR-058). The `graphql()` documents in `src/api/operations/` are embedded template strings that prettier re-indents, and the keys of the generated `src/gql/*/gql.ts` are those exact strings — after any change to their indentation run `yarn codegen`.
 
 ⚠️ **Never read, echo or commit a secret file.** The dotted env file is git-ignored and the pre-commit
 hook refuses it; `env` (no dot) is the committed template and is safe to read. To inspect the dotted one,
@@ -56,6 +56,8 @@ that message. Merging is the user's call alone.
 ⚠️ **Never lower a coverage or mutation threshold, and never remove a gate.** 100% on all four coverage
 metrics, mutation score 100 — the same bar as every other repo. `git commit --no-verify` is not needed
 here and must not be used; a red gate is fixed with a test.
+
+⚠️ **`osv-scanner.toml` ignores `GHSA-vfj7-8cjw-p6xm` (braces, no patched release) until 2027-01-15, under ADR-057.** The entry expires on purpose: after that date the Scorecard Vulnerabilities check and the pre-push floor gate fail again, and that failure is the review. Delete the entry as soon as a patched `braces` exists; do not just push the date out.
 
 ## Cross-repo
 

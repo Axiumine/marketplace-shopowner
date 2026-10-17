@@ -28,120 +28,120 @@ type RenderOptions = Parameters<RenderFn>[1]
 
 /** A stand-in for the widget, in the same shape `Turnstile.test.tsx` gives it — one call per mount. */
 const widgetApi = () => {
-	let mounted = 0
-	const render = vi.fn<RenderFn>(() => `widget-${++mounted}`)
-	const remove = vi.fn()
+  let mounted = 0
+  const render = vi.fn<RenderFn>(() => `widget-${++mounted}`)
+  const remove = vi.fn()
 
-	vi.stubGlobal('turnstile', { render, remove })
+  vi.stubGlobal('turnstile', { render, remove })
 
-	return {
-		render,
-		remove,
-		/** The options a given `render` call (0-based, in call order) was given. */
-		optionsAt: (call: number) => (render as Mock<RenderFn>).mock.calls[call]?.[1] as RenderOptions
-	}
+  return {
+    render,
+    remove,
+    /** The options a given `render` call (0-based, in call order) was given. */
+    optionsAt: (call: number) => (render as Mock<RenderFn>).mock.calls[call]?.[1] as RenderOptions
+  }
 }
 
 afterEach(() => {
-	vi.unstubAllEnvs()
-	document.getElementById(SCRIPT_ID)?.remove()
+  vi.unstubAllEnvs()
+  document.getElementById(SCRIPT_ID)?.remove()
 })
 
 describe('LoginForm, with a Turnstile site key configured', () => {
-	it('remounts the widget after a refused submit and sends the fresh token it issues', async () => {
-		vi.stubEnv('VITE_TURNSTILE_SITE_KEY', SITE_KEY)
-		vi.resetModules()
+  it('remounts the widget after a refused submit and sends the fresh token it issues', async () => {
+    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', SITE_KEY)
+    vi.resetModules()
 
-		// A script already in the document resolves `loadScript()` immediately — see the same technique
-		// in `Turnstile.test.tsx` — so the widget renders without a `load` event to fire by hand.
-		const existing = document.createElement('script')
-		existing.id = SCRIPT_ID
-		document.head.append(existing)
+    // A script already in the document resolves `loadScript()` immediately — see the same technique
+    // in `Turnstile.test.tsx` — so the widget renders without a `load` event to fire by hand.
+    const existing = document.createElement('script')
+    existing.id = SCRIPT_ID
+    document.head.append(existing)
 
-		const api = widgetApi()
-		const { createAppRouter } = await import('@/router')
-		const router = createAppRouter(createMemoryHistory({ initialEntries: ['/'] }))
+    const api = widgetApi()
+    const { createAppRouter } = await import('@/router')
+    const router = createAppRouter(createMemoryHistory({ initialEntries: ['/'] }))
 
-		const stub = stubGraphQL({
-			Login: [
-				{ data: { login: { accessToken: '', onboardingStep: '', onboardingDone: false } } },
-				{ data: { login: { accessToken: '', onboardingStep: '', onboardingDone: false } } },
-				{ data: { login: { accessToken: 'tok-2', onboardingStep: '', onboardingDone: false } } }
-			],
-			ShopOwnerCompanies: { data: { shopOwnerCompanies: [] } }
-		})
+    const stub = stubGraphQL({
+      Login: [
+        { data: { login: { accessToken: '', onboardingStep: '', onboardingDone: false } } },
+        { data: { login: { accessToken: '', onboardingStep: '', onboardingDone: false } } },
+        { data: { login: { accessToken: 'tok-2', onboardingStep: '', onboardingDone: false } } }
+      ],
+      ShopOwnerCompanies: { data: { shopOwnerCompanies: [] } }
+    })
 
-		render(
-			<UrqlProvider value={createGraphQLClient({ onSessionLost: vi.fn() })}>
-				<RouterProvider router={router as never} />
-			</UrqlProvider>
-		)
+    render(
+      <UrqlProvider value={createGraphQLClient({ onSessionLost: vi.fn() })}>
+        <RouterProvider router={router as never} />
+      </UrqlProvider>
+    )
 
-		await waitFor(() => {
-			expect(router.state.status).toBe('idle')
-		})
-		await waitFor(() => {
-			expect(api.render).toHaveBeenCalledTimes(1)
-		})
+    await waitFor(() => {
+      expect(router.state.status).toBe('idle')
+    })
+    await waitFor(() => {
+      expect(api.render).toHaveBeenCalledTimes(1)
+    })
 
-		// The shop owner solves the challenge and submits with a wrong password.
-		act(() => {
-			api.optionsAt(0).callback('token-1')
-		})
-		await userEvent.type(screen.getByLabelText('Email'), 'owner@marketplace.test')
-		await userEvent.type(screen.getByLabelText('Password'), 'wrong-password')
-		await userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
+    // The shop owner solves the challenge and submits with a wrong password.
+    act(() => {
+      api.optionsAt(0).callback('token-1')
+    })
+    await userEvent.type(screen.getByLabelText('Email'), 'owner@marketplace.test')
+    await userEvent.type(screen.getByLabelText('Password'), 'wrong-password')
+    await userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
 
-		await waitFor(() => {
-			expect(stub.calls.filter((call) => call.operationName === 'Login')).toHaveLength(1)
-		})
-		expect(stub.calls[0]?.variables).toMatchObject({ turnstileToken: 'token-1' })
-		await screen.findByText('Invalid credentials')
+    await waitFor(() => {
+      expect(stub.calls.filter((call) => call.operationName === 'Login')).toHaveLength(1)
+    })
+    expect(stub.calls[0]?.variables).toMatchObject({ turnstileToken: 'token-1' })
+    await screen.findByText('Invalid credentials')
 
-		// The rejected attempt already spent `token-1` against Cloudflare's siteverify. Without a reset
-		// the widget would still be sitting there holding it, and the corrected resubmit below would go
-		// out carrying the same, already-spent token.
-		await waitFor(() => {
-			expect(api.remove).toHaveBeenCalledWith('widget-1')
-		})
-		await waitFor(() => {
-			expect(api.render).toHaveBeenCalledTimes(2)
-		})
+    // The rejected attempt already spent `token-1` against Cloudflare's siteverify. Without a reset
+    // the widget would still be sitting there holding it, and the corrected resubmit below would go
+    // out carrying the same, already-spent token.
+    await waitFor(() => {
+      expect(api.remove).toHaveBeenCalledWith('widget-1')
+    })
+    await waitFor(() => {
+      expect(api.render).toHaveBeenCalledTimes(2)
+    })
 
-		// A second refused attempt in a row. This is the regression case for the key updater itself: a
-		// version that always produces the same value (rather than one that keeps changing) would leave
-		// `turnstileKey` unchanged the second time, so `Turnstile` would never unmount and `widget-2`
-		// would stay in place instead of a fresh `widget-3` taking over.
-		act(() => {
-			api.optionsAt(1).callback('token-2')
-		})
-		await userEvent.clear(screen.getByLabelText('Password'))
-		await userEvent.type(screen.getByLabelText('Password'), 'still-wrong-password')
-		await userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
+    // A second refused attempt in a row. This is the regression case for the key updater itself: a
+    // version that always produces the same value (rather than one that keeps changing) would leave
+    // `turnstileKey` unchanged the second time, so `Turnstile` would never unmount and `widget-2`
+    // would stay in place instead of a fresh `widget-3` taking over.
+    act(() => {
+      api.optionsAt(1).callback('token-2')
+    })
+    await userEvent.clear(screen.getByLabelText('Password'))
+    await userEvent.type(screen.getByLabelText('Password'), 'still-wrong-password')
+    await userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
 
-		await waitFor(() => {
-			expect(stub.calls.filter((call) => call.operationName === 'Login')).toHaveLength(2)
-		})
-		expect(stub.calls[1]?.variables).toMatchObject({ turnstileToken: 'token-2' })
+    await waitFor(() => {
+      expect(stub.calls.filter((call) => call.operationName === 'Login')).toHaveLength(2)
+    })
+    expect(stub.calls[1]?.variables).toMatchObject({ turnstileToken: 'token-2' })
 
-		await waitFor(() => {
-			expect(api.remove).toHaveBeenCalledWith('widget-2')
-		})
-		await waitFor(() => {
-			expect(api.render).toHaveBeenCalledTimes(3)
-		})
+    await waitFor(() => {
+      expect(api.remove).toHaveBeenCalledWith('widget-2')
+    })
+    await waitFor(() => {
+      expect(api.render).toHaveBeenCalledTimes(3)
+    })
 
-		// The third, fresh widget solves on its own and hands up a new token.
-		act(() => {
-			api.optionsAt(2).callback('token-3')
-		})
-		await userEvent.clear(screen.getByLabelText('Password'))
-		await userEvent.type(screen.getByLabelText('Password'), 'password123')
-		await userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
+    // The third, fresh widget solves on its own and hands up a new token.
+    act(() => {
+      api.optionsAt(2).callback('token-3')
+    })
+    await userEvent.clear(screen.getByLabelText('Password'))
+    await userEvent.type(screen.getByLabelText('Password'), 'password123')
+    await userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
 
-		await waitFor(() => {
-			expect(stub.calls.filter((call) => call.operationName === 'Login')).toHaveLength(3)
-		})
-		expect(stub.calls[2]?.variables).toMatchObject({ turnstileToken: 'token-3' })
-	})
+    await waitFor(() => {
+      expect(stub.calls.filter((call) => call.operationName === 'Login')).toHaveLength(3)
+    })
+    expect(stub.calls[2]?.variables).toMatchObject({ turnstileToken: 'token-3' })
+  })
 })

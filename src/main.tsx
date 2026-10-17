@@ -31,10 +31,10 @@ import { createAppRouter } from '@/router'
 const router = createAppRouter()
 
 const client = createGraphQLClient({
-	onSessionLost: () => {
-		clearSession()
-		window.location.assign('/')
-	}
+  onSessionLost: () => {
+    clearSession()
+    window.location.assign('/')
+  }
 })
 
 const container = document.getElementById('root')
@@ -42,9 +42,9 @@ const container = document.getElementById('root')
 if (container === null) throw new Error('#root element not found: index.html is not the expected one.')
 
 createRoot(container).render(
-	<StrictMode>
-		<UrqlProvider value={client}>
-			<RouterProvider router={router} />
-		</UrqlProvider>
-	</StrictMode>
+  <StrictMode>
+    <UrqlProvider value={client}>
+      <RouterProvider router={router} />
+    </UrqlProvider>
+  </StrictMode>
 )

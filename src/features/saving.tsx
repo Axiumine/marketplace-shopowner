@@ -19,9 +19,9 @@ import { Toast } from '@/components/ui/Toast'
  * firing the rest and leaving the owner with several half-applied cards and one error message.
  */
 export interface SavableSection {
-	/** True when the owner changed something inside this section. */
-	changed: boolean
-	save: () => Promise<boolean>
+  /** True when the owner changed something inside this section. */
+  changed: boolean
+  save: () => Promise<boolean>
 }
 
 /** Registers a section, or forgets it — `null` means the section unmounted. */
@@ -47,72 +47,72 @@ export type RegisterSection = (id: string, section: SavableSection | null) => vo
  * moved, which is what keeps a section re-registering itself from looping.
  */
 export const useSaving = () => {
-	const sections = useRef(new Map<string, SavableSection>())
-	const [changed, setChanged] = useState<ReadonlySet<string>>(() => new Set())
-	/*
-	 * How many times the page has been saved, and the key the caller remounts its sections with.
-	 *
-	 * A remount is the whole mechanism behind "after Save the page looks freshly loaded": every open
-	 * `EditableRow` goes back to a value and a pen, every address editor folds away, every form re-seeds
-	 * itself from the data the save just invalidated in the cache. ⚠️ It has to be a remount and cannot be
-	 * a `close()` passed down — `EditableRow` deliberately has no way to close, because closing a row
-	 * while react-hook-form still holds its edited value is how a page comes to display the server's
-	 * value and save a different one (see the note on that component). Unmounting takes the form with the
-	 * row, so there is no stale value left to disagree with.
-	 */
-	const [version, setVersion] = useState(0)
+  const sections = useRef(new Map<string, SavableSection>())
+  const [changed, setChanged] = useState<ReadonlySet<string>>(() => new Set())
+  /*
+   * How many times the page has been saved, and the key the caller remounts its sections with.
+   *
+   * A remount is the whole mechanism behind "after Save the page looks freshly loaded": every open
+   * `EditableRow` goes back to a value and a pen, every address editor folds away, every form re-seeds
+   * itself from the data the save just invalidated in the cache. ⚠️ It has to be a remount and cannot be
+   * a `close()` passed down — `EditableRow` deliberately has no way to close, because closing a row
+   * while react-hook-form still holds its edited value is how a page comes to display the server's
+   * value and save a different one (see the note on that component). Unmounting takes the form with the
+   * row, so there is no stale value left to disagree with.
+   */
+  const [version, setVersion] = useState(0)
 
-	/*
-	 * Both functions are built once and keep their identity for the life of the page, which is what
-	 * `useSavableSection` leans on: `register` sits in the dependency list of the effect that registers a
-	 * section, so a fresh identity per render would re-register every section on every render — and since
-	 * `register` can re-render the page, that is a loop.
-	 *
-	 * A lazy `useState` initialiser and not `useCallback(fn, [])`. The two behave identically, but an empty
-	 * dependency list is a claim nothing can check: replace it with a list holding any constant and the
-	 * behaviour is unchanged, so the one guarantee this hook has to make would be asserted nowhere.
-	 */
-	const [actions] = useState<{ register: RegisterSection; saveAll: () => Promise<boolean> }>(() => ({
-		register: (id, section) => {
-			if (section === null) sections.current.delete(id)
-			else sections.current.set(id, section)
+  /*
+   * Both functions are built once and keep their identity for the life of the page, which is what
+   * `useSavableSection` leans on: `register` sits in the dependency list of the effect that registers a
+   * section, so a fresh identity per render would re-register every section on every render — and since
+   * `register` can re-render the page, that is a loop.
+   *
+   * A lazy `useState` initialiser and not `useCallback(fn, [])`. The two behave identically, but an empty
+   * dependency list is a claim nothing can check: replace it with a list holding any constant and the
+   * behaviour is unchanged, so the one guarantee this hook has to make would be asserted nowhere.
+   */
+  const [actions] = useState<{ register: RegisterSection; saveAll: () => Promise<boolean> }>(() => ({
+    register: (id, section) => {
+      if (section === null) sections.current.delete(id)
+      else sections.current.set(id, section)
 
-			setChanged((previous) => {
-				const dirty = section?.changed === true
+      setChanged((previous) => {
+        const dirty = section?.changed === true
 
-				if (previous.has(id) === dirty) return previous
+        if (previous.has(id) === dirty) return previous
 
-				const next = new Set(previous)
+        const next = new Set(previous)
 
-				if (dirty) next.add(id)
-				else next.delete(id)
+        if (dirty) next.add(id)
+        else next.delete(id)
 
-				return next
-			})
-		},
+        return next
+      })
+    },
 
-		/**
-		 * Saves every registered section, in registration order, stopping at the first refusal.
-		 *
-		 * Clean sections are asked too: each one decides which of its own writes to send, and a section with
-		 * nothing to do answers true without a round-trip. Putting that decision here instead would need the
-		 * registry to know which mutation covers which field.
-		 */
-		saveAll: async () => {
-			for (const section of sections.current.values()) {
-				if (!(await section.save())) return false
-			}
+    /**
+     * Saves every registered section, in registration order, stopping at the first refusal.
+     *
+     * Clean sections are asked too: each one decides which of its own writes to send, and a section with
+     * nothing to do answers true without a round-trip. Putting that decision here instead would need the
+     * registry to know which mutation covers which field.
+     */
+    saveAll: async () => {
+      for (const section of sections.current.values()) {
+        if (!(await section.save())) return false
+      }
 
-			// Only a save that went through all the way bumps it — a page left half-written is a page the
-			// owner still has edits on, and closing their rows would hide the values they would have to
-			// retype.
-			setVersion((number) => number + 1)
+      // Only a save that went through all the way bumps it — a page left half-written is a page the
+      // owner still has edits on, and closing their rows would hide the values they would have to
+      // retype.
+      setVersion((number) => number + 1)
 
-			return true
-		}
-	}))
+      return true
+    }
+  }))
 
-	return { ...actions, changed: changed.size > 0, version }
+  return { ...actions, changed: changed.size > 0, version }
 }
 
 /**
@@ -135,8 +135,8 @@ export const useSaving = () => {
  * separates "refused" from "written".
  */
 export const saveValidated = async <T extends FieldValues>(
-	handleSubmit: UseFormHandleSubmit<T>,
-	write: (values: T) => Promise<boolean>
+  handleSubmit: UseFormHandleSubmit<T>,
+  write: (values: T) => Promise<boolean>
 ): Promise<boolean> => (await handleSubmit(write)()) === true
 
 /** What the owner is asked before an edit is thrown away. */
@@ -166,10 +166,10 @@ export const DISCARD_WARNING = 'There are unsaved changes. Do you really want to
  * around it, and `useBlocker` reads the router context.
  */
 export const useDiscardWarning = (changed: boolean) => {
-	useBlocker({
-		disabled: !changed,
-		shouldBlockFn: () => !window.confirm(DISCARD_WARNING)
-	})
+  useBlocker({
+    disabled: !changed,
+    shouldBlockFn: () => !window.confirm(DISCARD_WARNING)
+  })
 }
 
 /**
@@ -181,24 +181,24 @@ export const useDiscardWarning = (changed: boolean) => {
  * with it.
  */
 export const useSavableSection = (id: string, register: RegisterSection, changed: boolean, save: () => Promise<boolean>) => {
-	const saveRef = useRef(save)
+  const saveRef = useRef(save)
 
-	useEffect(() => {
-		saveRef.current = save
-	})
+  useEffect(() => {
+    saveRef.current = save
+  })
 
-	useEffect(() => {
-		register(id, { changed, save: () => saveRef.current() })
-	}, [id, register, changed])
+  useEffect(() => {
+    register(id, { changed, save: () => saveRef.current() })
+  }, [id, register, changed])
 
-	// Its own effect, with `changed` out of the dependencies: merged into the one above, the cleanup
-	// would fire on every dirtiness flip and unregister the section a beat before it re-registers.
-	useEffect(
-		() => () => {
-			register(id, null)
-		},
-		[id, register]
-	)
+  // Its own effect, with `changed` out of the dependencies: merged into the one above, the cleanup
+  // would fire on every dirtiness flip and unregister the section a beat before it re-registers.
+  useEffect(
+    () => () => {
+      register(id, null)
+    },
+    [id, register]
+  )
 }
 
 /**
@@ -216,38 +216,38 @@ export const useSavableSection = (id: string, register: RegisterSection, changed
  * never sit above a form holding unsaved changes.
  */
 export const SaveChanges = ({ changed, saveAll }: { changed: boolean; saveAll: () => Promise<boolean> }) => {
-	const [saving, setSaving] = useState(false)
-	const [saved, setSaved] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [saved, setSaved] = useState(false)
 
-	/*
-	 * No clearing of `saved` on the way in, deliberately. Every save produces its own toast anyway, and
-	 * `!changed` is what guarantees it: the button is dead unless something is dirty, so by the time a
-	 * second save can be pressed the condition below has already gone false and unmounted the first
-	 * confirmation — dismissed or not. A pre-clear here could only re-state that, and stated twice it
-	 * became a line no test could prove wrong.
-	 */
-	const press = async () => {
-		setSaving(true)
+  /*
+   * No clearing of `saved` on the way in, deliberately. Every save produces its own toast anyway, and
+   * `!changed` is what guarantees it: the button is dead unless something is dirty, so by the time a
+   * second save can be pressed the condition below has already gone false and unmounted the first
+   * confirmation — dismissed or not. A pre-clear here could only re-state that, and stated twice it
+   * became a line no test could prove wrong.
+   */
+  const press = async () => {
+    setSaving(true)
 
-		const outcome = await saveAll()
+    const outcome = await saveAll()
 
-		setSaving(false)
-		setSaved(outcome)
-	}
+    setSaving(false)
+    setSaved(outcome)
+  }
 
-	return (
-		<div className="mt-8 flex items-center justify-end gap-4">
-			{saved && !changed ? <Toast tone="success">Changes saved.</Toast> : null}
-			<Button
-				padding="form"
-				loading={saving}
-				disabled={!changed}
-				onClick={() => {
-					void press()
-				}}
-			>
-				Save
-			</Button>
-		</div>
-	)
+  return (
+    <div className="mt-8 flex items-center justify-end gap-4">
+      {saved && !changed ? <Toast tone="success">Changes saved.</Toast> : null}
+      <Button
+        padding="form"
+        loading={saving}
+        disabled={!changed}
+        onClick={() => {
+          void press()
+        }}
+      >
+        Save
+      </Button>
+    </div>
+  )
 }

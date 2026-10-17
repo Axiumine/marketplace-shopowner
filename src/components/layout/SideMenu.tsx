@@ -20,61 +20,61 @@ import { Button } from '@/components/ui/Button'
  * section and the reason it earns a tab.
  */
 const SECTIONS = [
-	{ to: '/home', label: 'Dashboard', prefixes: ['/home'] },
-	{ to: '/companies', label: 'Companies', prefixes: ['/companies'] },
-	// Its own section rather than a tab inside Companies: a catalogue is per shop, but the page is about
-	// the items and the shop is one select at the top of it.
-	{ to: '/items', label: 'Items', prefixes: ['/items'] },
-	{ to: '/account', label: 'Account', prefixes: ['/account'] }
+  { to: '/home', label: 'Dashboard', prefixes: ['/home'] },
+  { to: '/companies', label: 'Companies', prefixes: ['/companies'] },
+  // Its own section rather than a tab inside Companies: a catalogue is per shop, but the page is about
+  // the items and the shop is one select at the top of it.
+  { to: '/items', label: 'Items', prefixes: ['/items'] },
+  { to: '/account', label: 'Account', prefixes: ['/account'] }
 ] as const
 
 export const isSectionActive = (pathname: string, prefixes: readonly string[]): boolean =>
-	prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))
+  prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`))
 
 export const SideMenu = ({ pathname }: { pathname: string }) => {
-	const session = useSession()
-	const logout = useLogout()
+  const session = useSession()
+  const logout = useLogout()
 
-	return (
-		<nav aria-label="Main menu" className="flex h-full w-56 flex-col bg-secondary p-4">
-			<p className="mb-6 text-lg font-bold text-third">Marketplace</p>
+  return (
+    <nav aria-label="Main menu" className="flex h-full w-56 flex-col bg-secondary p-4">
+      <p className="mb-6 text-lg font-bold text-third">Marketplace</p>
 
-			<ul className="flex flex-col gap-1">
-				{SECTIONS.map((section) => (
-					<li key={section.to}>
-						<Link
-							to={section.to}
-							className={`block rounded-box px-3 py-2 text-sm ${
-								isSectionActive(pathname, section.prefixes) ? 'bg-palette-bg1 font-bold' : ''
-							}`}
-						>
-							{section.label}
-						</Link>
-					</li>
-				))}
-			</ul>
+      <ul className="flex flex-col gap-1">
+        {SECTIONS.map((section) => (
+          <li key={section.to}>
+            <Link
+              to={section.to}
+              className={`block rounded-box px-3 py-2 text-sm ${
+                isSectionActive(pathname, section.prefixes) ? 'bg-palette-bg1 font-bold' : ''
+              }`}
+            >
+              {section.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
 
-			<div className="mt-auto flex flex-col gap-2">
-				{/*
-				 * Two states render nothing here, for different reasons. Signed out is real but brief:
-				 * `useLogout` clears the session before it navigates away, so this menu re-renders once with
-				 * nothing to show. A session with a `null` email is the durable one — the address is only ever
-				 * known from the login form, so a session restored from the refresh cookie after a reload has
-				 * none, and this tier has no query to ask for it.
-				 *
-				 * Both render nothing rather than an empty string: a blank paragraph would leave its padding
-				 * behind, and a blank strip reads as a failed load rather than as an absent address.
-				 */}
-				{session?.email == null ? null : <p className="text-xs break-all text-tip">{session.email}</p>}
-				<Button
-					variant="ghost"
-					onClick={() => {
-						void logout()
-					}}
-				>
-					Logout
-				</Button>
-			</div>
-		</nav>
-	)
+      <div className="mt-auto flex flex-col gap-2">
+        {/*
+         * Two states render nothing here, for different reasons. Signed out is real but brief:
+         * `useLogout` clears the session before it navigates away, so this menu re-renders once with
+         * nothing to show. A session with a `null` email is the durable one — the address is only ever
+         * known from the login form, so a session restored from the refresh cookie after a reload has
+         * none, and this tier has no query to ask for it.
+         *
+         * Both render nothing rather than an empty string: a blank paragraph would leave its padding
+         * behind, and a blank strip reads as a failed load rather than as an absent address.
+         */}
+        {session?.email == null ? null : <p className="text-xs break-all text-tip">{session.email}</p>}
+        <Button
+          variant="ghost"
+          onClick={() => {
+            void logout()
+          }}
+        >
+          Logout
+        </Button>
+      </div>
+    </nav>
+  )
 }

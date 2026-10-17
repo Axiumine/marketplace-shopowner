@@ -19,10 +19,10 @@ import { formatAddress } from '@/lib/format'
  * there is the wrong length as well.
  */
 export const mapPoint = (coordinates: number[] | undefined): { lat: number; lon: number } | null => {
-	if (coordinates?.length !== 2) return null
+  if (coordinates?.length !== 2) return null
 
-	const [lon, lat] = coordinates as [number, number]
-	return { lat, lon }
+  const [lon, lat] = coordinates as [number, number]
+  return { lat, lon }
 }
 
 /**
@@ -35,8 +35,8 @@ export const mapPoint = (coordinates: number[] | undefined): { lat: number; lon:
  * only place the empty string can be pinned down is a test that calls this directly.
  */
 export const coordinatesText = (coordinates: number[]): { longitude: string; latitude: string } => ({
-	longitude: String(coordinates[0] ?? ''),
-	latitude: String(coordinates[1] ?? '')
+  longitude: String(coordinates[0] ?? ''),
+  latitude: String(coordinates[1] ?? '')
 })
 
 /**
@@ -47,7 +47,7 @@ export const coordinatesText = (coordinates: number[]): { longitude: string; lat
  * lower-case province code would otherwise seed a box that disagrees with the form before anything was typed.
  */
 export const composedAddress = (address: { street: string; postalCode: string; city: string; province: string }): string =>
-	formatAddress({ ...address, province: address.province.toUpperCase() })
+  formatAddress({ ...address, province: address.province.toUpperCase() })
 
 /**
  * Just enough of react-hook-form's `FieldError` to read a message off one, so this file stays free of
@@ -63,13 +63,13 @@ type ErrorField = { message?: string | undefined } | undefined
  * one. The assertion there needs a name to point at.
  */
 export type ErrorsAddress = {
-	street?: ErrorField
-	postalCode?: ErrorField
-	city?: ErrorField
-	province?: ErrorField
-	latitude?: ErrorField
-	longitude?: ErrorField
-	addressComplete?: ErrorField
+  street?: ErrorField
+  postalCode?: ErrorField
+  city?: ErrorField
+  province?: ErrorField
+  latitude?: ErrorField
+  longitude?: ErrorField
+  addressComplete?: ErrorField
 }
 
 /**
@@ -88,12 +88,12 @@ export type ErrorsAddress = {
  * lists, and that card alone would refuse to save with a silent form.
  */
 export const addressError = (errors: ErrorsAddress): string | undefined =>
-	[
-		errors.street,
-		errors.postalCode,
-		errors.city,
-		errors.province,
-		errors.latitude,
-		errors.longitude,
-		errors.addressComplete
-	].find((error) => error !== undefined)?.message
+  [
+    errors.street,
+    errors.postalCode,
+    errors.city,
+    errors.province,
+    errors.latitude,
+    errors.longitude,
+    errors.addressComplete
+  ].find((error) => error !== undefined)?.message

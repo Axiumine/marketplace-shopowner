@@ -14,32 +14,32 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "\n\tmutation CompanyAdd($company: GraphQLInputCompany!) {\n\t\tcompanyAdd(company: $company) {\n\t\t\t_id\n\t\t}\n\t}\n": typeof types.CompanyAddDocument,
-    "\n\tmutation CompanyUpdate($_id: ID!, $company: GraphQLInputCompany!) {\n\t\tcompanyUpdate(_id: $_id, company: $company)\n\t}\n": typeof types.CompanyUpdateDocument,
-    "\n\tmutation CompanyDel($_id: ID!) {\n\t\tcompanyDel(_id: $_id)\n\t}\n": typeof types.CompanyDelDocument,
-    "\n\tmutation ItemAdd($item: GraphQLInputItem!) {\n\t\titemAdd(item: $item) {\n\t\t\t_id\n\t\t}\n\t}\n": typeof types.ItemAddDocument,
-    "\n\tmutation ItemUpdate($_id: ID!, $item: GraphQLInputItem!) {\n\t\titemUpdate(_id: $_id, item: $item)\n\t}\n": typeof types.ItemUpdateDocument,
-    "\n\tmutation ItemUpdatePublished($_id: ID!, $published: Boolean!) {\n\t\titemUpdatePublished(_id: $_id, published: $published)\n\t}\n": typeof types.ItemUpdatePublishedDocument,
-    "\n\tmutation ItemDel($_id: ID!) {\n\t\titemDel(_id: $_id)\n\t}\n": typeof types.ItemDelDocument,
-    "\n\tmutation ItemsUpdatePublished($_ids: [ID!]!, $published: Boolean!) {\n\t\titemsUpdatePublished(_ids: $_ids, published: $published)\n\t}\n": typeof types.ItemsUpdatePublishedDocument,
-    "\n\tmutation ShopOwnerDel {\n\t\tshopOwnerDel\n\t}\n": typeof types.ShopOwnerDelDocument,
-    "\n\tquery ShopOwnerCompanies {\n\t\tshopOwnerCompanies {\n\t\t\t_id\n\t\t\tlegalName\n\t\t\tvatNumber\n\t\t\ttaxCode\n\t\t\tcontactPerson\n\t\t\tadministrator\n\t\t\tuniqueCode\n\t\t\tcertifiedEmail\n\t\t\tregistryExtract\n\t\t\taddress {\n\t\t\t\tstreet\n\t\t\t\tpostalCode\n\t\t\t\tcity\n\t\t\t\tprovince\n\t\t\t\tposition {\n\t\t\t\t\ttype\n\t\t\t\t\tcoordinates\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n": typeof types.ShopOwnerCompaniesDocument,
-    "\n\tquery CompanyItems($idCompany: ID!) {\n\t\tcompanyItems(idCompany: $idCompany) {\n\t\t\t_id\n\t\t\tidCompany\n\t\t\tidCategory\n\t\t\tname\n\t\t\tdescription\n\t\t\tslug\n\t\t\tpublished\n\t\t}\n\t}\n": typeof types.CompanyItemsDocument,
-    "\n\tquery ItemCategories {\n\t\titemCategories {\n\t\t\t_id\n\t\t\tidParent\n\t\t\tname\n\t\t\tslug\n\t\t\tposition\n\t\t}\n\t}\n": typeof types.ItemCategoriesDocument,
+    "\n  mutation CompanyAdd($company: GraphQLInputCompany!) {\n    companyAdd(company: $company) {\n      _id\n    }\n  }\n": typeof types.CompanyAddDocument,
+    "\n  mutation CompanyUpdate($_id: ID!, $company: GraphQLInputCompany!) {\n    companyUpdate(_id: $_id, company: $company)\n  }\n": typeof types.CompanyUpdateDocument,
+    "\n  mutation CompanyDel($_id: ID!) {\n    companyDel(_id: $_id)\n  }\n": typeof types.CompanyDelDocument,
+    "\n  mutation ItemAdd($item: GraphQLInputItem!) {\n    itemAdd(item: $item) {\n      _id\n    }\n  }\n": typeof types.ItemAddDocument,
+    "\n  mutation ItemUpdate($_id: ID!, $item: GraphQLInputItem!) {\n    itemUpdate(_id: $_id, item: $item)\n  }\n": typeof types.ItemUpdateDocument,
+    "\n  mutation ItemUpdatePublished($_id: ID!, $published: Boolean!) {\n    itemUpdatePublished(_id: $_id, published: $published)\n  }\n": typeof types.ItemUpdatePublishedDocument,
+    "\n  mutation ItemDel($_id: ID!) {\n    itemDel(_id: $_id)\n  }\n": typeof types.ItemDelDocument,
+    "\n  mutation ItemsUpdatePublished($_ids: [ID!]!, $published: Boolean!) {\n    itemsUpdatePublished(_ids: $_ids, published: $published)\n  }\n": typeof types.ItemsUpdatePublishedDocument,
+    "\n  mutation ShopOwnerDel {\n    shopOwnerDel\n  }\n": typeof types.ShopOwnerDelDocument,
+    "\n  query ShopOwnerCompanies {\n    shopOwnerCompanies {\n      _id\n      legalName\n      vatNumber\n      taxCode\n      contactPerson\n      administrator\n      uniqueCode\n      certifiedEmail\n      registryExtract\n      address {\n        street\n        postalCode\n        city\n        province\n        position {\n          type\n          coordinates\n        }\n      }\n    }\n  }\n": typeof types.ShopOwnerCompaniesDocument,
+    "\n  query CompanyItems($idCompany: ID!) {\n    companyItems(idCompany: $idCompany) {\n      _id\n      idCompany\n      idCategory\n      name\n      description\n      slug\n      published\n    }\n  }\n": typeof types.CompanyItemsDocument,
+    "\n  query ItemCategories {\n    itemCategories {\n      _id\n      idParent\n      name\n      slug\n      position\n    }\n  }\n": typeof types.ItemCategoriesDocument,
 };
 const documents: Documents = {
-    "\n\tmutation CompanyAdd($company: GraphQLInputCompany!) {\n\t\tcompanyAdd(company: $company) {\n\t\t\t_id\n\t\t}\n\t}\n": types.CompanyAddDocument,
-    "\n\tmutation CompanyUpdate($_id: ID!, $company: GraphQLInputCompany!) {\n\t\tcompanyUpdate(_id: $_id, company: $company)\n\t}\n": types.CompanyUpdateDocument,
-    "\n\tmutation CompanyDel($_id: ID!) {\n\t\tcompanyDel(_id: $_id)\n\t}\n": types.CompanyDelDocument,
-    "\n\tmutation ItemAdd($item: GraphQLInputItem!) {\n\t\titemAdd(item: $item) {\n\t\t\t_id\n\t\t}\n\t}\n": types.ItemAddDocument,
-    "\n\tmutation ItemUpdate($_id: ID!, $item: GraphQLInputItem!) {\n\t\titemUpdate(_id: $_id, item: $item)\n\t}\n": types.ItemUpdateDocument,
-    "\n\tmutation ItemUpdatePublished($_id: ID!, $published: Boolean!) {\n\t\titemUpdatePublished(_id: $_id, published: $published)\n\t}\n": types.ItemUpdatePublishedDocument,
-    "\n\tmutation ItemDel($_id: ID!) {\n\t\titemDel(_id: $_id)\n\t}\n": types.ItemDelDocument,
-    "\n\tmutation ItemsUpdatePublished($_ids: [ID!]!, $published: Boolean!) {\n\t\titemsUpdatePublished(_ids: $_ids, published: $published)\n\t}\n": types.ItemsUpdatePublishedDocument,
-    "\n\tmutation ShopOwnerDel {\n\t\tshopOwnerDel\n\t}\n": types.ShopOwnerDelDocument,
-    "\n\tquery ShopOwnerCompanies {\n\t\tshopOwnerCompanies {\n\t\t\t_id\n\t\t\tlegalName\n\t\t\tvatNumber\n\t\t\ttaxCode\n\t\t\tcontactPerson\n\t\t\tadministrator\n\t\t\tuniqueCode\n\t\t\tcertifiedEmail\n\t\t\tregistryExtract\n\t\t\taddress {\n\t\t\t\tstreet\n\t\t\t\tpostalCode\n\t\t\t\tcity\n\t\t\t\tprovince\n\t\t\t\tposition {\n\t\t\t\t\ttype\n\t\t\t\t\tcoordinates\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n": types.ShopOwnerCompaniesDocument,
-    "\n\tquery CompanyItems($idCompany: ID!) {\n\t\tcompanyItems(idCompany: $idCompany) {\n\t\t\t_id\n\t\t\tidCompany\n\t\t\tidCategory\n\t\t\tname\n\t\t\tdescription\n\t\t\tslug\n\t\t\tpublished\n\t\t}\n\t}\n": types.CompanyItemsDocument,
-    "\n\tquery ItemCategories {\n\t\titemCategories {\n\t\t\t_id\n\t\t\tidParent\n\t\t\tname\n\t\t\tslug\n\t\t\tposition\n\t\t}\n\t}\n": types.ItemCategoriesDocument,
+    "\n  mutation CompanyAdd($company: GraphQLInputCompany!) {\n    companyAdd(company: $company) {\n      _id\n    }\n  }\n": types.CompanyAddDocument,
+    "\n  mutation CompanyUpdate($_id: ID!, $company: GraphQLInputCompany!) {\n    companyUpdate(_id: $_id, company: $company)\n  }\n": types.CompanyUpdateDocument,
+    "\n  mutation CompanyDel($_id: ID!) {\n    companyDel(_id: $_id)\n  }\n": types.CompanyDelDocument,
+    "\n  mutation ItemAdd($item: GraphQLInputItem!) {\n    itemAdd(item: $item) {\n      _id\n    }\n  }\n": types.ItemAddDocument,
+    "\n  mutation ItemUpdate($_id: ID!, $item: GraphQLInputItem!) {\n    itemUpdate(_id: $_id, item: $item)\n  }\n": types.ItemUpdateDocument,
+    "\n  mutation ItemUpdatePublished($_id: ID!, $published: Boolean!) {\n    itemUpdatePublished(_id: $_id, published: $published)\n  }\n": types.ItemUpdatePublishedDocument,
+    "\n  mutation ItemDel($_id: ID!) {\n    itemDel(_id: $_id)\n  }\n": types.ItemDelDocument,
+    "\n  mutation ItemsUpdatePublished($_ids: [ID!]!, $published: Boolean!) {\n    itemsUpdatePublished(_ids: $_ids, published: $published)\n  }\n": types.ItemsUpdatePublishedDocument,
+    "\n  mutation ShopOwnerDel {\n    shopOwnerDel\n  }\n": types.ShopOwnerDelDocument,
+    "\n  query ShopOwnerCompanies {\n    shopOwnerCompanies {\n      _id\n      legalName\n      vatNumber\n      taxCode\n      contactPerson\n      administrator\n      uniqueCode\n      certifiedEmail\n      registryExtract\n      address {\n        street\n        postalCode\n        city\n        province\n        position {\n          type\n          coordinates\n        }\n      }\n    }\n  }\n": types.ShopOwnerCompaniesDocument,
+    "\n  query CompanyItems($idCompany: ID!) {\n    companyItems(idCompany: $idCompany) {\n      _id\n      idCompany\n      idCategory\n      name\n      description\n      slug\n      published\n    }\n  }\n": types.CompanyItemsDocument,
+    "\n  query ItemCategories {\n    itemCategories {\n      _id\n      idParent\n      name\n      slug\n      position\n    }\n  }\n": types.ItemCategoriesDocument,
 };
 
 /**
@@ -59,51 +59,51 @@ export function graphql(source: string): unknown;
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n\tmutation CompanyAdd($company: GraphQLInputCompany!) {\n\t\tcompanyAdd(company: $company) {\n\t\t\t_id\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation CompanyAdd($company: GraphQLInputCompany!) {\n\t\tcompanyAdd(company: $company) {\n\t\t\t_id\n\t\t}\n\t}\n"];
+export function graphql(source: "\n  mutation CompanyAdd($company: GraphQLInputCompany!) {\n    companyAdd(company: $company) {\n      _id\n    }\n  }\n"): (typeof documents)["\n  mutation CompanyAdd($company: GraphQLInputCompany!) {\n    companyAdd(company: $company) {\n      _id\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n\tmutation CompanyUpdate($_id: ID!, $company: GraphQLInputCompany!) {\n\t\tcompanyUpdate(_id: $_id, company: $company)\n\t}\n"): (typeof documents)["\n\tmutation CompanyUpdate($_id: ID!, $company: GraphQLInputCompany!) {\n\t\tcompanyUpdate(_id: $_id, company: $company)\n\t}\n"];
+export function graphql(source: "\n  mutation CompanyUpdate($_id: ID!, $company: GraphQLInputCompany!) {\n    companyUpdate(_id: $_id, company: $company)\n  }\n"): (typeof documents)["\n  mutation CompanyUpdate($_id: ID!, $company: GraphQLInputCompany!) {\n    companyUpdate(_id: $_id, company: $company)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n\tmutation CompanyDel($_id: ID!) {\n\t\tcompanyDel(_id: $_id)\n\t}\n"): (typeof documents)["\n\tmutation CompanyDel($_id: ID!) {\n\t\tcompanyDel(_id: $_id)\n\t}\n"];
+export function graphql(source: "\n  mutation CompanyDel($_id: ID!) {\n    companyDel(_id: $_id)\n  }\n"): (typeof documents)["\n  mutation CompanyDel($_id: ID!) {\n    companyDel(_id: $_id)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n\tmutation ItemAdd($item: GraphQLInputItem!) {\n\t\titemAdd(item: $item) {\n\t\t\t_id\n\t\t}\n\t}\n"): (typeof documents)["\n\tmutation ItemAdd($item: GraphQLInputItem!) {\n\t\titemAdd(item: $item) {\n\t\t\t_id\n\t\t}\n\t}\n"];
+export function graphql(source: "\n  mutation ItemAdd($item: GraphQLInputItem!) {\n    itemAdd(item: $item) {\n      _id\n    }\n  }\n"): (typeof documents)["\n  mutation ItemAdd($item: GraphQLInputItem!) {\n    itemAdd(item: $item) {\n      _id\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n\tmutation ItemUpdate($_id: ID!, $item: GraphQLInputItem!) {\n\t\titemUpdate(_id: $_id, item: $item)\n\t}\n"): (typeof documents)["\n\tmutation ItemUpdate($_id: ID!, $item: GraphQLInputItem!) {\n\t\titemUpdate(_id: $_id, item: $item)\n\t}\n"];
+export function graphql(source: "\n  mutation ItemUpdate($_id: ID!, $item: GraphQLInputItem!) {\n    itemUpdate(_id: $_id, item: $item)\n  }\n"): (typeof documents)["\n  mutation ItemUpdate($_id: ID!, $item: GraphQLInputItem!) {\n    itemUpdate(_id: $_id, item: $item)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n\tmutation ItemUpdatePublished($_id: ID!, $published: Boolean!) {\n\t\titemUpdatePublished(_id: $_id, published: $published)\n\t}\n"): (typeof documents)["\n\tmutation ItemUpdatePublished($_id: ID!, $published: Boolean!) {\n\t\titemUpdatePublished(_id: $_id, published: $published)\n\t}\n"];
+export function graphql(source: "\n  mutation ItemUpdatePublished($_id: ID!, $published: Boolean!) {\n    itemUpdatePublished(_id: $_id, published: $published)\n  }\n"): (typeof documents)["\n  mutation ItemUpdatePublished($_id: ID!, $published: Boolean!) {\n    itemUpdatePublished(_id: $_id, published: $published)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n\tmutation ItemDel($_id: ID!) {\n\t\titemDel(_id: $_id)\n\t}\n"): (typeof documents)["\n\tmutation ItemDel($_id: ID!) {\n\t\titemDel(_id: $_id)\n\t}\n"];
+export function graphql(source: "\n  mutation ItemDel($_id: ID!) {\n    itemDel(_id: $_id)\n  }\n"): (typeof documents)["\n  mutation ItemDel($_id: ID!) {\n    itemDel(_id: $_id)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n\tmutation ItemsUpdatePublished($_ids: [ID!]!, $published: Boolean!) {\n\t\titemsUpdatePublished(_ids: $_ids, published: $published)\n\t}\n"): (typeof documents)["\n\tmutation ItemsUpdatePublished($_ids: [ID!]!, $published: Boolean!) {\n\t\titemsUpdatePublished(_ids: $_ids, published: $published)\n\t}\n"];
+export function graphql(source: "\n  mutation ItemsUpdatePublished($_ids: [ID!]!, $published: Boolean!) {\n    itemsUpdatePublished(_ids: $_ids, published: $published)\n  }\n"): (typeof documents)["\n  mutation ItemsUpdatePublished($_ids: [ID!]!, $published: Boolean!) {\n    itemsUpdatePublished(_ids: $_ids, published: $published)\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n\tmutation ShopOwnerDel {\n\t\tshopOwnerDel\n\t}\n"): (typeof documents)["\n\tmutation ShopOwnerDel {\n\t\tshopOwnerDel\n\t}\n"];
+export function graphql(source: "\n  mutation ShopOwnerDel {\n    shopOwnerDel\n  }\n"): (typeof documents)["\n  mutation ShopOwnerDel {\n    shopOwnerDel\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n\tquery ShopOwnerCompanies {\n\t\tshopOwnerCompanies {\n\t\t\t_id\n\t\t\tlegalName\n\t\t\tvatNumber\n\t\t\ttaxCode\n\t\t\tcontactPerson\n\t\t\tadministrator\n\t\t\tuniqueCode\n\t\t\tcertifiedEmail\n\t\t\tregistryExtract\n\t\t\taddress {\n\t\t\t\tstreet\n\t\t\t\tpostalCode\n\t\t\t\tcity\n\t\t\t\tprovince\n\t\t\t\tposition {\n\t\t\t\t\ttype\n\t\t\t\t\tcoordinates\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n"): (typeof documents)["\n\tquery ShopOwnerCompanies {\n\t\tshopOwnerCompanies {\n\t\t\t_id\n\t\t\tlegalName\n\t\t\tvatNumber\n\t\t\ttaxCode\n\t\t\tcontactPerson\n\t\t\tadministrator\n\t\t\tuniqueCode\n\t\t\tcertifiedEmail\n\t\t\tregistryExtract\n\t\t\taddress {\n\t\t\t\tstreet\n\t\t\t\tpostalCode\n\t\t\t\tcity\n\t\t\t\tprovince\n\t\t\t\tposition {\n\t\t\t\t\ttype\n\t\t\t\t\tcoordinates\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t}\n"];
+export function graphql(source: "\n  query ShopOwnerCompanies {\n    shopOwnerCompanies {\n      _id\n      legalName\n      vatNumber\n      taxCode\n      contactPerson\n      administrator\n      uniqueCode\n      certifiedEmail\n      registryExtract\n      address {\n        street\n        postalCode\n        city\n        province\n        position {\n          type\n          coordinates\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query ShopOwnerCompanies {\n    shopOwnerCompanies {\n      _id\n      legalName\n      vatNumber\n      taxCode\n      contactPerson\n      administrator\n      uniqueCode\n      certifiedEmail\n      registryExtract\n      address {\n        street\n        postalCode\n        city\n        province\n        position {\n          type\n          coordinates\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n\tquery CompanyItems($idCompany: ID!) {\n\t\tcompanyItems(idCompany: $idCompany) {\n\t\t\t_id\n\t\t\tidCompany\n\t\t\tidCategory\n\t\t\tname\n\t\t\tdescription\n\t\t\tslug\n\t\t\tpublished\n\t\t}\n\t}\n"): (typeof documents)["\n\tquery CompanyItems($idCompany: ID!) {\n\t\tcompanyItems(idCompany: $idCompany) {\n\t\t\t_id\n\t\t\tidCompany\n\t\t\tidCategory\n\t\t\tname\n\t\t\tdescription\n\t\t\tslug\n\t\t\tpublished\n\t\t}\n\t}\n"];
+export function graphql(source: "\n  query CompanyItems($idCompany: ID!) {\n    companyItems(idCompany: $idCompany) {\n      _id\n      idCompany\n      idCategory\n      name\n      description\n      slug\n      published\n    }\n  }\n"): (typeof documents)["\n  query CompanyItems($idCompany: ID!) {\n    companyItems(idCompany: $idCompany) {\n      _id\n      idCompany\n      idCategory\n      name\n      description\n      slug\n      published\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n\tquery ItemCategories {\n\t\titemCategories {\n\t\t\t_id\n\t\t\tidParent\n\t\t\tname\n\t\t\tslug\n\t\t\tposition\n\t\t}\n\t}\n"): (typeof documents)["\n\tquery ItemCategories {\n\t\titemCategories {\n\t\t\t_id\n\t\t\tidParent\n\t\t\tname\n\t\t\tslug\n\t\t\tposition\n\t\t}\n\t}\n"];
+export function graphql(source: "\n  query ItemCategories {\n    itemCategories {\n      _id\n      idParent\n      name\n      slug\n      position\n    }\n  }\n"): (typeof documents)["\n  query ItemCategories {\n    itemCategories {\n      _id\n      idParent\n      name\n      slug\n      position\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
