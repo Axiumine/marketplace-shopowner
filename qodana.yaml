@@ -19,20 +19,20 @@ image: jetbrains/qodana-js:2026.2
 
 # ── SCA: third-party license audit (Ultimate Plus) ────────────────────────────
 # Scans Yarn deps and surfaces license conflicts as problems. The project is
-# proprietary (package.json "UNLICENSED"), so Qodana's default compatibility
-# matrix already flags copyleft dependencies.
+# GPL-3.0-or-later (package.json "license", LICENSE); the `licenseRules` below say which
+# dependency licenses are accepted against it.
 raiseLicenseProblems: true
 
 # `keys` is THIS project's license, `allowed` the dependency licenses accepted
-# against it. The default matrix for a proprietary project flags every copyleft
-# dep as a Critical — correct for shipped software, wrong here: this SPA is never
+# against it. Qodana's default matrix flags every copyleft dep as a Critical — correct
+# for shipped software, wrong here: this SPA is never
 # distributed as a package, it is served as a bundle from our own nginx, so the
 # GPL's distribution trigger is never pulled. Accepted by the project owner.
 #
-# `keys` must carry the key Qodana derives, NOT the package.json string: it maps
-# "UNLICENSED" to PROPRIETARY-LICENSE, and the finding text says so verbatim —
-# "…is in the prohibited licenses list with project license 'PROPRIETARY-LICENSE'".
-# Putting "UNLICENSED" here matches no project and the rule silently does nothing.
+# `keys` must carry the key Qodana derives, NOT the raw package.json string: GPL-3.0-or-later
+# is its own key. The earlier "UNLICENSED" value was mapped to PROPRIETARY-LICENSE, and the
+# finding text said so verbatim — "…is in the prohibited licenses list with project license
+# 'PROPRIETARY-LICENSE'". A key that matches no project makes the rule silently do nothing.
 #
 # MPL-2.0 covers lightningcss, which arrives as `vite -> lightningcss` and again
 # under tailwindcss. Build-time only: never imported by src/, never present on a
