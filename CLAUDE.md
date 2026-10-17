@@ -57,6 +57,8 @@ that message. Merging is the user's call alone.
 metrics, mutation score 100 — the same bar as every other repo. `git commit --no-verify` is not needed
 here and must not be used; a red gate is fixed with a test.
 
+⚠️ **`osv-scanner.toml` ignores `GHSA-vfj7-8cjw-p6xm` (braces, no patched release) until 2027-01-15, under ADR-057.** The entry expires on purpose: after that date the Scorecard Vulnerabilities check and the pre-push floor gate fail again, and that failure is the review. Delete the entry as soon as a patched `braces` exists; do not just push the date out.
+
 ## Cross-repo
 
 A change here often is not local: operation shape → the resolver in
