@@ -25,17 +25,17 @@ export const OK_DURATION = 5000
 const STACK_ID = 'toast-stack'
 
 const stack = (): HTMLElement => {
-	const existing = document.getElementById(STACK_ID)
+  const existing = document.getElementById(STACK_ID)
 
-	if (existing !== null) return existing
+  if (existing !== null) return existing
 
-	const created = document.createElement('div')
+  const created = document.createElement('div')
 
-	created.id = STACK_ID
-	created.className = 'pointer-events-none fixed right-4 top-4 z-50 flex w-full max-w-sm flex-col gap-2'
-	document.body.appendChild(created)
+  created.id = STACK_ID
+  created.className = 'pointer-events-none fixed right-4 top-4 z-50 flex w-full max-w-sm flex-col gap-2'
+  document.body.appendChild(created)
 
-	return created
+  return created
 }
 
 /*
@@ -43,9 +43,9 @@ const stack = (): HTMLElement => {
  * over a form is the form read through a green filter.
  */
 const TONE_CLASS: Record<AlertTone, string> = {
-	error: 'border-app-error bg-palette-white text-app-error',
-	success: 'border-app-ok bg-palette-white text-app-ok',
-	info: 'border-third bg-palette-white text-palette-bg'
+  error: 'border-app-error bg-palette-white text-app-error',
+  success: 'border-app-ok bg-palette-white text-app-ok',
+  info: 'border-third bg-palette-white text-palette-bg'
 }
 
 /**
@@ -68,84 +68,84 @@ const TONE_CLASS: Record<AlertTone, string> = {
  * goes away when the cross is pressed.
  */
 export const Toast = ({ tone, children }: { tone: AlertTone; children: ReactNode }) => {
-	const hasTimer = tone === 'success'
-	const [inPause, setInPause] = useState(false)
-	const [closed, setClosed] = useState(false)
-	// Read once, in a lazy initialiser rather than in an effect: the portal needs the node during the
-	// first render, and creating it on every render would be a `getElementById` per keystroke elsewhere.
-	const [node] = useState(stack)
+  const hasTimer = tone === 'success'
+  const [inPause, setInPause] = useState(false)
+  const [closed, setClosed] = useState(false)
+  // Read once, in a lazy initialiser rather than in an effect: the portal needs the node during the
+  // first render, and creating it on every render would be a `getElementById` per keystroke elsewhere.
+  const [node] = useState(stack)
 
-	if (closed) return null
+  if (closed) return null
 
-	return createPortal(
-		<div
-			role={tone === 'error' ? 'alert' : 'status'}
-			className={`pointer-events-auto overflow-hidden rounded-box border shadow-lg ${TONE_CLASS[tone]}`}
-			// The pause is what makes a five-second message readable: an owner who moves the mouse onto
-			// it is reading it. Focus pauses it for the same reason and for a second one — the cross is a
-			// tab stop, and a toast that closed under a keyboard user's fingers would throw focus back to
-			// the body mid-press.
-			onMouseEnter={() => {
-				setInPause(true)
-			}}
-			onMouseLeave={() => {
-				setInPause(false)
-			}}
-			onFocus={() => {
-				setInPause(true)
-			}}
-			onBlur={() => {
-				setInPause(false)
-			}}
-		>
-			<div className="flex items-start gap-3 px-4 py-3 text-sm">
-				<span className="grow">{children}</span>
-				<IconButton
-					name="Close"
-					onClick={() => {
-						setClosed(true)
-					}}
-				>
-					<IconX />
-				</IconButton>
-			</div>
-			{/* The countdown, drawn rather than announced: `aria-hidden` because the live region above has
-			    already read the message out, and a bar that reported itself would say "80%" every frame. */}
-			{hasTimer ? (
-				<div aria-hidden="true" className="h-1 w-full bg-palette-bg1">
-					{/*
-					 * ⚠️ The animation **is** the clock — `animationend` is what closes the toast, and there is no
-					 * timer anywhere in this component. That is the whole reason the bar is fluid: a JS clock
-					 * driving a width would have to re-render to move the bar, so it would move in visible steps,
-					 * and one running fast enough to look smooth is a re-render per frame for five seconds. The
-					 * browser interpolates this one on its own thread, and a second clock alongside it could only
-					 * disagree with it.
-					 *
-					 * It also gets the pause for free: `animation-play-state: paused` stops the bar where it
-					 * stands *and* postpones `animationend` by exactly as long, so "resumes where it stopped" is
-					 * not something this component has to compute. Same for a backgrounded tab — the animation
-					 * suspends with the rendering, so a confirmation is still there to read on the way back,
-					 * which a `setTimeout` would have burned through unseen.
-					 *
-					 * Longhands rather than the `animation` shorthand: the shorthand resets `play-state` to
-					 * `running`, so the two would have to stay in this order to work.
-					 */}
-					<div
-						className="h-full origin-left bg-current"
-						style={{
-							animationName: 'countdown',
-							animationDuration: `${OK_DURATION}ms`,
-							animationTimingFunction: 'linear',
-							animationFillMode: 'forwards',
-							animationPlayState: inPause ? 'paused' : 'running'
-						}}
-						onAnimationEnd={() => {
-							setClosed(true)
-						}}
-					/>
-				</div>
-			) : null}
-		</div>,
-		node
-	)
+  return createPortal(
+    <div
+      role={tone === 'error' ? 'alert' : 'status'}
+      className={`pointer-events-auto overflow-hidden rounded-box border shadow-lg ${TONE_CLASS[tone]}`}
+      // The pause is what makes a five-second message readable: an owner who moves the mouse onto
+      // it is reading it. Focus pauses it for the same reason and for a second one — the cross is a
+      // tab stop, and a toast that closed under a keyboard user's fingers would throw focus back to
+      // the body mid-press.
+      onMouseEnter={() => {
+        setInPause(true)
+      }}
+      onMouseLeave={() => {
+        setInPause(false)
+      }}
+      onFocus={() => {
+        setInPause(true)
+      }}
+      onBlur={() => {
+        setInPause(false)
+      }}
+    >
+      <div className="flex items-start gap-3 px-4 py-3 text-sm">
+        <span className="grow">{children}</span>
+        <IconButton
+          name="Close"
+          onClick={() => {
+            setClosed(true)
+          }}
+        >
+          <IconX />
+        </IconButton>
+      </div>
+      {/* The countdown, drawn rather than announced: `aria-hidden` because the live region above has
+          already read the message out, and a bar that reported itself would say "80%" every frame. */}
+      {hasTimer ? (
+        <div aria-hidden="true" className="h-1 w-full bg-palette-bg1">
+          {/*
+           * ⚠️ The animation **is** the clock — `animationend` is what closes the toast, and there is no
+           * timer anywhere in this component. That is the whole reason the bar is fluid: a JS clock
+           * driving a width would have to re-render to move the bar, so it would move in visible steps,
+           * and one running fast enough to look smooth is a re-render per frame for five seconds. The
+           * browser interpolates this one on its own thread, and a second clock alongside it could only
+           * disagree with it.
+           *
+           * It also gets the pause for free: `animation-play-state: paused` stops the bar where it
+           * stands *and* postpones `animationend` by exactly as long, so "resumes where it stopped" is
+           * not something this component has to compute. Same for a backgrounded tab — the animation
+           * suspends with the rendering, so a confirmation is still there to read on the way back,
+           * which a `setTimeout` would have burned through unseen.
+           *
+           * Longhands rather than the `animation` shorthand: the shorthand resets `play-state` to
+           * `running`, so the two would have to stay in this order to work.
+           */}
+          <div
+            className="h-full origin-left bg-current"
+            style={{
+              animationName: 'countdown',
+              animationDuration: `${OK_DURATION}ms`,
+              animationTimingFunction: 'linear',
+              animationFillMode: 'forwards',
+              animationPlayState: inPause ? 'paused' : 'running'
+            }}
+            onAnimationEnd={() => {
+              setClosed(true)
+            }}
+          />
+        </div>
+      ) : null}
+    </div>,
+    node
+  )
 }

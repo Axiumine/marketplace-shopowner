@@ -16,42 +16,42 @@ import { ADDRESS_MESSAGE, coordinate, EMPTY_ADDRESS, optional, optionalEmail, re
  * next, and the message text is the whole of what an admin ever sees.
  */
 describe('coordinate', () => {
-	const longitude = coordinate('Longitude', 180)
+  const longitude = coordinate('Longitude', 180)
 
-	it('takes a number inside its bound', () => {
-		expect(longitude.parse('-71.06')).toBe('-71.06')
-	})
+  it('takes a number inside its bound', () => {
+    expect(longitude.parse('-71.06')).toBe('-71.06')
+  })
 
-	// The trim is the rule, not a tidy-up: `Number('   ')` is `0`, so a box holding nothing but spaces
-	// would otherwise validate as the prime meridian and be written as a position the admin never
-	// picked.
-	it('refuses a box holding only spaces', () => {
-		const outcome = longitude.safeParse('   ')
+  // The trim is the rule, not a tidy-up: `Number('   ')` is `0`, so a box holding nothing but spaces
+  // would otherwise validate as the prime meridian and be written as a position the admin never
+  // picked.
+  it('refuses a box holding only spaces', () => {
+    const outcome = longitude.safeParse('   ')
 
-		expect(outcome.success).toBe(false)
-		expect(outcome.error?.issues[0]?.message).toBe('Longitude must be a number')
-	})
+    expect(outcome.success).toBe(false)
+    expect(outcome.error?.issues[0]?.message).toBe('Longitude must be a number')
+  })
 
-	it('refuses a value outside its bound', () => {
-		expect(longitude.safeParse('181').error?.issues[0]?.message).toBe('Longitude is outside -180..180')
-	})
+  it('refuses a value outside its bound', () => {
+    expect(longitude.safeParse('181').error?.issues[0]?.message).toBe('Longitude is outside -180..180')
+  })
 })
 
 describe('required', () => {
-	const legalName = required('Legal name', 10)
+  const legalName = required('Legal name', 10)
 
-	// The trim is what makes "empty" mean what an admin means by it: a box holding three spaces looks
-	// blank and would otherwise pass a bare `min(1)`, storing whitespace as a legal name.
-	it('trims, and answers the label when what is left is nothing', () => {
-		expect(legalName.parse('  Rivers   ')).toBe('Rivers')
-		expect(legalName.safeParse('   ').error?.issues[0]?.message).toBe('Legal name is required')
-	})
+  // The trim is what makes "empty" mean what an admin means by it: a box holding three spaces looks
+  // blank and would otherwise pass a bare `min(1)`, storing whitespace as a legal name.
+  it('trims, and answers the label when what is left is nothing', () => {
+    expect(legalName.parse('  Rivers   ')).toBe('Rivers')
+    expect(legalName.safeParse('   ').error?.issues[0]?.message).toBe('Legal name is required')
+  })
 
-	// The bound is measured after the trim, so the cap counts characters that were actually typed.
-	it('names both the label and the cap it exceeded', () => {
-		expect(legalName.safeParse('V'.repeat(11)).error?.issues[0]?.message).toBe('Legal name cannot exceed 10 characters')
-		expect(legalName.parse('V'.repeat(10))).toBe('V'.repeat(10))
-	})
+  // The bound is measured after the trim, so the cap counts characters that were actually typed.
+  it('names both the label and the cap it exceeded', () => {
+    expect(legalName.safeParse('V'.repeat(11)).error?.issues[0]?.message).toBe('Legal name cannot exceed 10 characters')
+    expect(legalName.parse('V'.repeat(10))).toBe('V'.repeat(10))
+  })
 })
 
 /*
@@ -64,40 +64,40 @@ describe('required', () => {
  * backend suites import their schema modules inside `beforeEach`.
  */
 describe('optional', () => {
-	// The whole difference from `required`: blank is an answer, not a missing one.
-	it('accepts a blank box', () => {
-		expect(optional('Notes', 5).parse('   ')).toBe('')
-	})
+  // The whole difference from `required`: blank is an answer, not a missing one.
+  it('accepts a blank box', () => {
+    expect(optional('Notes', 5).parse('   ')).toBe('')
+  })
 
-	it('still caps what is there', () => {
-		expect(optional('Notes', 5).safeParse('abcdef').error?.issues[0]?.message).toBe('Notes cannot exceed 5 characters')
-	})
+  it('still caps what is there', () => {
+    expect(optional('Notes', 5).safeParse('abcdef').error?.issues[0]?.message).toBe('Notes cannot exceed 5 characters')
+  })
 })
 
 describe('optionalEmail', () => {
-	const contact = () => optionalEmail('The contact email', 250)
+  const contact = () => optionalEmail('The contact email', 250)
 
-	// Blank is how a contact is removed, so it has to survive the address check rather than be excused by
-	// it — the refinement runs on every value, and `''` is the one it lets through on purpose.
-	it('lets a blank box through', () => {
-		expect(contact().parse('')).toBe('')
-	})
+  // Blank is how a contact is removed, so it has to survive the address check rather than be excused by
+  // it — the refinement runs on every value, and `''` is the one it lets through on purpose.
+  it('lets a blank box through', () => {
+    expect(contact().parse('')).toBe('')
+  })
 
-	it('takes an address that looks like one', () => {
-		expect(contact().parse('mark@rivers.test')).toBe('mark@rivers.test')
-	})
+  it('takes an address that looks like one', () => {
+    expect(contact().parse('mark@rivers.test')).toBe('mark@rivers.test')
+  })
 
-	it('refuses anything else', () => {
-		expect(contact().safeParse('mark@rivers').error?.issues[0]?.message).toBe('The contact email is not a valid address')
-	})
+  it('refuses anything else', () => {
+    expect(contact().safeParse('mark@rivers').error?.issues[0]?.message).toBe('The contact email is not a valid address')
+  })
 
-	// The cap is checked before the shape, so an over-length address is reported as too long rather than
-	// as malformed — two different mistakes, and the first is the one the admin made.
-	it('caps before it checks the shape', () => {
-		const long = `${'v'.repeat(250)}@rivers.test`
+  // The cap is checked before the shape, so an over-length address is reported as too long rather than
+  // as malformed — two different mistakes, and the first is the one the admin made.
+  it('caps before it checks the shape', () => {
+    const long = `${'v'.repeat(250)}@rivers.test`
 
-		expect(contact().safeParse(long).error?.issues[0]?.message).toBe('The contact email cannot exceed 250 characters')
-	})
+    expect(contact().safeParse(long).error?.issues[0]?.message).toBe('The contact email cannot exceed 250 characters')
+  })
 })
 
 /*
@@ -106,13 +106,13 @@ describe('optionalEmail', () => {
  * enforces interactive validation, so a bare `mark` never reaches zod from a keyboard at all.
  */
 describe('SHAPE_EMAIL', () => {
-	it.each(['mark@rivers.test', 'a+tag@sub.domain.co.uk'])('accepts %s', (address) => {
-		expect(SHAPE_EMAIL.test(address)).toBe(true)
-	})
+  it.each(['mark@rivers.test', 'a+tag@sub.domain.co.uk'])('accepts %s', (address) => {
+    expect(SHAPE_EMAIL.test(address)).toBe(true)
+  })
 
-	it.each(['mark', 'mark@rivers', 'mark@@rivers.test', 'ma rk@rivers.test', 'mark@ros si.it', ''])('refuses %s', (address) => {
-		expect(SHAPE_EMAIL.test(address)).toBe(false)
-	})
+  it.each(['mark', 'mark@rivers', 'mark@@rivers.test', 'ma rk@rivers.test', 'mark@ros si.it', ''])('refuses %s', (address) => {
+    expect(SHAPE_EMAIL.test(address)).toBe(false)
+  })
 })
 
 /*
@@ -121,9 +121,9 @@ describe('SHAPE_EMAIL', () => {
  * whatever it happened to hold.
  */
 describe('ADDRESS_MESSAGE', () => {
-	it('says to pick the address from the list', () => {
-		expect(ADDRESS_MESSAGE).toBe('Select the address from the list')
-	})
+  it('says to pick the address from the list', () => {
+    expect(ADDRESS_MESSAGE).toBe('Select the address from the list')
+  })
 })
 
 /*
@@ -132,15 +132,15 @@ describe('ADDRESS_MESSAGE', () => {
  * holding a sentence look identical through the form. Stated here instead.
  */
 describe('ADDRESS_VUOTO', () => {
-	it('is every address field empty, and nothing else', () => {
-		expect(EMPTY_ADDRESS).toEqual({
-			addressComplete: '',
-			street: '',
-			postalCode: '',
-			city: '',
-			province: '',
-			longitude: '',
-			latitude: ''
-		})
-	})
+  it('is every address field empty, and nothing else', () => {
+    expect(EMPTY_ADDRESS).toEqual({
+      addressComplete: '',
+      street: '',
+      postalCode: '',
+      city: '',
+      province: '',
+      longitude: '',
+      latitude: ''
+    })
+  })
 })

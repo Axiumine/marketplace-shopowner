@@ -33,16 +33,16 @@ import { clearPendingEmail, clearSession } from '@/auth/session'
  * caller no obligation to keep it stable.
  */
 export const useLogout = (): (() => Promise<void>) => {
-	const [, executeLogout] = useMutation(LogoutDocument)
+  const [, executeLogout] = useMutation(LogoutDocument)
 
-	return async () => {
-		await executeLogout({}, CTX_LOGOUT)
-		clearAccessToken()
-		clearSession()
-		// The address typed at sign-in is dropped here and nowhere else. `/loading` reads it without
-		// consuming it, so that React's development double-invoke cannot swallow it between the two runs of
-		// the same effect; this is the one moment it genuinely stops describing the current user.
-		clearPendingEmail()
-		window.location.assign('/')
-	}
+  return async () => {
+    await executeLogout({}, CTX_LOGOUT)
+    clearAccessToken()
+    clearSession()
+    // The address typed at sign-in is dropped here and nowhere else. `/loading` reads it without
+    // consuming it, so that React's development double-invoke cannot swallow it between the two runs of
+    // the same effect; this is the one moment it genuinely stops describing the current user.
+    clearPendingEmail()
+    window.location.assign('/')
+  }
 }

@@ -22,23 +22,23 @@ import { graphql } from '@gql/shopOwnerResource'
  * itself, or the document cache invalidates nothing and the page keeps rendering what it had.
  */
 export const CompanyAddDocument = graphql(`
-	mutation CompanyAdd($company: GraphQLInputCompany!) {
-		companyAdd(company: $company) {
-			_id
-		}
-	}
+  mutation CompanyAdd($company: GraphQLInputCompany!) {
+    companyAdd(company: $company) {
+      _id
+    }
+  }
 `)
 
 export const CompanyUpdateDocument = graphql(`
-	mutation CompanyUpdate($_id: ID!, $company: GraphQLInputCompany!) {
-		companyUpdate(_id: $_id, company: $company)
-	}
+  mutation CompanyUpdate($_id: ID!, $company: GraphQLInputCompany!) {
+    companyUpdate(_id: $_id, company: $company)
+  }
 `)
 
 export const CompanyDelDocument = graphql(`
-	mutation CompanyDel($_id: ID!) {
-		companyDel(_id: $_id)
-	}
+  mutation CompanyDel($_id: ID!) {
+    companyDel(_id: $_id)
+  }
 `)
 
 /**
@@ -70,29 +70,29 @@ export const CompanyDelDocument = graphql(`
  * all — it is what puts the new flag on screen, since nothing here holds a local copy of it.
  */
 export const ItemAddDocument = graphql(`
-	mutation ItemAdd($item: GraphQLInputItem!) {
-		itemAdd(item: $item) {
-			_id
-		}
-	}
+  mutation ItemAdd($item: GraphQLInputItem!) {
+    itemAdd(item: $item) {
+      _id
+    }
+  }
 `)
 
 export const ItemUpdateDocument = graphql(`
-	mutation ItemUpdate($_id: ID!, $item: GraphQLInputItem!) {
-		itemUpdate(_id: $_id, item: $item)
-	}
+  mutation ItemUpdate($_id: ID!, $item: GraphQLInputItem!) {
+    itemUpdate(_id: $_id, item: $item)
+  }
 `)
 
 export const ItemUpdatePublishedDocument = graphql(`
-	mutation ItemUpdatePublished($_id: ID!, $published: Boolean!) {
-		itemUpdatePublished(_id: $_id, published: $published)
-	}
+  mutation ItemUpdatePublished($_id: ID!, $published: Boolean!) {
+    itemUpdatePublished(_id: $_id, published: $published)
+  }
 `)
 
 export const ItemDelDocument = graphql(`
-	mutation ItemDel($_id: ID!) {
-		itemDel(_id: $_id)
-	}
+  mutation ItemDel($_id: ID!) {
+    itemDel(_id: $_id)
+  }
 `)
 
 /**
@@ -112,9 +112,9 @@ export const ItemDelDocument = graphql(`
  * card on the page is now showing a stale flag.
  */
 export const ItemsUpdatePublishedDocument = graphql(`
-	mutation ItemsUpdatePublished($_ids: [ID!]!, $published: Boolean!) {
-		itemsUpdatePublished(_ids: $_ids, published: $published)
-	}
+  mutation ItemsUpdatePublished($_ids: [ID!]!, $published: Boolean!) {
+    itemsUpdatePublished(_ids: $_ids, published: $published)
+  }
 `)
 
 /**
@@ -131,7 +131,7 @@ export const ItemsUpdatePublishedDocument = graphql(`
  * invalidating a cache — there is nothing left to read.
  */
 export const ShopOwnerDelDocument = graphql(`
-	mutation ShopOwnerDel {
-		shopOwnerDel
-	}
+  mutation ShopOwnerDel {
+    shopOwnerDel
+  }
 `)

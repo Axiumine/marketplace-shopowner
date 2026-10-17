@@ -12,27 +12,27 @@
 # value and must never try to. Selecting it returns a validation error, not a token.
 
 schema {
-	query: QueriesApi
-	mutation: MutationsApi
+  query: QueriesApi
+  mutation: MutationsApi
 }
 
 type QueriesApi {
-	helloRefresh: Hello2Type!
+  helloRefresh: Hello2Type!
 }
 
 type Hello2Type {
-	txt: String!
+  txt: String!
 }
 
 type MutationsApi {
-	"""
-	Consumes the refresh-token cookie, mints a new access/refresh pair, rotates the cookie and
-	deletes the used refresh key from Redis.
-	"""
-	refresh: RefreshType!
+  """
+  Consumes the refresh-token cookie, mints a new access/refresh pair, rotates the cookie and
+  deletes the used refresh key from Redis.
+  """
+  refresh: RefreshType!
 }
 
 type RefreshType {
-	status: Boolean!
-	accessToken: String!
+  status: Boolean!
+  accessToken: String!
 }

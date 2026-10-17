@@ -12,10 +12,10 @@ const signedOut = { token: null, session: null } as const
  * the form against a router shape no owner's browser produces.
  */
 describe('LoginForm', () => {
-	it('renders', async () => {
-		stubGraphQL({})
-		await renderRoute('/', signedOut)
+  it('renders', async () => {
+    stubGraphQL({})
+    await renderRoute('/', signedOut)
 
-		expect(screen.getByRole('heading', { name: 'Login', level: 2 }).closest('form')).toMatchSnapshot()
-	})
+    expect(screen.getByRole('heading', { name: 'Login', level: 2 }).closest('form')).toMatchSnapshot()
+  })
 })

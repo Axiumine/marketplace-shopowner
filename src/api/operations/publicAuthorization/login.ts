@@ -37,11 +37,11 @@ import { graphql } from '@gql/publicAuthorization'
  * help — so the variable is declared `String`, not `String!`.
  */
 export const LoginDocument = graphql(`
-	mutation Login($email: String!, $password: String!, $rememberMe: Boolean!, $turnstileToken: String) {
-		login(email: $email, password: $password, rememberMe: $rememberMe, turnstileToken: $turnstileToken) {
-			accessToken
-			onboardingStep
-			onboardingDone
-		}
-	}
+  mutation Login($email: String!, $password: String!, $rememberMe: Boolean!, $turnstileToken: String) {
+    login(email: $email, password: $password, rememberMe: $rememberMe, turnstileToken: $turnstileToken) {
+      accessToken
+      onboardingStep
+      onboardingDone
+    }
+  }
 `)

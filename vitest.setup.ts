@@ -16,24 +16,24 @@ const ID_ATTRS = ['id', 'for', 'aria-labelledby', 'aria-describedby', 'aria-cont
 const normalised = new WeakSet<Element>()
 
 const rewrite = (element: Element, stable: Map<string, string>): void => {
-	normalised.add(element)
+  normalised.add(element)
 
-	for (const attribute of ID_ATTRS) {
-		const value = element.getAttribute(attribute)
-		if (value === null) continue
+  for (const attribute of ID_ATTRS) {
+    const value = element.getAttribute(attribute)
+    if (value === null) continue
 
-		element.setAttribute(
-			attribute,
-			value.replace(GENERATED_ID, (generated) => {
-				const known = stable.get(generated)
-				if (known !== undefined) return known
+    element.setAttribute(
+      attribute,
+      value.replace(GENERATED_ID, (generated) => {
+        const known = stable.get(generated)
+        if (known !== undefined) return known
 
-				const token = `:id-${String(stable.size)}:`
-				stable.set(generated, token)
-				return token
-			})
-		)
-	}
+        const token = `:id-${String(stable.size)}:`
+        stable.set(generated, token)
+        return token
+      })
+    )
+  }
 }
 
 /**
@@ -44,22 +44,22 @@ const rewrite = (element: Element, stable: Map<string, string>): void => {
  * so a broken pairing still shows up as a diff and an added test does not.
  */
 expect.addSnapshotSerializer({
-	test: (value: unknown) => value instanceof Element && !normalised.has(value),
-	serialize: (value, config, indentation, depth, refs, printer) => {
-		const clone = (value as Element).cloneNode(true) as Element
-		const stable = new Map<string, string>()
+  test: (value: unknown) => value instanceof Element && !normalised.has(value),
+  serialize: (value, config, indentation, depth, refs, printer) => {
+    const clone = (value as Element).cloneNode(true) as Element
+    const stable = new Map<string, string>()
 
-		rewrite(clone, stable)
-		for (const descendant of clone.querySelectorAll('*')) rewrite(descendant, stable)
+    rewrite(clone, stable)
+    for (const descendant of clone.querySelectorAll('*')) rewrite(descendant, stable)
 
-		return printer(clone, config, indentation, depth, refs)
-	}
+    return printer(clone, config, indentation, depth, refs)
+  }
 })
 
 // jsdom has no layout, so it answers every `scrollTo` with a "Not implemented" line on stderr. The
 // router calls it on each navigation, which buries real failures under a dozen identical warnings.
 window.scrollTo = () => {
-	/* no layout to scroll in jsdom */
+  /* no layout to scroll in jsdom */
 }
 
 // The access token, the signed-in identity and the address waiting to become one are module-scoped
@@ -68,9 +68,9 @@ window.scrollTo = () => {
 // to opt out of. The pending address is the easiest of the three to forget: nothing renders it, so a
 // leak shows up two files later as a sidebar naming an owner that test never signed in.
 beforeEach(() => {
-	clearAccessToken()
-	clearSession()
-	clearPendingEmail()
+  clearAccessToken()
+  clearSession()
+  clearPendingEmail()
 })
 
 // Testing Library's auto-cleanup only fires when it detects a global `afterEach`, and it detects it
@@ -78,5 +78,5 @@ beforeEach(() => {
 // the hook explicitly means a snapshot never picks up the previous test's DOM if that ever changes —
 // a failure mode that shows up as one unrelated test's markup appearing inside another's snapshot.
 afterEach(() => {
-	cleanup()
+  cleanup()
 })

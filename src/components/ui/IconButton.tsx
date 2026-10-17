@@ -16,24 +16,24 @@ import type { ReactNode } from 'react'
  * for that state, since `:hover` still matches a disabled button and would go on promising a press.
  */
 export const IconButton = ({
-	name,
-	onClick,
-	disabled = false,
-	children
+  name,
+  onClick,
+  disabled = false,
+  children
 }: {
-	name: string
-	onClick: () => void
-	disabled?: boolean
-	children: ReactNode
+  name: string
+  onClick: () => void
+  disabled?: boolean
+  children: ReactNode
 }) => (
-	<button
-		type="button"
-		className="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
-		aria-label={name}
-		title={name}
-		disabled={disabled}
-		onClick={onClick}
-	>
-		{children}
-	</button>
+  <button
+    type="button"
+    className="rounded-box p-1 text-tip transition-colors hover:text-third focus-visible:text-third disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-tip"
+    aria-label={name}
+    title={name}
+    disabled={disabled}
+    onClick={onClick}
+  >
+    {children}
+  </button>
 )

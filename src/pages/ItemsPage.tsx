@@ -24,23 +24,23 @@ import { SaveChanges, useDiscardWarning, useSaving } from '@/features/saving'
  * and send the owner back to an empty page each time they pressed Save.
  */
 export const ItemsPage = () => {
-	const { register, saveAll, changed, version } = useSaving()
-	const [idCompany, setIdCompany] = useState('')
+  const { register, saveAll, changed, version } = useSaving()
+  const [idCompany, setIdCompany] = useState('')
 
-	useDiscardWarning(changed)
+  useDiscardWarning(changed)
 
-	return (
-		<>
-			<PageHeader title="Items" crumbs={[{ name: 'Dashboard', to: '/home' }, { name: 'Items' }]} />
-			<CompanyPicker idCompany={idCompany} locked={changed} onSelect={setIdCompany} />
-			{idCompany === '' ? (
-				<p className="mt-8 text-tip">Select a shop to see its items.</p>
-			) : (
-				<>
-					<Items key={`items-${idCompany}-${version}`} idCompany={idCompany} registerSection={register} />
-					<SaveChanges changed={changed} saveAll={saveAll} />
-				</>
-			)}
-		</>
-	)
+  return (
+    <>
+      <PageHeader title="Items" crumbs={[{ name: 'Dashboard', to: '/home' }, { name: 'Items' }]} />
+      <CompanyPicker idCompany={idCompany} locked={changed} onSelect={setIdCompany} />
+      {idCompany === '' ? (
+        <p className="mt-8 text-tip">Select a shop to see its items.</p>
+      ) : (
+        <>
+          <Items key={`items-${idCompany}-${version}`} idCompany={idCompany} registerSection={register} />
+          <SaveChanges changed={changed} saveAll={saveAll} />
+        </>
+      )}
+    </>
+  )
 }

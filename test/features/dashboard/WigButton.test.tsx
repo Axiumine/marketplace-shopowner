@@ -10,10 +10,10 @@ import { renderRoute } from '../../helpers/render'
  * than against a router shape assembled by hand.
  */
 describe('WigButton', () => {
-	it('renders', async () => {
-		stubGraphQL({})
-		await renderRoute('/home')
+  it('renders', async () => {
+    stubGraphQL({})
+    await renderRoute('/home')
 
-		expect(screen.getByRole('link', { name: /Companies\s*Manage your companies/ })).toMatchSnapshot()
-	})
+    expect(screen.getByRole('link', { name: /Companies\s*Manage your companies/ })).toMatchSnapshot()
+  })
 })

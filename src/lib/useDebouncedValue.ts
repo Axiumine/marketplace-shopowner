@@ -11,17 +11,17 @@ import { useEffect, useState } from 'react'
  * The cleanup clears the pending timer, so the value only ever settles on the last input.
  */
 export const useDebouncedValue = <T>(value: T, delay: number): T => {
-	const [debounced, setDebounced] = useState(value)
+  const [debounced, setDebounced] = useState(value)
 
-	useEffect(() => {
-		const timer = setTimeout(() => {
-			setDebounced(value)
-		}, delay)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebounced(value)
+    }, delay)
 
-		return () => {
-			clearTimeout(timer)
-		}
-	}, [value, delay])
+    return () => {
+      clearTimeout(timer)
+    }
+  }, [value, delay])
 
-	return debounced
+  return debounced
 }

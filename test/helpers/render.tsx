@@ -15,14 +15,14 @@ import { createAppRouter } from '@/router'
 export const OWNER: ShopOwnerIdentity = { email: 'owner@marketplace.test' }
 
 export interface RenderOptions {
-	/**
-	 * Seeds the in-memory access token. Defaults to a value, because the interesting default is
-	 * "signed in": with a null token urql's `willAuthError` fires a `Refresh` before every operation,
-	 * which every test would then have to stub. Pass `null` to exercise that path on purpose.
-	 */
-	token?: string | null
-	/** Seeds the signed-in identity. Pass `null` to hit the router's redirect guard. */
-	session?: ShopOwnerIdentity | null
+  /**
+   * Seeds the in-memory access token. Defaults to a value, because the interesting default is
+   * "signed in": with a null token urql's `willAuthError` fires a `Refresh` before every operation,
+   * which every test would then have to stub. Pass `null` to exercise that path on purpose.
+   */
+  token?: string | null
+  /** Seeds the signed-in identity. Pass `null` to hit the router's redirect guard. */
+  session?: ShopOwnerIdentity | null
 }
 
 const DEFAULTS: Required<RenderOptions> = { token: 'tok-1', session: OWNER }
@@ -35,11 +35,11 @@ const DEFAULTS: Required<RenderOptions> = { token: 'tok-1', session: OWNER }
  * shared jsdom `window` for every client a test builds across the whole suite.
  */
 export const clientWithSpy = () => {
-	const onSessionLost = vi.fn()
-	const controller = new AbortController()
-	onTestFinished(() => controller.abort())
+  const onSessionLost = vi.fn()
+  const controller = new AbortController()
+  onTestFinished(() => controller.abort())
 
-	return { client: createGraphQLClient({ onSessionLost, signal: controller.signal }), onSessionLost }
+  return { client: createGraphQLClient({ onSessionLost, signal: controller.signal }), onSessionLost }
 }
 
 /**
@@ -47,17 +47,17 @@ export const clientWithSpy = () => {
  * built only from them.
  */
 export const renderWithClient = (ui: ReactElement, options: RenderOptions = {}): RenderResult => {
-	const { token, session } = { ...DEFAULTS, ...options }
-	if (token !== null) setAccessToken(token)
-	if (session !== null) setSession(session)
+  const { token, session } = { ...DEFAULTS, ...options }
+  if (token !== null) setAccessToken(token)
+  if (session !== null) setSession(session)
 
-	const { client } = clientWithSpy()
-	return render(<UrqlProvider value={client}>{ui}</UrqlProvider>)
+  const { client } = clientWithSpy()
+  return render(<UrqlProvider value={client}>{ui}</UrqlProvider>)
 }
 
 export interface RouterRenderResult extends RenderResult {
-	readonly router: AnyRouter
-	readonly onSessionLost: ReturnType<typeof vi.fn>
+  readonly router: AnyRouter
+  readonly onSessionLost: ReturnType<typeof vi.fn>
 }
 
 /**
@@ -69,28 +69,28 @@ export interface RouterRenderResult extends RenderResult {
  * owner can produce.
  */
 export const renderRoute = async (path: string, options: RenderOptions = {}): Promise<RouterRenderResult> => {
-	const { token, session } = { ...DEFAULTS, ...options }
-	if (token !== null) setAccessToken(token)
-	if (session !== null) setSession(session)
+  const { token, session } = { ...DEFAULTS, ...options }
+  if (token !== null) setAccessToken(token)
+  if (session !== null) setSession(session)
 
-	const { client, onSessionLost } = clientWithSpy()
-	// The app's own factory, given a memory history — not a router assembled here out of the same parts.
-	// A local `createRouter({ routeTree: createAppRouteTree() })` would test everything except the one
-	// function `main.tsx` calls. The tree is rebuilt per render, not shared: `createAppRouteTree` is a
-	// factory precisely so the route definitions are evaluated inside the test rather than at import time
-	// (see the note on it in src/router.tsx), and a `Route` object also carries per-router state that must
-	// not outlive one.
-	const router = createAppRouter(createMemoryHistory({ initialEntries: [path] }))
+  const { client, onSessionLost } = clientWithSpy()
+  // The app's own factory, given a memory history — not a router assembled here out of the same parts.
+  // A local `createRouter({ routeTree: createAppRouteTree() })` would test everything except the one
+  // function `main.tsx` calls. The tree is rebuilt per render, not shared: `createAppRouteTree` is a
+  // factory precisely so the route definitions are evaluated inside the test rather than at import time
+  // (see the note on it in src/router.tsx), and a `Route` object also carries per-router state that must
+  // not outlive one.
+  const router = createAppRouter(createMemoryHistory({ initialEntries: [path] }))
 
-	const result = render(
-		<UrqlProvider value={client}>
-			<RouterProvider router={router as never} />
-		</UrqlProvider>
-	)
+  const result = render(
+    <UrqlProvider value={client}>
+      <RouterProvider router={router as never} />
+    </UrqlProvider>
+  )
 
-	await waitFor(() => {
-		expect(router.state.status).toBe('idle')
-	})
+  await waitFor(() => {
+    expect(router.state.status).toBe('idle')
+  })
 
-	return { ...result, router, onSessionLost }
+  return { ...result, router, onSessionLost }
 }

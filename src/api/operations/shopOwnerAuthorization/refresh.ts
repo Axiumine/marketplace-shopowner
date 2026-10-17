@@ -16,10 +16,10 @@ import { graphql } from '@gql/shopOwnerAuthorization'
  * the other's cookie.
  */
 export const RefreshDocument = graphql(`
-	mutation Refresh {
-		refresh {
-			status
-			accessToken
-		}
-	}
+  mutation Refresh {
+    refresh {
+      status
+      accessToken
+    }
+  }
 `)

@@ -23,36 +23,36 @@ import { useSyncExternalStore } from 'react'
  * authenticated round-trip has succeeded, whatever it managed to learn about the owner.
  */
 export interface ShopOwnerIdentity {
-	/** The address typed at sign-in, or `null` when the session was restored from the cookie instead. */
-	readonly email: string | null
+  /** The address typed at sign-in, or `null` when the session was restored from the cookie instead. */
+  readonly email: string | null
 }
 
 let current: ShopOwnerIdentity | null = null
 const listeners = new Set<() => void>()
 
 const emit = (): void => {
-	listeners.forEach((listener) => {
-		listener()
-	})
+  listeners.forEach((listener) => {
+    listener()
+  })
 }
 
 export const getSession = (): ShopOwnerIdentity | null => current
 
 export const setSession = (identity: ShopOwnerIdentity): void => {
-	current = identity
-	emit()
+  current = identity
+  emit()
 }
 
 export const clearSession = (): void => {
-	current = null
-	emit()
+  current = null
+  emit()
 }
 
 export const subscribeSession = (listener: () => void): (() => void) => {
-	listeners.add(listener)
-	return () => {
-		listeners.delete(listener)
-	}
+  listeners.add(listener)
+  return () => {
+    listeners.delete(listener)
+  }
 }
 
 export const useSession = (): ShopOwnerIdentity | null => useSyncExternalStore(subscribeSession, getSession, getSession)
@@ -75,11 +75,11 @@ export const useSession = (): ShopOwnerIdentity | null => useSyncExternalStore(s
 let pendingEmail: string | null = null
 
 export const setPendingEmail = (email: string): void => {
-	pendingEmail = email
+  pendingEmail = email
 }
 
 export const getPendingEmail = (): string | null => pendingEmail
 
 export const clearPendingEmail = (): void => {
-	pendingEmail = null
+  pendingEmail = null
 }

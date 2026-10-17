@@ -39,47 +39,47 @@ const presetConfig = { fragmentMasking: false }
  * `YYYY-MM-DD`.
  */
 const config = {
-	enumsAsTypes: true,
-	skipTypename: true,
-	useTypeImports: true,
-	scalars: { DateTime: 'string', Date: 'string' }
+  enumsAsTypes: true,
+  skipTypename: true,
+  useTypeImports: true,
+  scalars: { DateTime: 'string', Date: 'string' }
 }
 
 const codegenConfig: CodegenConfig = {
-	// Tabs, to match every other file in this repo and the eslint `indent` rule the generated output
-	// is exempt from but the config file is not.
-	config: { useTypeImports: true },
-	ignoreNoDocuments: true,
-	generates: {
-		'src/gql/publicAuthorization/': {
-			schema: 'schema/public-authorization.graphql',
-			documents: 'src/api/operations/publicAuthorization/**/*.ts',
-			preset,
-			presetConfig,
-			config
-		},
-		'src/gql/shopOwnerAuthorization/': {
-			schema: 'schema/authenticated-authorization.graphql',
-			documents: 'src/api/operations/shopOwnerAuthorization/**/*.ts',
-			preset,
-			presetConfig,
-			config
-		},
-		'src/gql/logout/': {
-			schema: 'schema/logout.graphql',
-			documents: 'src/api/operations/logout/**/*.ts',
-			preset,
-			presetConfig,
-			config
-		},
-		'src/gql/shopOwnerResource/': {
-			schema: 'schema/authenticated-resource.graphql',
-			documents: 'src/api/operations/shopOwnerResource/**/*.ts',
-			preset,
-			presetConfig,
-			config
-		}
-	}
+  // Two spaces, to match every other file in this repo and the eslint `indent` rule the generated output
+  // is exempt from but the config file is not.
+  config: { useTypeImports: true },
+  ignoreNoDocuments: true,
+  generates: {
+    'src/gql/publicAuthorization/': {
+      schema: 'schema/public-authorization.graphql',
+      documents: 'src/api/operations/publicAuthorization/**/*.ts',
+      preset,
+      presetConfig,
+      config
+    },
+    'src/gql/shopOwnerAuthorization/': {
+      schema: 'schema/authenticated-authorization.graphql',
+      documents: 'src/api/operations/shopOwnerAuthorization/**/*.ts',
+      preset,
+      presetConfig,
+      config
+    },
+    'src/gql/logout/': {
+      schema: 'schema/logout.graphql',
+      documents: 'src/api/operations/logout/**/*.ts',
+      preset,
+      presetConfig,
+      config
+    },
+    'src/gql/shopOwnerResource/': {
+      schema: 'schema/authenticated-resource.graphql',
+      documents: 'src/api/operations/shopOwnerResource/**/*.ts',
+      preset,
+      presetConfig,
+      config
+    }
+  }
 }
 
 export default codegenConfig

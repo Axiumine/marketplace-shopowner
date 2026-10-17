@@ -9,8 +9,8 @@
 # id must not be renamed: the branch protection rule on all sixteen repositories
 # refers to it by that exact string.
 #
-# ⚠️ YAML forbids tabs. The workspace-wide "indentation is tabs" rule is enforced by
-# eslint and prettier over JavaScript and TypeScript — it cannot apply here.
+# ⚠️ YAML forbids tabs, and it no longer sets this file apart: the whole workspace indents with two
+# spaces (ADR-058), enforced by prettier, and by eslint over JavaScript and TypeScript.
 #
 # ⚠️ Every `uses:` is pinned to a commit SHA, not a tag: Scorecard's
 # Pinned-Dependencies check grades this file too, and a tag is mutable.

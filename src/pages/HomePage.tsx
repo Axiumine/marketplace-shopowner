@@ -11,10 +11,10 @@ import { WigButton } from '@/features/dashboard/WigButton'
  * this page would have to fetch in full to say a number about.
  */
 export const HomePage = () => (
-	<>
-		<PageHeader title="Dashboard" />
-		<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-			<WigButton title="Companies" phrase="Manage your companies" to="/companies" />
-		</div>
-	</>
+  <>
+    <PageHeader title="Dashboard" />
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <WigButton title="Companies" phrase="Manage your companies" to="/companies" />
+    </div>
+  </>
 )

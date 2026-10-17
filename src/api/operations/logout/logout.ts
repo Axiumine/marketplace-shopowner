@@ -8,7 +8,7 @@ import { graphql } from '@gql/logout'
  * in-memory token regardless.
  */
 export const LogoutDocument = graphql(`
-	mutation Logout {
-		logout
-	}
+  mutation Logout {
+    logout
+  }
 `)

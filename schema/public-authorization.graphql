@@ -19,30 +19,30 @@
 # maintained by hand rather than generated.
 
 schema {
-	query: QueriesPublic
-	mutation: MutationsPublic
+  query: QueriesPublic
+  mutation: MutationsPublic
 }
 
 type QueriesPublic {
-	authPublicHello: Hello2Type!
+  authPublicHello: Hello2Type!
 }
 
 type Hello2Type {
-	txt: String!
+  txt: String!
 }
 
 type MutationsPublic {
-	"""
-	The ShopOwner-tier login: checks the address against the `shopOwner` collection, mints an
-	access/refresh pair and sets the refresh token as a signed httpOnly cookie.
+  """
+  The ShopOwner-tier login: checks the address against the `shopOwner` collection, mints an
+  access/refresh pair and sets the refresh token as a signed httpOnly cookie.
 
-	⚠️ `turnstileToken` is nullable on purpose. The widget is disabled on a machine with no site key,
-	and the resolver's `assertTurnstile` verifies a token only where a secret key is configured — so a
-	deployment that holds the secret refuses the tokenless request, and a developer box waves it
-	through. Making the argument non-null would break exactly that setup and buy nothing: a client
-	cannot weaken the gate by omitting the field, it can only fail to help.
-	"""
-	login(email: String!, password: String!, rememberMe: Boolean!, turnstileToken: String): LoginAppType!
+  ⚠️ `turnstileToken` is nullable on purpose. The widget is disabled on a machine with no site key,
+  and the resolver's `assertTurnstile` verifies a token only where a secret key is configured — so a
+  deployment that holds the secret refuses the tokenless request, and a developer box waves it
+  through. Making the argument non-null would break exactly that setup and buy nothing: a client
+  cannot weaken the gate by omitting the field, it can only fail to help.
+  """
+  login(email: String!, password: String!, rememberMe: Boolean!, turnstileToken: String): LoginAppType!
 }
 
 """
@@ -56,7 +56,7 @@ that into the Redis payload, and returns the two untouched locals. So the mutati
 nothing has to change here when the resolver is fixed — but **no code may branch on them until it is**.
 """
 type LoginAppType {
-	accessToken: String!
-	onboardingStep: String!
-	onboardingDone: Boolean!
+  accessToken: String!
+  onboardingStep: String!
+  onboardingDone: Boolean!
 }

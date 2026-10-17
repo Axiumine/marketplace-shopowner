@@ -6,154 +6,154 @@ import { describe, expect, it } from 'vitest'
 import { SelectField } from '@/components/ui/SelectField'
 
 const days = (
-	<>
-		<option value="Lun">Monday</option>
-		<option value="Mar">Tuesday</option>
-	</>
+  <>
+    <option value="Lun">Monday</option>
+    <option value="Mar">Tuesday</option>
+  </>
 )
 
 describe('SelectField', () => {
-	it('associates its label with the select', async () => {
-		render(<SelectField label="Day">{days}</SelectField>)
+  it('associates its label with the select', async () => {
+    render(<SelectField label="Day">{days}</SelectField>)
 
-		const select = screen.getByLabelText('Day')
-		await userEvent.selectOptions(select, 'Mar')
-		expect(select).toHaveValue('Mar')
-	})
+    const select = screen.getByLabelText('Day')
+    await userEvent.selectOptions(select, 'Mar')
+    expect(select).toHaveValue('Mar')
+  })
 
-	// The displayed name and the stored value are two different vocabularies here — `Monday` is read,
-	// `Lun` is written — so a select that reported its label instead of its value would silently put a
-	// second vocabulary into a collection that already has one.
-	it('reports the option value, not the option text', async () => {
-		render(<SelectField label="Day">{days}</SelectField>)
+  // The displayed name and the stored value are two different vocabularies here — `Monday` is read,
+  // `Lun` is written — so a select that reported its label instead of its value would silently put a
+  // second vocabulary into a collection that already has one.
+  it('reports the option value, not the option text', async () => {
+    render(<SelectField label="Day">{days}</SelectField>)
 
-		await userEvent.selectOptions(screen.getByLabelText('Day'), screen.getByRole('option', { name: 'Monday' }))
-		expect(screen.getByLabelText('Day')).toHaveValue('Lun')
-	})
+    await userEvent.selectOptions(screen.getByLabelText('Day'), screen.getByRole('option', { name: 'Monday' }))
+    expect(screen.getByLabelText('Day')).toHaveValue('Lun')
+  })
 
-	it('generates an id when none is given, so two fields on one page do not collide', () => {
-		render(
-			<>
-				<SelectField label="Da">{days}</SelectField>
-				<SelectField label="A">{days}</SelectField>
-			</>
-		)
+  it('generates an id when none is given, so two fields on one page do not collide', () => {
+    render(
+      <>
+        <SelectField label="Da">{days}</SelectField>
+        <SelectField label="A">{days}</SelectField>
+      </>
+    )
 
-		const da = screen.getByLabelText('Da')
-		const a = screen.getByLabelText('A')
-		expect(da.id).not.toBe('')
-		expect(da.id).not.toBe(a.id)
-	})
+    const da = screen.getByLabelText('Da')
+    const a = screen.getByLabelText('A')
+    expect(da.id).not.toBe('')
+    expect(da.id).not.toBe(a.id)
+  })
 
-	it('uses a caller-supplied id verbatim', () => {
-		render(
-			<SelectField label="Day" id="field-day">
-				{days}
-			</SelectField>
-		)
-		expect(screen.getByLabelText('Day')).toHaveAttribute('id', 'field-day')
-	})
+  it('uses a caller-supplied id verbatim', () => {
+    render(
+      <SelectField label="Day" id="field-day">
+        {days}
+      </SelectField>
+    )
+    expect(screen.getByLabelText('Day')).toHaveAttribute('id', 'field-day')
+  })
 
-	it('is valid and describes nothing when there is no error', () => {
-		render(<SelectField label="Day">{days}</SelectField>)
+  it('is valid and describes nothing when there is no error', () => {
+    render(<SelectField label="Day">{days}</SelectField>)
 
-		const select = screen.getByLabelText('Day')
-		expect(select).toHaveAttribute('aria-invalid', 'false')
-		expect(select).not.toHaveAttribute('aria-describedby')
-	})
+    const select = screen.getByLabelText('Day')
+    expect(select).toHaveAttribute('aria-invalid', 'false')
+    expect(select).not.toHaveAttribute('aria-describedby')
+  })
 
-	// As on `TextField`: the message has to be announced *with* the field, or a screen-reader user hears
-	// "Day, combo box" and never learns why the form refused.
-	it('wires the error message to the select', () => {
-		render(
-			<SelectField label="Day" id="field-day" error="Day is required">
-				{days}
-			</SelectField>
-		)
+  // As on `TextField`: the message has to be announced *with* the field, or a screen-reader user hears
+  // "Day, combo box" and never learns why the form refused.
+  it('wires the error message to the select', () => {
+    render(
+      <SelectField label="Day" id="field-day" error="Day is required">
+        {days}
+      </SelectField>
+    )
 
-		const select = screen.getByLabelText('Day')
-		expect(select).toHaveAttribute('aria-invalid', 'true')
-		expect(select).toHaveAttribute('aria-describedby', 'field-day-error')
-		expect(document.getElementById('field-day-error')).toHaveTextContent('Day is required')
-	})
+    const select = screen.getByLabelText('Day')
+    expect(select).toHaveAttribute('aria-invalid', 'true')
+    expect(select).toHaveAttribute('aria-describedby', 'field-day-error')
+    expect(document.getElementById('field-day-error')).toHaveTextContent('Day is required')
+  })
 
-	// Without the forwarded ref, react-hook-form's `register()` never reaches the real select: the field
-	// is both uncontrolled and unregistered, and the form reads it as permanently empty.
-	it('forwards its ref to the select element', () => {
-		const ref = createRef<HTMLSelectElement>()
-		render(
-			<SelectField label="Day" ref={ref}>
-				{days}
-			</SelectField>
-		)
-		expect(ref.current).toBe(screen.getByLabelText('Day'))
-	})
+  // Without the forwarded ref, react-hook-form's `register()` never reaches the real select: the field
+  // is both uncontrolled and unregistered, and the form reads it as permanently empty.
+  it('forwards its ref to the select element', () => {
+    const ref = createRef<HTMLSelectElement>()
+    render(
+      <SelectField label="Day" ref={ref}>
+        {days}
+      </SelectField>
+    )
+    expect(ref.current).toBe(screen.getByLabelText('Day'))
+  })
 
-	it('passes the remaining select attributes through', () => {
-		render(
-			<SelectField label="Day" name="openingHours.0.day" disabled>
-				{days}
-			</SelectField>
-		)
+  it('passes the remaining select attributes through', () => {
+    render(
+      <SelectField label="Day" name="openingHours.0.day" disabled>
+        {days}
+      </SelectField>
+    )
 
-		const select = screen.getByLabelText('Day')
-		expect(select).toHaveAttribute('name', 'openingHours.0.day')
-		expect(select).toBeDisabled()
-	})
+    const select = screen.getByLabelText('Day')
+    expect(select).toHaveAttribute('name', 'openingHours.0.day')
+    expect(select).toBeDisabled()
+  })
 
-	/*
-	 * ⚠️ The native arrow is drawn in the browser's own shadow tree, hard against the right border, and
-	 * no property moves it — `padding-right` widens the text area behind it and leaves it where it was.
-	 * So the control is stripped and the glyph drawn as an ordinary child. Both halves are asserted here:
-	 * without `appearance-none` the page shows two arrows, and without the span it shows none at all.
-	 */
-	it('draws its own arrow, having dropped the native one', () => {
-		const { container } = render(<SelectField label="Day">{days}</SelectField>)
+  /*
+   * ⚠️ The native arrow is drawn in the browser's own shadow tree, hard against the right border, and
+   * no property moves it — `padding-right` widens the text area behind it and leaves it where it was.
+   * So the control is stripped and the glyph drawn as an ordinary child. Both halves are asserted here:
+   * without `appearance-none` the page shows two arrows, and without the span it shows none at all.
+   */
+  it('draws its own arrow, having dropped the native one', () => {
+    const { container } = render(<SelectField label="Day">{days}</SelectField>)
 
-		expect(screen.getByLabelText('Day')).toHaveClass('appearance-none')
+    expect(screen.getByLabelText('Day')).toHaveClass('appearance-none')
 
-		const arrow = container.querySelector('svg')?.parentElement
-		expect(arrow).toHaveClass('right-3')
-		// A click landing on the arrow must reach the select underneath, or the one obvious place to
-		// press is the one place that does nothing.
-		expect(arrow).toHaveClass('pointer-events-none')
-	})
+    const arrow = container.querySelector('svg')?.parentElement
+    expect(arrow).toHaveClass('right-3')
+    // A click landing on the arrow must reach the select underneath, or the one obvious place to
+    // press is the one place that does nothing.
+    expect(arrow).toHaveClass('pointer-events-none')
+  })
 
-	// Every class is asserted absent in the other state: the two pairs set two properties, so a field
-	// carrying both halves of either would be resolved by stylesheet order rather than by the error.
-	it('doubles its border and turns red when it is invalid', () => {
-		const { rerender } = render(<SelectField label="Day">{days}</SelectField>)
+  // Every class is asserted absent in the other state: the two pairs set two properties, so a field
+  // carrying both halves of either would be resolved by stylesheet order rather than by the error.
+  it('doubles its border and turns red when it is invalid', () => {
+    const { rerender } = render(<SelectField label="Day">{days}</SelectField>)
 
-		expect(screen.getByLabelText('Day')).toHaveClass('border', 'bg-white')
-		expect(screen.getByLabelText('Day')).not.toHaveClass('border-2')
-		expect(screen.getByLabelText('Day')).not.toHaveClass('bg-app-error/10')
+    expect(screen.getByLabelText('Day')).toHaveClass('border', 'bg-white')
+    expect(screen.getByLabelText('Day')).not.toHaveClass('border-2')
+    expect(screen.getByLabelText('Day')).not.toHaveClass('bg-app-error/10')
 
-		rerender(
-			<SelectField label="Day" error="Day is required">
-				{days}
-			</SelectField>
-		)
+    rerender(
+      <SelectField label="Day" error="Day is required">
+        {days}
+      </SelectField>
+    )
 
-		expect(screen.getByLabelText('Day')).toHaveClass('border-2', 'bg-app-error/10')
-		expect(screen.getByLabelText('Day')).not.toHaveClass('border')
-		expect(screen.getByLabelText('Day')).not.toHaveClass('bg-white')
-	})
+    expect(screen.getByLabelText('Day')).toHaveClass('border-2', 'bg-app-error/10')
+    expect(screen.getByLabelText('Day')).not.toHaveClass('border')
+    expect(screen.getByLabelText('Day')).not.toHaveClass('bg-white')
+  })
 
-	it('renders', () => {
-		const { container } = render(
-			<SelectField label="Day" id="field-day">
-				{days}
-			</SelectField>
-		)
-		expect(container.firstChild).toMatchSnapshot()
-	})
+  it('renders', () => {
+    const { container } = render(
+      <SelectField label="Day" id="field-day">
+        {days}
+      </SelectField>
+    )
+    expect(container.firstChild).toMatchSnapshot()
+  })
 
-	it('renders with an error', () => {
-		const { container } = render(
-			<SelectField label="Day" id="field-day" error="Day is required">
-				{days}
-			</SelectField>
-		)
-		expect(container.firstChild).toMatchSnapshot()
-	})
+  it('renders with an error', () => {
+    const { container } = render(
+      <SelectField label="Day" id="field-day" error="Day is required">
+        {days}
+      </SelectField>
+    )
+    expect(container.firstChild).toMatchSnapshot()
+  })
 })
