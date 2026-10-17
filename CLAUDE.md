@@ -43,7 +43,7 @@ against the resolver in the service repo before trusting a slice; recorded diver
 app's slices are in [`REPO.md`](./REPO.md). `src/gql/` is **generated** — never edit it, run
 `yarn codegen`.
 
-⚠️ **Tabs, not spaces** (eslint `indent: ['error','tab']`), matching every repo in the workspace.
+⚠️ **Two spaces, not tabs** (prettier `useTabs: false`, `tabWidth: 2`; eslint `indent: ['error', 2]`), matching every repo in the workspace (ADR-058). The `graphql()` documents in `src/api/operations/` are embedded template strings that prettier re-indents, and the keys of the generated `src/gql/*/gql.ts` are those exact strings — after any change to their indentation run `yarn codegen`.
 
 ⚠️ **Never read, echo or commit a secret file.** The dotted env file is git-ignored and the pre-commit
 hook refuses it; `env` (no dot) is the committed template and is safe to read. To inspect the dotted one,
