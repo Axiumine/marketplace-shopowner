@@ -573,7 +573,7 @@
     "@graphql-typed-document-node/core" "3.2.0"
     tslib "^2.8.0"
 
-"@graphql-codegen/core@^6.2.0", "@graphql-codegen/core@^6.2.2":
+"@graphql-codegen/core@^6.2.2":
   version "6.2.2"
   resolved "https://registry.npmjs.org/@graphql-codegen/core/-/core-6.2.2.tgz#0c17967de55758e59e9dd484e6a54ac896d2efc1"
   integrity sha512-bClqhA2ZITWKiEYd5A87KaU93YBC8o1++B3Y0FpYIZPZfGEWEwbhyvUkrSKrXqUagwM7c0h77f7DB4oR6vBgpQ==
@@ -583,7 +583,7 @@
     "@graphql-tools/utils" "^12.0.3"
     tslib "^2.8.0"
 
-"@graphql-codegen/gql-tag-operations@^6.1.0", "@graphql-codegen/gql-tag-operations@^6.1.1":
+"@graphql-codegen/gql-tag-operations@^6.1.1":
   version "6.1.1"
   resolved "https://registry.npmjs.org/@graphql-codegen/gql-tag-operations/-/gql-tag-operations-6.1.1.tgz#2164bec37832398aae929797f5224b502e97d4d8"
   integrity sha512-TJ8yK31ZExBdslw8VG5P8mclrYvhMR7a/UnQvYp87pfekNJqfJignALxdZUkwjWWZNiO8hZEBYQiIrCwSJBHKg==
@@ -594,7 +594,7 @@
     auto-bind "^5.0.0"
     tslib "^2.8.0"
 
-"@graphql-codegen/plugin-helpers@^7.1.0", "@graphql-codegen/plugin-helpers@^7.4.0", "@graphql-codegen/plugin-helpers@^7.4.1", "@graphql-codegen/plugin-helpers@^7.4.2":
+"@graphql-codegen/plugin-helpers@^7.4.0", "@graphql-codegen/plugin-helpers@^7.4.1", "@graphql-codegen/plugin-helpers@^7.4.2":
   version "7.4.2"
   resolved "https://registry.npmjs.org/@graphql-codegen/plugin-helpers/-/plugin-helpers-7.4.2.tgz#2f38032e608c8414f510fa03b16dd5b4c283b34b"
   integrity sha512-5SmkQvoNg3orbCNWBIv6lD1Zk1/mJbgdqv5oUy2Pw8Q70sO1Y3CGOkdwnPUp5l/pm0GKApQUyqPJkqFaJKewpQ==
@@ -647,7 +647,7 @@
     auto-bind "^5.0.0"
     tslib "~2.8.0"
 
-"@graphql-codegen/visitor-plugin-common@^7.2.0", "@graphql-codegen/visitor-plugin-common@^7.2.10", "@graphql-codegen/visitor-plugin-common@^7.2.8", "@graphql-codegen/visitor-plugin-common@^7.2.9", "@graphql-codegen/visitor-plugin-common@^7.3.0":
+"@graphql-codegen/visitor-plugin-common@^7.2.10", "@graphql-codegen/visitor-plugin-common@^7.2.8", "@graphql-codegen/visitor-plugin-common@^7.2.9", "@graphql-codegen/visitor-plugin-common@^7.3.0":
   version "7.3.0"
   resolved "https://registry.npmjs.org/@graphql-codegen/visitor-plugin-common/-/visitor-plugin-common-7.3.0.tgz#bc7bd692a7f0c1d228ac541fac16d697cc070890"
   integrity sha512-XS+VizbHubOXwk6TKK24FLiaicm5p210vufhhpQK78+0ETLhOiMGPBnkz6ieT3OOPJkakKXQoit948ekxE4ohg==
@@ -2914,7 +2914,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.4:
   resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.11.tgz#4183e4e8bf08bb6e05bbb2f7d2e0c8f712ca40e3"
   integrity sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==
 
-graphql-config@^5.1.6, graphql-config@^5.1.8:
+graphql-config@^5.1.8:
   version "5.1.8"
   resolved "https://registry.npmjs.org/graphql-config/-/graphql-config-5.1.8.tgz#09329751205bc94153359a7fe9d11b4527a15d04"
   integrity sha512-7DyT4ctUiNRMAU19IFy8o1zoQCJPjik1/vBwWIZlILGI6O1mHZXd59rUzF81oglNyHtPrNNCWonqfwu58BG66A==
@@ -3983,10 +3983,10 @@ react-dom@^19.2.8:
   dependencies:
     scheduler "^0.28.0"
 
-react-hook-form@^7.84.0:
-  version "7.88.0"
-  resolved "https://registry.npmjs.org/react-hook-form/-/react-hook-form-7.88.0.tgz#887e669339ff940a5a5cd1d0d00055954d05c2a9"
-  integrity sha512-QRaLOWhX93YCnMiRfnOFRSwWXZNt8qhm2JTZwypoDvKpSffTJHmpzMXt8U6PV5UThvL3IiiLDUWe2nHMtz6Mmw==
+react-hook-form@^7.90.0:
+  version "7.90.0"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.90.0.tgz#166fc35a3f6df7cd62bc880789aba6ea16e5d443"
+  integrity sha512-+NdG0FLzCPhFOp2NNxaUYLF9fyZhNjx9FTBBSYWF71/l6BBlmIc/j6xlp3DbaHWLJbIG7Zd8oznA19xJClU97w==
 
 react-is@^17.0.1:
   version "17.0.2"
