@@ -573,7 +573,7 @@
     "@graphql-typed-document-node/core" "3.2.0"
     tslib "^2.8.0"
 
-"@graphql-codegen/core@^6.2.0", "@graphql-codegen/core@^6.2.2":
+"@graphql-codegen/core@^6.2.2":
   version "6.2.2"
   resolved "https://registry.npmjs.org/@graphql-codegen/core/-/core-6.2.2.tgz#0c17967de55758e59e9dd484e6a54ac896d2efc1"
   integrity sha512-bClqhA2ZITWKiEYd5A87KaU93YBC8o1++B3Y0FpYIZPZfGEWEwbhyvUkrSKrXqUagwM7c0h77f7DB4oR6vBgpQ==
@@ -583,7 +583,7 @@
     "@graphql-tools/utils" "^12.0.3"
     tslib "^2.8.0"
 
-"@graphql-codegen/gql-tag-operations@^6.1.0", "@graphql-codegen/gql-tag-operations@^6.1.1":
+"@graphql-codegen/gql-tag-operations@^6.1.1":
   version "6.1.1"
   resolved "https://registry.npmjs.org/@graphql-codegen/gql-tag-operations/-/gql-tag-operations-6.1.1.tgz#2164bec37832398aae929797f5224b502e97d4d8"
   integrity sha512-TJ8yK31ZExBdslw8VG5P8mclrYvhMR7a/UnQvYp87pfekNJqfJignALxdZUkwjWWZNiO8hZEBYQiIrCwSJBHKg==
@@ -594,7 +594,7 @@
     auto-bind "^5.0.0"
     tslib "^2.8.0"
 
-"@graphql-codegen/plugin-helpers@^7.1.0", "@graphql-codegen/plugin-helpers@^7.4.0", "@graphql-codegen/plugin-helpers@^7.4.1", "@graphql-codegen/plugin-helpers@^7.4.2":
+"@graphql-codegen/plugin-helpers@^7.4.0", "@graphql-codegen/plugin-helpers@^7.4.1", "@graphql-codegen/plugin-helpers@^7.4.2":
   version "7.4.2"
   resolved "https://registry.npmjs.org/@graphql-codegen/plugin-helpers/-/plugin-helpers-7.4.2.tgz#2f38032e608c8414f510fa03b16dd5b4c283b34b"
   integrity sha512-5SmkQvoNg3orbCNWBIv6lD1Zk1/mJbgdqv5oUy2Pw8Q70sO1Y3CGOkdwnPUp5l/pm0GKApQUyqPJkqFaJKewpQ==
@@ -647,7 +647,7 @@
     auto-bind "^5.0.0"
     tslib "~2.8.0"
 
-"@graphql-codegen/visitor-plugin-common@^7.2.0", "@graphql-codegen/visitor-plugin-common@^7.2.10", "@graphql-codegen/visitor-plugin-common@^7.2.8", "@graphql-codegen/visitor-plugin-common@^7.2.9", "@graphql-codegen/visitor-plugin-common@^7.3.0":
+"@graphql-codegen/visitor-plugin-common@^7.2.10", "@graphql-codegen/visitor-plugin-common@^7.2.8", "@graphql-codegen/visitor-plugin-common@^7.2.9", "@graphql-codegen/visitor-plugin-common@^7.3.0":
   version "7.3.0"
   resolved "https://registry.npmjs.org/@graphql-codegen/visitor-plugin-common/-/visitor-plugin-common-7.3.0.tgz#bc7bd692a7f0c1d228ac541fac16d697cc070890"
   integrity sha512-XS+VizbHubOXwk6TKK24FLiaicm5p210vufhhpQK78+0ETLhOiMGPBnkz6ieT3OOPJkakKXQoit948ekxE4ohg==
@@ -1583,43 +1583,43 @@
     "@tailwindcss/oxide" "4.3.3"
     tailwindcss "4.3.3"
 
-"@tanstack/history@1.162.4":
-  version "1.162.4"
-  resolved "https://registry.npmjs.org/@tanstack/history/-/history-1.162.4.tgz#bbb72e9d2ad8885fc7beafcbd97ed34b2cd38d1b"
-  integrity sha512-utTS5L2OkeYUzXGohL1Z8sefu1GLNOJcxe8Hd6iIdc/Xo1K1nDB2JEp4iSFhvYh33xKC9V91TxrS8qfrpoKobQ==
+"@tanstack/history@1.162.5":
+  version "1.162.5"
+  resolved "https://registry.yarnpkg.com/@tanstack/history/-/history-1.162.5.tgz#967cb42b2e33fb1a45cb6d17a561c9223567a0f3"
+  integrity sha512-w1+YvwmTkwt5n8yUqEH3IWZ9DsmorCZW/EQ3KYHnqEgIkOZpH54NvW6/Epq3Dzb8H0ifIeYX8PExvrNLIH5FIA==
 
-"@tanstack/react-router@^1.170.18":
-  version "1.170.38"
-  resolved "https://registry.npmjs.org/@tanstack/react-router/-/react-router-1.170.38.tgz#9c58a40d6a46b96a64457ba5969a65f47bf44f28"
-  integrity sha512-iHM9b0aDJbuvftmkiQXawzoqsdV68p2Re2safbVLCnxafe+iLKV++2i3hI/BMAP6uR92/Mjw94JKJJfD7pbwHQ==
+"@tanstack/react-router@^1.170.44":
+  version "1.170.44"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-router/-/react-router-1.170.44.tgz#5c2388d1305cbdd68a7ad4581e7359c0fc8c31d0"
+  integrity sha512-uIIZ3CHU1yWlkMkmbnGFX3WIfZozF+tNrOMMEoM9lo+jzPInCRq80LBqW3DH9ixNHWjB3TM/cNIvr05uGIlP3A==
   dependencies:
-    "@tanstack/history" "1.162.4"
-    "@tanstack/react-store" "^0.11.0"
-    "@tanstack/router-core" "1.171.32"
+    "@tanstack/history" "1.162.5"
+    "@tanstack/react-store" "^0.11.2"
+    "@tanstack/router-core" "1.171.37"
     isbot "^5.1.22"
 
-"@tanstack/react-store@^0.11.0":
-  version "0.11.1"
-  resolved "https://registry.npmjs.org/@tanstack/react-store/-/react-store-0.11.1.tgz#e1e58036ffffa58f5b5d8826c2389f97502fac2c"
-  integrity sha512-HaIGKI3YLmjBYIvy5DFDY23oNaYZIsTZfngey07Uh5iLVJgM3bIGCnZeOFOqzjFld9JHWcaHJnasD/bKoGKwJQ==
+"@tanstack/react-store@^0.11.2":
+  version "0.11.2"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-store/-/react-store-0.11.2.tgz#14f81f98f43b04c34e76d348de3fe8488b3c3939"
+  integrity sha512-oj5O5DmiMWE+ih+SioX2ayC1kbK7d3fpLx0B75fPJr9nY3zU+hoW010yr64qXsY/9fyiLVE2bn5mGNV3owm8RQ==
   dependencies:
-    "@tanstack/store" "0.11.1"
+    "@tanstack/store" "0.11.2"
     use-sync-external-store "^1.6.0"
 
-"@tanstack/router-core@1.171.32":
-  version "1.171.32"
-  resolved "https://registry.npmjs.org/@tanstack/router-core/-/router-core-1.171.32.tgz#7a8406fd80ad88ed7d65c389e856db63f6e5ade0"
-  integrity sha512-X86Jqk3vB2KJcUfS6oLi7B7yxbaa59QEhZRPPP1fRx3k+Jw/Fu1UYVBcRtdwK/OccQnrlQdVoKvNO3QXmyEBOw==
+"@tanstack/router-core@1.171.37":
+  version "1.171.37"
+  resolved "https://registry.yarnpkg.com/@tanstack/router-core/-/router-core-1.171.37.tgz#dd5b3e8f0a12f5b29cda007e594696c03916f976"
+  integrity sha512-11Le36++mHNeeFIABz4C3PdTWyJ1ilOmGmANOQOypknZwC1xN674al5BUqWuimKasWane1/XSNcEx8NYNHh0+A==
   dependencies:
-    "@tanstack/history" "1.162.4"
+    "@tanstack/history" "1.162.5"
     cookie-es "^3.0.0"
-    seroval "^1.6.2"
-    seroval-plugins "^1.6.2"
+    seroval "^1.6.7"
+    seroval-plugins "^1.6.7"
 
-"@tanstack/store@0.11.1":
-  version "0.11.1"
-  resolved "https://registry.npmjs.org/@tanstack/store/-/store-0.11.1.tgz#063f634fe3cc925ad83704581a7be75301bec612"
-  integrity sha512-mzTOBhypOuDJAy/D8n2MfUZ1HFkXnmSETviRyhqEC8LUE7/IZQExOTxMANj3KjTofYTkFNpBY67qaVrT41YccA==
+"@tanstack/store@0.11.2":
+  version "0.11.2"
+  resolved "https://registry.yarnpkg.com/@tanstack/store/-/store-0.11.2.tgz#cea02e554a483c7334a64a3ca2c0e4b703ba8531"
+  integrity sha512-sJ4mjol8uQsHV0gOJzzjwXfh2Fwm+Sz0+8deqiTm4jGbMdjzNSW+xZCFm0kUa870uhd8yi+DpKnZb5Kc4apa0Q==
 
 "@testing-library/dom@^10.4.1":
   version "10.4.2"
@@ -2914,7 +2914,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.4:
   resolved "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.11.tgz#4183e4e8bf08bb6e05bbb2f7d2e0c8f712ca40e3"
   integrity sha512-RbJ5/jmFcNNCcDV5o9eTnBLJ/HszWV0P73bc+Ff4nS/rJj+YaS6IGyiOL0VoBYX+l1Wrl3k63h/KrH+nhJ0XvQ==
 
-graphql-config@^5.1.6, graphql-config@^5.1.8:
+graphql-config@^5.1.8:
   version "5.1.8"
   resolved "https://registry.npmjs.org/graphql-config/-/graphql-config-5.1.8.tgz#09329751205bc94153359a7fe9d11b4527a15d04"
   integrity sha512-7DyT4ctUiNRMAU19IFy8o1zoQCJPjik1/vBwWIZlILGI6O1mHZXd59rUzF81oglNyHtPrNNCWonqfwu58BG66A==
@@ -4124,15 +4124,15 @@ semver@~7.7.0:
   resolved "https://registry.npmjs.org/semver/-/semver-7.7.4.tgz#28464e36060e991fa7a11d0279d2d3f3b57a7e8a"
   integrity sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==
 
-seroval-plugins@^1.6.2:
-  version "1.6.7"
-  resolved "https://registry.npmjs.org/seroval-plugins/-/seroval-plugins-1.6.7.tgz#4aba839a2fdafa9c115d965a71861d4b288b90c1"
-  integrity sha512-4Nk35ttD3DTDJW4hgw5StsVAPeU6qnDFnULAouw6tQ7oLTV/ICXrWpsXo2EE52eSP2joUMazbVf52mFEcADqRw==
+seroval-plugins@^1.6.7:
+  version "1.6.9"
+  resolved "https://registry.yarnpkg.com/seroval-plugins/-/seroval-plugins-1.6.9.tgz#54bbbe553db9a575b8c3711312d2e9c5813549a4"
+  integrity sha512-kiDK/Tb8IWZ61WEU8pA2PDmAuw37gKph9Y77OZlD56mg0Y2g0Bg7gZ1HeHhs5d40w+nRoUq/wj08V26ilbez9g==
 
-seroval@^1.6.2:
-  version "1.6.7"
-  resolved "https://registry.npmjs.org/seroval/-/seroval-1.6.7.tgz#b33953ac59aec5bde14f99e010bdaa7a507ae2db"
-  integrity sha512-AeDcLh0yO2SFm9W71essgnSzLV9DI8ZH0x0knXn2DMnUZj728mpLbxjlbB6IqKCmqh8JA3cEqRyGoNkt584JcQ==
+seroval@^1.6.7:
+  version "1.6.9"
+  resolved "https://registry.yarnpkg.com/seroval/-/seroval-1.6.9.tgz#f6cdae92cf2fdeee19c6097e3b2089913f96f3dc"
+  integrity sha512-UeEzHwAK+yl0YLbsvROV1t5yMYEwZZ0CfKYxDvUgS2fO9Vxdf8djqVIB+OuVpuawRNPqw68LE1Du/GMsW2ZPqA==
 
 set-function-length@^1.2.2:
   version "1.2.2"
