@@ -40,7 +40,7 @@
 		"@tanstack/react-router": "^1.170.46",
 		"@urql/core": "^6.0.3",
 		"@urql/exchange-auth": "^3.0.0",
-		"graphql": "^17.0.2",
+		"graphql": "^17.1.0",
 		"react": "^19.2.8",
 		"react-dom": "^19.2.8",
 		"react-hook-form": "^7.91.0",
