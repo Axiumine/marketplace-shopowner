@@ -50,11 +50,11 @@ project.
 Ahead of its eight gates the pre-push hook selects node itself. It reads `engines.node` from `package.json`
 — never a hard-coded version — and sources nvm to switch if the current node does not satisfy it.
 
-This is necessary because every gate shells out to yarn and yarn's `engines` check is a hard failure: on
-the wrong node the push used to die at step 1 with `The engine "node" is incompatible with this module`,
-printed under the banner about type errors, which is not what had gone wrong. If nvm is absent or the
-version is not installed, the hook blocks with the `nvm install` line instead of letting yarn report
-nonsense. All fourteen sub-repos that carry hooks have the same block now; it started in `marketplace-common`'s
+This is necessary because Yarn 4 does not enforce `engines` (yarn classic's check was a hard failure, and
+nothing took over), so this selection is the only enforcement: on the wrong node every gate would run on
+the wrong runtime and fail, if it fails, under that gate's banner, which is not what had gone wrong. If nvm
+is absent or the version is not installed, the hook blocks with the `nvm install` line instead of letting
+the gates report nonsense. All fourteen sub-repos that carry hooks have the same block now; it started in `marketplace-common`'s
 *pre-commit*, which is where it was copied from.
 
 ## Lint scope

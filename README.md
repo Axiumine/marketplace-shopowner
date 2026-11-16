@@ -74,11 +74,11 @@ a second collection hangs off `company`.
 
 ## Getting started
 
-Node **24.18.0** via nvm — `engines` is a hard gate under yarn classic, a mismatch exits 1.
+Node **24.18.0** via nvm — Yarn 4 does not enforce `engines`, so the hooks check the node version themselves.
 
 ```bash
 nvm use 24.18.0
-yarn install          # `prepare` points core.hooksPath at .githooks
+yarn install          # `postinstall` points core.hooksPath at .githooks
 cp env .env           # then edit: the dotted file is git-ignored, `env` is the committed template
 yarn codegen          # writes src/gql/ from schema/*.graphql
 yarn dev              # http://127.0.0.1:3044
