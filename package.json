@@ -33,7 +33,7 @@
 	},
 	"dependencies": {
 		"@axiumine/marketplace-common": "^4.6.0",
-		"@hookform/resolvers": "^7.0.3",
+		"@hookform/resolvers": "^7.0.6",
 		"@radix-ui/react-label": "^2.1.17",
 		"@sentry/react": "^11.11.0",
 		"@tanstack/react-router": "^1.170.46",
