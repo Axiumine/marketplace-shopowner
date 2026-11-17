@@ -92,7 +92,8 @@ describe('Toast', () => {
 
     expect(bar(screen.getByRole('status'))).toHaveStyle({
       animationName: 'countdown',
-      animationDuration: '5000ms',
+      // jsdom 31 serialises a computed time in seconds, as browsers do: 5000ms reads back as 5s.
+      animationDuration: '5s',
       animationTimingFunction: 'linear',
       animationFillMode: 'forwards',
       animationPlayState: 'running'
