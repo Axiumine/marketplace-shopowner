@@ -34,7 +34,7 @@ export default [
     // `src/gql/**`, which the source glob does match and which must stay here. The rest are kept
     // for two reasons that survive the scoping: eslint skips the directory instead of walking it,
     // and the eight backend repos list the same paths, so the nine configs stay comparable.
-    ignores: ['dist/**', 'coverage/**', '.stryker-tmp/**', 'reports/**', '.gitnexus/**', '.qodana/**', 'src/gql/**']
+    ignores: ['dist/**', 'coverage/**', '.stryker-tmp/**', 'reports/**', '.qodana/**', 'src/gql/**']
   },
   { ...js.configs.recommended, files: [...SOURCES, ...CONFIG_ROOT] },
   {
