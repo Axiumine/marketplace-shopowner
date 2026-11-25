@@ -187,6 +187,25 @@ describe('LoadingPage', () => {
     expect(getSession()).toBeNull()
   })
 
+  /*
+   * ⚠️ A 500 and not a 401. The client clears the token itself on a lost session, so the case above would
+   * pass with this page clearing no token — and it starts signed out, so it says nothing about the session
+   * either. Any other failure of the probe is cleaned up by the page alone.
+   */
+  it('clears everything itself when the probe fails for a reason the client leaves to the page', async () => {
+    stubGraphQL({
+      ShopOwnerCompanies: { errors: [graphQLError('Server error', 'Companies unavailable', 500)], status: 500 }
+    })
+    const { router, onSessionLost } = await renderRoute('/loading')
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/')
+    })
+    expect(onSessionLost).not.toHaveBeenCalled()
+    expect(getAccessToken()).toBeNull()
+    expect(getSession()).toBeNull()
+  })
+
   it('renders', async () => {
     stubGraphQL({ ShopOwnerCompanies: { pending: true } })
     const { container } = await renderRoute('/loading')

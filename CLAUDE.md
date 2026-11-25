@@ -5,14 +5,13 @@ Mirror of `marketplace-admin` — same stack, conventions, hooks — thinner bec
 backend is thinner.
 
 **Read parent first** — [`../CLAUDE.md`](https://github.com/Axiumine/fullstack-marketplace-blueprint/blob/main/CLAUDE.md)
-One of fifteen sub-repos; almost nothing here is changeable on its own.
+One of sixteen sub-repos; almost nothing here is changeable on its own.
 
 | Need | File |
 |---|---|
 | what the app is, screens that do not exist yet | [`README.md`](./README.md) |
 | hooks, gate order, lint scope, schema-vs-resolver divergences, source layout, testing conventions, gotchas | [`REPO.md`](./REPO.md) |
 | gate policy, Stryker survivors | [`COVERAGE.md`](./COVERAGE.md) |
-| GitNexus rules, registry name, CLI skill map | [`AGENTS.md`](./AGENTS.md) |
 | anything cross-repo | parent `CLAUDE.md` |
 
 ⚠️ **A shop owner sees their own companies and nothing else, and nothing in this app enforces it.**
@@ -66,11 +65,3 @@ A change here often is not local: operation shape → the resolver in
 slice, then `yarn codegen`. A model field → `marketplace-common`, published, then every consumer bumped.
 An index or a validator → `marketplace-db-setup`, as a new migration — **applied migrations are
 immutable**. **One logical change = N commits, one per repo.** There is no atomic cross-repo commit.
-
-## GitNexus
-
-Rules, registry name (`marketplace-shopowner`) and the CLI skill map are in
-[`AGENTS.md`](./AGENTS.md) — the block there is hand-maintained, not regenerated (`.gitnexusrc` sets
-`skipContextFiles`). Two rules apply everywhere in this workspace: run `impact({target, repo})` before
-editing a symbol, and run `detect_changes()` before committing — `repo:` is mandatory and must be a
-`marketplace*` registry name.

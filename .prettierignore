@@ -13,11 +13,10 @@ yarn.lock
 # on the next run and would show up as noise in every diff that touches an operation.
 src/gql/
 
-# Written by `gitnexus analyze` and by the skills installer on every run. .claude/skills/*
-# are symlinks into .agents/, so formatting them would write straight through the link.
+# Written by the skills installer on every run. .claude/skills/* are symlinks into .agents/, so
+# formatting them would write straight through the link.
 .agents/
 .claude/
-.gitnexus/
 skills-lock.json
 
 # Markdown is excluded on purpose, not by oversight: `proseWrap: "never"` collapses every

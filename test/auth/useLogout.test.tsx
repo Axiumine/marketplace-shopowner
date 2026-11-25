@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import { ENDPOINT } from '@/api/endpoints'
 import { getAccessToken } from '@/api/tokenStore'
-import { getSession } from '@/auth/session'
+import { getPendingEmail, getSession, setPendingEmail } from '@/auth/session'
 
 import { graphQLError, stubGraphQL } from '../helpers/graphql'
 import { stubLocationAssign } from '../helpers/location'
@@ -38,6 +38,18 @@ describe('useLogout', () => {
     expect(stub.calls[0]?.authorization).toBe('Bearer access:tok-1')
     expect(getAccessToken()).toBeNull()
     expect(getSession()).toBeNull()
+  })
+
+  // `/loading` reads the pending address without consuming it, so logout is the one place that drops it.
+  it('forgets the address typed at sign-in', async () => {
+    setPendingEmail('owner@marketplace.test')
+    stubGraphQL({ Logout: { data: { logout: true } } })
+    stubLocationAssign()
+    await renderRoute('/home')
+
+    await logout()
+
+    expect(getPendingEmail()).toBeNull()
   })
 
   // A logout that failed server-side still has to log the owner out of this browser. Keeping the

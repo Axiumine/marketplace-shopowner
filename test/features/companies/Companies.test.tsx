@@ -498,6 +498,30 @@ describe('Companies — editing', () => {
     expect(screen.queryByText('Certified email already registered')).not.toBeInTheDocument()
   })
 
+  /*
+   * ⚠️ A company that has been written is clean again even when a later one is refused. Nothing remounts
+   * then, so a card that stayed dirty would be written a second time by the retry.
+   */
+  it('does not write a stored company again when the retry is about another', async () => {
+    const stub = stubGraphQL({
+      ...companies([company, companyTwo]),
+      CompanyUpdate: [
+        { data: { companyUpdate: true } },
+        { errors: [graphQLError('Server error', 'Certified email already registered', 409)], status: 409 }
+      ]
+    })
+    await editBothContactPersons()
+
+    expect(await screen.findByText('Certified email already registered')).toBeInTheDocument()
+
+    await userEvent.click(save())
+
+    await waitFor(() => {
+      expect(writes(stub)).toHaveLength(3)
+    })
+    expect(writes(stub).map((call) => call.variables['_id'])).toEqual([ID_COMPANY, companyTwo._id, companyTwo._id])
+  })
+
   // `false` with no error at all: no resolver answers that way, but `Boolean!` says it could, and a save
   // reported as successful would be worse than a generic line.
   it('reports a bare refusal', async () => {
@@ -1178,6 +1202,31 @@ describe('Companies — new company', () => {
     // The list refetches on `additionalTypenames` and the stored company takes the card's place. A
     // placeholder left behind would show the same company twice, the second time as a form adding it again.
     expect(screen.queryByRole('heading', { name: NEW, level: 3 })).toBeNull()
+  })
+
+  /*
+   * ⚠️ A stored card goes even when the press as a whole fails. The page remounts its sections only when
+   * every one of them succeeded, so nothing else would take it down — and the retry would add the same
+   * company a second time.
+   */
+  it('drops a stored card even when the card after it is refused', async () => {
+    const stub = stubNetwork({ ...companies([]), ...OK_ADD }, withAddress)
+    await renderRoute(PAGE)
+
+    await screen.findByText('No company registered.')
+    await add()
+    await fill()
+    await add()
+    await userEvent.click(save())
+
+    expect(await page().findByText('Legal name is required')).toBeInTheDocument()
+    expect(newCards()).toHaveLength(1)
+
+    await fill()
+    await userEvent.click(save())
+
+    await screen.findByText('Changes saved.')
+    expect(adds(stub)).toHaveLength(2)
   })
 
   /*

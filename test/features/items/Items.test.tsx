@@ -713,6 +713,32 @@ describe('Items — editing', () => {
     expect(screen.queryByText('Slug already used in this shop')).not.toBeInTheDocument()
   })
 
+  /*
+   * ⚠️ An item that has been written is clean again even when a later one is refused. Nothing remounts then,
+   * so a card that stayed dirty would be written a second time by the retry.
+   */
+  it('does not write a stored item again when the retry is about another', async () => {
+    const stub = stubGraphQL({
+      ...shops([shop]),
+      ...catalogue([item, itemTwo]),
+      ...taxonomy([categoryTop, categoryChild]),
+      ItemUpdate: [
+        { data: { itemUpdate: true } },
+        { errors: [graphQLError('Server error', 'Slug already used in this shop', 409)], status: 409 }
+      ]
+    })
+    await editBothNames()
+
+    expect(await screen.findByText('Slug already used in this shop')).toBeInTheDocument()
+
+    await userEvent.click(save())
+
+    await waitFor(() => {
+      expect(writes(stub)).toHaveLength(3)
+    })
+    expect(writes(stub).map((call) => call.variables['_id'])).toEqual([ID_ITEM, ID_ITEM_TWO, ID_ITEM_TWO])
+  })
+
   // `false` with no error at all: no resolver answers that way, but `Boolean!` says it could, and a save
   // reported as successful would be worse than a generic line.
   it('reports a bare refusal', async () => {
@@ -1183,6 +1209,26 @@ describe('Items — bulk publishing', () => {
     expect(screen.getByText('1 of 2 selected')).toBeInTheDocument()
   })
 
+  // The bar's error line is about the last write, and nothing remounts the bar to take it down: a bulk write
+  // is not the page's Save.
+  it('clears its toast once a later write goes through', async () => {
+    await loaded({
+      ItemsUpdatePublished: [{ data: { itemsUpdatePublished: false } }, { data: { itemsUpdatePublished: true } }]
+    })
+
+    await tick(item.name)
+    await userEvent.click(publishSelected())
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('The write was refused.')
+
+    await userEvent.click(publishSelected())
+
+    await waitFor(() => {
+      expect(screen.getByText('0 of 2 selected')).toBeInTheDocument()
+    })
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
   it('shuts both buttons while the write is in flight', async () => {
     await loaded({ ItemsUpdatePublished: { pending: true } })
 
@@ -1577,6 +1623,32 @@ describe('Items — new item', () => {
     // placeholder left behind would offer to add the same item a second time.
     expect(screen.queryByRole('heading', { name: NEW, level: 3 })).toBeNull()
     expect(await screen.findByRole('heading', { name: itemTwo.name, level: 3 })).toBeInTheDocument()
+  })
+
+  /*
+   * ⚠️ A stored card goes even when the press as a whole fails. The page remounts its sections only when
+   * every one of them succeeded, so nothing else would take it down — and the retry would add the same item
+   * a second time.
+   */
+  it('drops a stored card even when the card after it is refused', async () => {
+    const stub = stubGraphQL({ ...shops([shop]), ...catalogue([]), ...taxonomy([categoryTop]), ...OK_ADD })
+    await renderRoute(PAGE)
+    await chooseShop()
+
+    await screen.findByText('No item in this shop.')
+    await add()
+    fill()
+    await add()
+    await userEvent.click(save())
+
+    expect(await page().findByText('Name is required')).toBeInTheDocument()
+    expect(newCards()).toHaveLength(1)
+
+    fill()
+    await userEvent.click(save())
+
+    await screen.findByText('Changes saved.')
+    expect(adds(stub)).toHaveLength(2)
   })
 
   /*
