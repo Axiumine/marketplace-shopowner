@@ -389,6 +389,24 @@ describe('AddressField', () => {
   })
 
   /*
+   * A pick throws the answer away rather than only hiding it. The debounce still holds the query that
+   * produced it for a moment after the pick, so a key pressed in that window would otherwise bring the old
+   * matches back, under a box that no longer says what they answered.
+   */
+  it('does not bring the old matches back under the next keystroke', async () => {
+    installOsm({ results: [BOSTON] })
+    render(<Host compose={composed} />)
+
+    write('main street boston')
+    await awaitSearch()
+    fireEvent.click(screen.getByRole('button', { name: 'Main Street, 1, Boston, MA, 02108, USA' }))
+    write('1 Main Street, 02108 Boston (MA) 2')
+
+    expect(screen.queryByRole('list')).not.toBeInTheDocument()
+    expect(screen.getByRole('status')).toHaveTextContent('Searching addresses')
+  })
+
+  /*
    * A form editing an address that already exists hands the field its text, and that text is not
    * something anybody typed. Geocoding it would open a list of suggestions over an address nobody asked
    * about, and spend a request on a donated service to do it.

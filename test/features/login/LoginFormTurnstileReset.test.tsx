@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createGraphQLClient } from '@/api/client'
 
+import type { GraphQLReply } from '../../helpers/graphql'
 import { stubGraphQL } from '../../helpers/graphql'
 
 /**
@@ -47,42 +48,46 @@ afterEach(() => {
   document.getElementById(SCRIPT_ID)?.remove()
 })
 
+/** The login page mounted with a site key configured, and the stand-in widget it asks for a token. */
+const renderLogin = async (logins: readonly GraphQLReply[]) => {
+  vi.stubEnv('VITE_TURNSTILE_SITE_KEY', SITE_KEY)
+  vi.resetModules()
+
+  // A script already in the document resolves `loadScript()` immediately — see the same technique
+  // in `Turnstile.test.tsx` — so the widget renders without a `load` event to fire by hand.
+  const existing = document.createElement('script')
+  existing.id = SCRIPT_ID
+  document.head.append(existing)
+
+  const api = widgetApi()
+  const { createAppRouter } = await import('@/router')
+  const router = createAppRouter(createMemoryHistory({ initialEntries: ['/'] }))
+
+  const stub = stubGraphQL({ Login: logins, ShopOwnerCompanies: { data: { shopOwnerCompanies: [] } } })
+
+  render(
+    <UrqlProvider value={createGraphQLClient({ onSessionLost: vi.fn() })}>
+      <RouterProvider router={router as never} />
+    </UrqlProvider>
+  )
+
+  await waitFor(() => {
+    expect(router.state.status).toBe('idle')
+  })
+  await waitFor(() => {
+    expect(api.render).toHaveBeenCalledTimes(1)
+  })
+
+  return { api, stub }
+}
+
 describe('LoginForm, with a Turnstile site key configured', () => {
   it('remounts the widget after a refused submit and sends the fresh token it issues', async () => {
-    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', SITE_KEY)
-    vi.resetModules()
-
-    // A script already in the document resolves `loadScript()` immediately — see the same technique
-    // in `Turnstile.test.tsx` — so the widget renders without a `load` event to fire by hand.
-    const existing = document.createElement('script')
-    existing.id = SCRIPT_ID
-    document.head.append(existing)
-
-    const api = widgetApi()
-    const { createAppRouter } = await import('@/router')
-    const router = createAppRouter(createMemoryHistory({ initialEntries: ['/'] }))
-
-    const stub = stubGraphQL({
-      Login: [
-        { data: { login: { accessToken: '', onboardingStep: '', onboardingDone: false } } },
-        { data: { login: { accessToken: '', onboardingStep: '', onboardingDone: false } } },
-        { data: { login: { accessToken: 'tok-2', onboardingStep: '', onboardingDone: false } } }
-      ],
-      ShopOwnerCompanies: { data: { shopOwnerCompanies: [] } }
-    })
-
-    render(
-      <UrqlProvider value={createGraphQLClient({ onSessionLost: vi.fn() })}>
-        <RouterProvider router={router as never} />
-      </UrqlProvider>
-    )
-
-    await waitFor(() => {
-      expect(router.state.status).toBe('idle')
-    })
-    await waitFor(() => {
-      expect(api.render).toHaveBeenCalledTimes(1)
-    })
+    const { api, stub } = await renderLogin([
+      { data: { login: { accessToken: '', onboardingStep: '', onboardingDone: false } } },
+      { data: { login: { accessToken: '', onboardingStep: '', onboardingDone: false } } },
+      { data: { login: { accessToken: 'tok-2', onboardingStep: '', onboardingDone: false } } }
+    ])
 
     // The shop owner solves the challenge and submits with a wrong password.
     act(() => {
@@ -143,5 +148,34 @@ describe('LoginForm, with a Turnstile site key configured', () => {
       expect(stub.calls.filter((call) => call.operationName === 'Login')).toHaveLength(3)
     })
     expect(stub.calls[2]?.variables).toMatchObject({ turnstileToken: 'token-3' })
+  })
+
+  /*
+   * The other half of the fix. The fresh widget takes a moment to solve, and a resubmit that beats it has to
+   * go out with no token at all: the one still held was spent on the attempt that was just refused.
+   */
+  it('sends no token on a resubmit that beats the fresh widget', async () => {
+    const { api, stub } = await renderLogin([
+      { data: { login: { accessToken: '', onboardingStep: '', onboardingDone: false } } }
+    ])
+
+    act(() => {
+      api.optionsAt(0).callback('token-1')
+    })
+    await userEvent.type(screen.getByLabelText('Email'), 'owner@marketplace.test')
+    await userEvent.type(screen.getByLabelText('Password'), 'wrong-password')
+    await userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
+
+    await screen.findByText('Invalid credentials')
+    await waitFor(() => {
+      expect(api.render).toHaveBeenCalledTimes(2)
+    })
+
+    await userEvent.click(screen.getByRole('button', { name: 'Sign in' }))
+
+    await waitFor(() => {
+      expect(stub.calls.filter((call) => call.operationName === 'Login')).toHaveLength(2)
+    })
+    expect(stub.calls[1]?.variables).toMatchObject({ turnstileToken: null })
   })
 })
