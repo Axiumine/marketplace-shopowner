@@ -5,7 +5,7 @@ Mirror of `marketplace-admin` — same stack, conventions, hooks — thinner bec
 backend is thinner.
 
 **Read parent first** — [`../CLAUDE.md`](https://github.com/Axiumine/fullstack-marketplace-blueprint/blob/main/CLAUDE.md)
-One of fifteen sub-repos; almost nothing here is changeable on its own.
+One of sixteen sub-repos; almost nothing here is changeable on its own.
 
 | Need | File |
 |---|---|
